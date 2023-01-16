@@ -31,13 +31,13 @@
 #include "util/singleton.h"
 
 namespace archimedes {
+	class name_generator;
 	enum class gender;
 }
 
 namespace wyrmgus {
 
 class gendered_name_generator;
-class name_generator;
 
 class fallback_name_generator final : public singleton<fallback_name_generator>
 {

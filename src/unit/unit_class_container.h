@@ -30,7 +30,7 @@ namespace wyrmgus {
 
 class unit_class;
 
-struct unit_class_compare
+struct unit_class_compare final
 {
 	bool operator()(const unit_class *unit_class, const wyrmgus::unit_class *other_unit_class) const;
 };

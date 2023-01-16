@@ -28,8 +28,13 @@
 
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
+#include "unit/unit_class_container.h"
 
 class CPlayer;
+
+namespace archimedes {
+	class name_generator;
+}
 
 namespace wyrmgus {
 
@@ -85,6 +90,8 @@ public:
 
 		unit_class::unit_classes_by_0_ad_template_name.clear();
 	}
+
+	static void propagate_unit_class_names(const unit_class_map<std::unique_ptr<name_generator>> &unit_class_name_generators, std::unique_ptr<name_generator> &ship_name_generator);
 
 private:
 	static inline std::map<std::string, const unit_class *> unit_classes_by_0_ad_template_name;

@@ -28,6 +28,7 @@
 
 #include "unit/unit_class.h"
 
+#include "language/name_generator.h"
 #include "map/terrain_type.h"
 #include "script/condition/and_condition.h"
 #include "unit/unit_type.h"
@@ -35,6 +36,21 @@
 #include "util/vector_util.h"
 
 namespace wyrmgus {
+
+void unit_class::propagate_unit_class_names(const unit_class_map<std::unique_ptr<name_generator>> &unit_class_name_generators, std::unique_ptr<name_generator> &ship_name_generator)
+{
+	for (const auto &kv_pair : unit_class_name_generators) {
+		const unit_class *unit_class = kv_pair.first;
+
+		if (unit_class->is_ship()) {
+			if (ship_name_generator == nullptr) {
+				ship_name_generator = std::make_unique<name_generator>();
+			}
+
+			ship_name_generator->add_names(kv_pair.second->get_names());
+		}
+	}
+}
 
 unit_class::unit_class(const std::string &identifier) : named_data_entry(identifier)
 {

@@ -29,7 +29,7 @@
 #include "fallback_name_generator.h"
 
 #include "gendered_name_generator.h"
-#include "name_generator.h"
+#include "language/name_generator.h"
 #include "unit/unit_class.h"
 #include "util/gender.h"
 #include "util/vector_util.h"
@@ -122,7 +122,7 @@ void fallback_name_generator::add_unit_class_names(const unit_class_map<std::uni
 		this->unit_class_name_generators[kv_pair.first]->add_names(kv_pair.second->get_names());
 	}
 
-	name_generator::propagate_unit_class_names(unit_class_names, this->ship_name_generator);
+	unit_class::propagate_unit_class_names(unit_class_names, this->ship_name_generator);
 }
 
 void fallback_name_generator::add_ship_names(const std::vector<name_variant> &ship_names)

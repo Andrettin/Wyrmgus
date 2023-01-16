@@ -33,10 +33,10 @@
 #include "character.h"
 #include "character_title.h"
 #include "fallback_name_generator.h"
+#include "language/name_generator.h"
 #include "luacallback.h"
 #include "map/region.h"
 #include "map/site.h"
-#include "name_generator.h"
 #include "player/civilization.h"
 #include "player/diplomacy_state.h"
 #include "player/faction_history.h"
@@ -338,7 +338,7 @@ void faction::initialize()
 		fallback_name_generator::get()->add_ship_names(this->ship_name_generator->get_names());
 	}
 
-	name_generator::propagate_unit_class_names(this->unit_class_name_generators, this->ship_name_generator);
+	unit_class::propagate_unit_class_names(this->unit_class_name_generators, this->ship_name_generator);
 
 	data_entry::initialize();
 }

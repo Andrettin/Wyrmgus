@@ -55,6 +55,7 @@ extern int CclDefinePredependency(lua_State *l);
 extern int CclDefineUnitType(lua_State *l);
 
 namespace archimedes {
+	class name_generator;
 	enum class colorization_type;
 	enum class gender;
 }
@@ -72,7 +73,6 @@ namespace wyrmgus {
 	class font;
 	class icon;
 	class missile_type;
-	class name_generator;
 	class player_color;
 	class renderer;
 	class resource;

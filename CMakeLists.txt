@@ -461,7 +461,6 @@ set(wyrmgus_base_SRCS
 	src/stratagus/magic_domain.cpp
 	src/stratagus/mainloop.cpp
 	src/stratagus/mod.cpp
-	src/stratagus/name_generator.cpp
 	src/stratagus/parameters.cpp
 	src/stratagus/script.cpp
 	src/stratagus/script_character.cpp
@@ -1212,7 +1211,6 @@ set(wyrmgus_generic_HDRS
 	src/stratagus/gendered_name_generator.h
 	src/stratagus/literary_text.h
 	src/stratagus/magic_domain.h
-	src/stratagus/name_generator.h
 	src/stratagus/parameters.h
 	src/stratagus/text_processing_context.h
 	src/stratagus/text_processor.h

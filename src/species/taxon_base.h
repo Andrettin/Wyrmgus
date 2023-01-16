@@ -39,13 +39,13 @@ extern int CclDefineSpeciesClass(lua_State *l);
 extern int CclDefineSpeciesPhylum(lua_State *l);
 
 namespace archimedes {
+	class name_generator;
 	enum class gender;
 }
 
 namespace wyrmgus {
 
 class gendered_name_generator;
-class name_generator;
 class taxon;
 enum class taxonomic_rank;
 

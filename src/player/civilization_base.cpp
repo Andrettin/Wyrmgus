@@ -32,7 +32,7 @@
 #include "database/gsml_operator.h"
 #include "fallback_name_generator.h"
 #include "gendered_name_generator.h"
-#include "name_generator.h"
+#include "language/name_generator.h"
 #include "player/civilization_group.h"
 #include "player/civilization_history.h"
 #include "player/faction.h"
@@ -179,7 +179,7 @@ void civilization_base::initialize()
 	}
 
 	fallback_name_generator::get()->add_unit_class_names(this->unit_class_name_generators);
-	name_generator::propagate_unit_class_names(this->unit_class_name_generators, this->ship_name_generator);
+	unit_class::propagate_unit_class_names(this->unit_class_name_generators, this->ship_name_generator);
 
 	if (this->ship_name_generator != nullptr) {
 		fallback_name_generator::get()->add_ship_names(this->ship_name_generator->get_names());
@@ -530,7 +530,7 @@ void civilization_base::add_names_from(const civilization_base *other)
 		this->unit_class_name_generators[kv_pair.first]->add_names(kv_pair.second->get_names());
 	}
 
-	name_generator::propagate_unit_class_names(other->unit_class_name_generators, this->ship_name_generator);
+	unit_class::propagate_unit_class_names(other->unit_class_name_generators, this->ship_name_generator);
 
 	if (other->ship_name_generator != nullptr) {
 		if (this->ship_name_generator == nullptr) {
@@ -555,7 +555,7 @@ void civilization_base::add_names_from(const faction *faction)
 		this->unit_class_name_generators[kv_pair.first]->add_names(kv_pair.second->get_names());
 	}
 
-	name_generator::propagate_unit_class_names(faction->get_unit_class_name_generators(), this->ship_name_generator);
+	unit_class::propagate_unit_class_names(faction->get_unit_class_name_generators(), this->ship_name_generator);
 
 	if (faction->get_ship_name_generator() != nullptr) {
 		if (this->ship_name_generator == nullptr) {

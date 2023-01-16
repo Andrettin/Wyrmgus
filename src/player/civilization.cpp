@@ -34,7 +34,7 @@
 #include "character.h"
 #include "character_title.h"
 #include "database/defines.h"
-#include "name_generator.h"
+#include "language/name_generator.h"
 #include "player/civilization_group.h"
 #include "player/faction.h"
 #include "player/faction_tier.h"

@@ -44,6 +44,7 @@ enum class ButtonCmd;
 extern int CclDefineFaction(lua_State *l);
 
 namespace archimedes {
+	class name_generator;
 	enum class gender;
 }
 
@@ -56,7 +57,6 @@ class deity;
 class dynasty;
 class faction_history;
 class icon;
-class name_generator;
 class region;
 class resource;
 class site;
