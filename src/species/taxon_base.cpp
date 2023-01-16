@@ -30,7 +30,7 @@
 
 #include "database/gsml_data.h"
 #include "fallback_name_generator.h"
-#include "gendered_name_generator.h"
+#include "language/gendered_name_generator.h"
 #include "language/name_generator.h"
 #include "species/taxon.h"
 #include "util/gender.h"

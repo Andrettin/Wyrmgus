@@ -33,6 +33,7 @@
 class CUpgrade;
 
 namespace archimedes {
+	class gendered_name_generator;
 	class name_generator;
 	enum class gender;
 }
@@ -43,7 +44,6 @@ class civilization_group;
 class civilization_history;
 class cursor;
 class faction;
-class gendered_name_generator;
 class player_color;
 class population_class;
 class population_type;

@@ -28,7 +28,7 @@
 
 #include "fallback_name_generator.h"
 
-#include "gendered_name_generator.h"
+#include "language/gendered_name_generator.h"
 #include "language/name_generator.h"
 #include "unit/unit_class.h"
 #include "util/gender.h"

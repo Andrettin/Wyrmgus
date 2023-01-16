@@ -31,7 +31,7 @@
 #include "database/gsml_data.h"
 #include "database/gsml_operator.h"
 #include "fallback_name_generator.h"
-#include "gendered_name_generator.h"
+#include "language/gendered_name_generator.h"
 #include "language/name_generator.h"
 #include "player/civilization_group.h"
 #include "player/civilization_history.h"
