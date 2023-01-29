@@ -27,6 +27,7 @@
 #pragma once
 
 #pragma warning(push, 0)
+#include <GL/gl.h>
 #include <QOpenGLTexture>
 #include <QOpenGLTextureBlitter>
 #pragma warning(pop)
