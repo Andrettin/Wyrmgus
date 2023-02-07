@@ -58,7 +58,7 @@ public:
 
 	const condition<scope_type> *get_conditions() const
 	{
-		return this->conditions;
+		return this->conditions.get();
 	}
 
 private:

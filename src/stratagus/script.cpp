@@ -1766,7 +1766,7 @@ std::string EvalString(const StringDesc *s)
 		case EString_TypeRequirementsString : // name of the unit type's requirements string
 			type = s->D.Type;
 			if (type != nullptr) {
-				return (**type).get_requirements_string();
+				return (**type).get_requirements_string(CPlayer::GetThisPlayer());
 			} else { // ERROR.
 				return std::string();
 			}

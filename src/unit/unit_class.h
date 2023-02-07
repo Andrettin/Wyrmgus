@@ -44,6 +44,9 @@ class upgrade_class;
 template <typename scope_type>
 class condition;
 
+template <typename scope_type>
+class conditional_string;
+
 class unit_class final : public named_data_entry, public data_type<unit_class>
 {
 	Q_OBJECT
@@ -138,6 +141,8 @@ public:
 		return this->requirements_string;
 	}
 
+	const std::string &get_requirements_string(const CPlayer *player) const;
+
 	const std::vector<unit_type *> &get_unit_types() const
 	{
 		return this->unit_types;
@@ -209,6 +214,7 @@ private:
 	std::unique_ptr<condition<CPlayer>> preconditions;
 	std::unique_ptr<condition<CPlayer>> conditions;
 	std::string requirements_string;
+	std::vector<std::unique_ptr<const conditional_string<CPlayer>>> conditional_requirements_strings;
 	std::vector<unit_type *> unit_types;
 	unit_class *tech_tree_parent_unit_class = nullptr;
 	upgrade_class *tech_tree_parent_upgrade_class = nullptr;

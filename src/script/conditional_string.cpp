@@ -30,6 +30,7 @@
 
 #include "database/gsml_property.h"
 #include "script/condition/and_condition.h"
+#include "util/assert_util.h"
 
 namespace wyrmgus {
 

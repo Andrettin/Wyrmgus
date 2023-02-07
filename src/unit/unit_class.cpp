@@ -31,6 +31,7 @@
 #include "language/name_generator.h"
 #include "map/terrain_type.h"
 #include "script/condition/and_condition.h"
+#include "script/conditional_string.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_class.h"
 #include "util/vector_util.h"
@@ -65,7 +66,13 @@ void unit_class::process_gsml_scope(const gsml_data &scope)
 	const std::string &tag = scope.get_tag();
 	const std::vector<std::string> &values = scope.get_values();
 
-	if (tag == "preconditions") {
+	if (tag == "conditional_requirements_strings") {
+		scope.for_each_child([&](const gsml_data &child_scope) {
+			auto conditional_string = std::make_unique<wyrmgus::conditional_string<CPlayer>>();
+			database::process_gsml_data(conditional_string, child_scope);
+			this->conditional_requirements_strings.push_back(std::move(conditional_string));
+		});
+	} else if (tag == "preconditions") {
 		this->preconditions = std::make_unique<and_condition<CPlayer>>();
 		database::process_gsml_data(this->preconditions, scope);
 	} else if (tag == "conditions") {
@@ -119,6 +126,21 @@ void unit_class::set_town_hall(const bool town_hall)
 	} else {
 		vector::remove(unit_class::town_hall_classes, this);
 	}
+}
+
+const std::string &unit_class::get_requirements_string(const CPlayer *player) const
+{
+	const read_only_context ctx = read_only_context::from_scope(player);
+
+	for (const auto &conditional_string : this->conditional_requirements_strings) {
+		if (!conditional_string->get_conditions()->check(player, ctx)) {
+			continue;
+		}
+
+		return conditional_string->get_text();
+	}
+
+	return this->get_requirements_string();
 }
 
 bool unit_class::has_unit_type(unit_type *unit_type) const

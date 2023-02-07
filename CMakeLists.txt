@@ -358,6 +358,7 @@ source_group(religion FILES ${religion_SRCS})
 
 set(script_SRCS
 	src/script/cheat.cpp
+	src/script/conditional_string.cpp
 	src/script/context.cpp
 	src/script/factor.cpp
 	src/script/factor_modifier.cpp
@@ -900,6 +901,7 @@ set(wyrmgus_religion_HDRS
 
 set(wyrmgus_script_HDRS
 	src/script/cheat.h
+	src/script/conditional_string.h
 	src/script/context.h
 	src/script/factor.h
 	src/script/factor_modifier.h

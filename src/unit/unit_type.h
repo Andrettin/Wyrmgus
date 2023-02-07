@@ -96,6 +96,9 @@ namespace wyrmgus {
 
 	template <typename scope_type>
 	class condition;
+
+	template <typename scope_type>
+	class conditional_string;
 }
 
 constexpr int UnitSides = 8;
@@ -1109,6 +1112,7 @@ public:
 	}
 
 	const std::string &get_requirements_string() const;
+	const std::string &get_requirements_string(const CPlayer *player) const;
 
 	bool can_gain_experience() const;
 	bool is_infantry() const;
@@ -1144,6 +1148,7 @@ private:
 	wyrmgus::faction *faction = nullptr; //which faction this unit belongs to, if any
 	std::vector<const unit_type *> subtypes; //subtypes of this type; when a unit of this type is created, it has a subtype picked automatically instead
 	std::string requirements_string;
+	std::vector<std::unique_ptr<const conditional_string<CPlayer>>> conditional_requirements_strings;
 public:
 	std::string ExperienceRequirementsString;	/// Experience requirements string of the unit type
 	std::string BuildingRulesString;	/// Building rules string of the unit type
