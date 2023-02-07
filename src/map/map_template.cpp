@@ -121,7 +121,7 @@ void map_template::set_terrain_image_pixel(QImage &terrain_image, const QPoint &
 
 map_template::map_template(const std::string &identifier)
 	: named_data_entry(identifier), CDataType(identifier),
-	georectangle(geocoordinate(geocoordinate::min_longitude, geocoordinate::min_latitude), geocoordinate(geocoordinate::max_longitude, geocoordinate::max_latitude))
+	georectangle(geocoordinate(0, 0), geocoordinate(0, 0))
 {
 }
 
