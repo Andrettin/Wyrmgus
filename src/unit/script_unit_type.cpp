@@ -1443,7 +1443,7 @@ int CclDefineUnitType(lua_State *l)
 		} else if (!strcmp(value, "Background")) {
 			type->set_background(LuaToString(l, -1));
 		} else if (!strcmp(value, "RequirementsString")) {
-			type->RequirementsString = LuaToString(l, -1);
+			type->requirements_string = LuaToString(l, -1);
 		} else if (!strcmp(value, "BuildingRulesString")) {
 			type->BuildingRulesString = LuaToString(l, -1);
 		} else if (!strcmp(value, "TrainQuantity")) {
@@ -1890,7 +1890,7 @@ static int CclGetUnitTypeData(lua_State *l)
 		lua_pushstring(l, type->get_background().c_str());
 		return 1;
 	} else if (!strcmp(data, "RequirementsString")) {
-		lua_pushstring(l, type->RequirementsString.c_str());
+		lua_pushstring(l, type->get_requirements_string().c_str());
 		return 1;
 	} else if (!strcmp(data, "ExperienceRequirementsString")) {
 		lua_pushstring(l, type->ExperienceRequirementsString.c_str());

@@ -747,7 +747,7 @@ void unit_type::process_gsml_property(const gsml_property &property)
 			throw std::runtime_error("Invalid right mouse action: \"" + value + "\".");
 		}
 	} else if (key == "requirements_string") {
-		this->RequirementsString = value;
+		this->requirements_string = value;
 	} else if (key == "experience_requirements_string") {
 		this->ExperienceRequirementsString = value;
 	} else if (key == "build_restrictions_string") {
@@ -1615,7 +1615,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 	this->neutral_random_movement_probability = parent_type->neutral_random_movement_probability;
 	this->random_movement_distance = parent_type->random_movement_distance;
 	this->given_resource = parent_type->given_resource;
-	this->RequirementsString = parent_type->RequirementsString;
+	this->requirements_string = parent_type->requirements_string;
 	this->ExperienceRequirementsString = parent_type->ExperienceRequirementsString;
 	this->BuildingRulesString = parent_type->BuildingRulesString;
 	this->elixir = parent_type->elixir;
@@ -2223,6 +2223,19 @@ QString unit_type::get_encyclopedia_background_file_qstring() const
 void unit_type::set_encyclopedia_background_file(const std::filesystem::path &filepath)
 {
 	this->encyclopedia_background_file = database::get()->get_graphics_filepath(filepath);
+}
+
+const std::string &unit_type::get_requirements_string() const
+{
+	if (!this->requirements_string.empty()) {
+		return this->requirements_string;
+	}
+
+	if (this->get_unit_class() != nullptr) {
+		return this->get_unit_class()->get_requirements_string();
+	}
+
+	return this->requirements_string;
 }
 
 bool unit_type::can_gain_experience() const

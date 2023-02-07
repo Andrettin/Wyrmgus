@@ -50,6 +50,7 @@ class unit_class final : public named_data_entry, public data_type<unit_class>
 
 	Q_PROPERTY(bool town_hall MEMBER town_hall READ is_town_hall)
 	Q_PROPERTY(bool ship MEMBER ship READ is_ship)
+	Q_PROPERTY(std::string requirements_string MEMBER requirements_string)
 	Q_PROPERTY(wyrmgus::unit_class* tech_tree_parent_unit_class MEMBER tech_tree_parent_unit_class)
 	Q_PROPERTY(wyrmgus::upgrade_class* tech_tree_parent_upgrade_class MEMBER tech_tree_parent_upgrade_class)
 	Q_PROPERTY(wyrmgus::data_entry* tech_tree_parent READ get_tech_tree_parent CONSTANT)
@@ -58,9 +59,9 @@ class unit_class final : public named_data_entry, public data_type<unit_class>
 	Q_PROPERTY(int tech_tree_width READ get_tech_tree_width CONSTANT)
 
 public:
-	static constexpr const char *class_identifier = "unit_class";
+	static constexpr const char class_identifier[] = "unit_class";
 	static constexpr const char property_class_identifier[] = "wyrmgus::unit_class*";
-	static constexpr const char *database_folder = "unit_classes";
+	static constexpr const char database_folder[] = "unit_classes";
 
 	static unit_class *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
@@ -130,6 +131,11 @@ public:
 	const std::unique_ptr<condition<CPlayer>> &get_conditions() const
 	{
 		return this->conditions;
+	}
+
+	const std::string &get_requirements_string() const
+	{
+		return this->requirements_string;
 	}
 
 	const std::vector<unit_type *> &get_unit_types() const
@@ -202,6 +208,7 @@ private:
 	bool ship = false; //whether the unit class is a ship
 	std::unique_ptr<condition<CPlayer>> preconditions;
 	std::unique_ptr<condition<CPlayer>> conditions;
+	std::string requirements_string;
 	std::vector<unit_type *> unit_types;
 	unit_class *tech_tree_parent_unit_class = nullptr;
 	upgrade_class *tech_tree_parent_upgrade_class = nullptr;

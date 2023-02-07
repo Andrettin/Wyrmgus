@@ -1108,6 +1108,8 @@ public:
 		return this->conditions;
 	}
 
+	const std::string &get_requirements_string() const;
+
 	bool can_gain_experience() const;
 	bool is_infantry() const;
 
@@ -1141,8 +1143,8 @@ private:
 	wyrmgus::civilization *civilization = nullptr; //which civilization this unit belongs to, if any
 	wyrmgus::faction *faction = nullptr; //which faction this unit belongs to, if any
 	std::vector<const unit_type *> subtypes; //subtypes of this type; when a unit of this type is created, it has a subtype picked automatically instead
+	std::string requirements_string;
 public:
-	std::string RequirementsString;	/// Requirements string of the unit type
 	std::string ExperienceRequirementsString;	/// Experience requirements string of the unit type
 	std::string BuildingRulesString;	/// Building rules string of the unit type
 private:

@@ -499,7 +499,7 @@ static bool CanShowPopupContent(const PopupConditionPanel *condition,
 			case ButtonCmd::UpgradeTo:
 			case ButtonCmd::UpgradeToClass:
 			case ButtonCmd::Buy:
-				has_requirements_string = has_requirements_string && type != nullptr && !type->RequirementsString.empty();
+				has_requirements_string = has_requirements_string && type != nullptr && !type->get_requirements_string().empty();
 				break;
 			case ButtonCmd::Research:
 			case ButtonCmd::ResearchClass:
