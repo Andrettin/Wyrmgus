@@ -3614,13 +3614,13 @@ void map_template::load_0_ad_terrain_file()
 		const QXmlStreamReader::TokenType tokenType = xml_reader.readNext();
 
 		if (tokenType == QXmlStreamReader::StartElement) {
-			if (xml_reader.name() == "WaterBody") {
+			if (xml_reader.name() == QStringLiteral("WaterBody")) {
 				uint16_t water_height = 0;
 
 				const int water_height_multiplier = defines::get()->get_0_ad_water_height_multiplier();
 
 				while (xml_reader.readNextStartElement()) {
-					if (xml_reader.name() == "Height") {
+					if (xml_reader.name() == QStringLiteral("Height")) {
 						water_height = static_cast<uint16_t>(xml_reader.readElementText().toDouble() * water_height_multiplier);
 					} else {
 						xml_reader.skipCurrentElement();
@@ -3650,15 +3650,15 @@ void map_template::load_0_ad_terrain_file()
 						}
 					}
 				}
-			} else if (xml_reader.name() == "Entity") {
+			} else if (xml_reader.name() == QStringLiteral("Entity")) {
 				std::string template_name;
 				int player = PlayerNumNeutral;
 				QPoint pos(-1, -1);
 
 				while (xml_reader.readNextStartElement()) {
-					if (xml_reader.name() == "Template") {
+					if (xml_reader.name() == QStringLiteral("Template")) {
 						template_name = xml_reader.readElementText().toStdString();
-					} else if (xml_reader.name() == "Player") {
+					} else if (xml_reader.name() == QStringLiteral("Player")) {
 						const int xml_player = xml_reader.readElementText().toInt();
 
 						if (xml_player == 0) {
@@ -3666,7 +3666,7 @@ void map_template::load_0_ad_terrain_file()
 						} else {
 							player = xml_player - 1;
 						}
-					} else if (xml_reader.name() == "Position") {
+					} else if (xml_reader.name() == QStringLiteral("Position")) {
 						const QXmlStreamAttributes attributes = xml_reader.attributes();
 						const double xml_x = attributes.value("x").toDouble();
 						const double xml_y = attributes.value("z").toDouble();
