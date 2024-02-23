@@ -99,6 +99,7 @@
 #include "video/video.h"
 
 #pragma warning(push, 0)
+#include <QFile>
 #include <QSettings>
 #include <QXmlStreamReader>
 #pragma warning(pop)
