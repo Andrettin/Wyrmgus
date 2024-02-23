@@ -37,36 +37,32 @@
 
 BOOST_AUTO_TEST_CASE(scale_image_test)
 {
-	thread_pool::get()->co_spawn_sync([]() -> boost::asio::awaitable<void> {
-		QImage image(128, 128, QImage::Format_RGBA8888);
-		image.fill(Qt::black);
+	QImage image(128, 128, QImage::Format_RGBA8888);
+	image.fill(Qt::black);
 
-		for (int scale_factor = 2; scale_factor <= 5; ++scale_factor) {
-			const QImage scaled_image = co_await image::scale<QImage::Format_RGBA8888>(image, centesimal_int(scale_factor), [](const size_t factor, const uint32_t *src, uint32_t *tgt, const int src_width, const int src_height) {
-				xbrz::scale(factor, src, tgt, src_width, src_height);
-			});
+	for (int scale_factor = 2; scale_factor <= 5; ++scale_factor) {
+		const QImage scaled_image = image::scale<QImage::Format_RGBA8888>(image, centesimal_int(scale_factor), [](const size_t factor, const uint32_t *src, uint32_t *tgt, const int src_width, const int src_height) {
+			xbrz::scale(factor, src, tgt, src_width, src_height);
+		});
 
-			BOOST_CHECK(scaled_image.width() == image.width() * scale_factor);
-			BOOST_CHECK(scaled_image.height() == image.height() * scale_factor);
-		}
-	});
+		BOOST_CHECK(scaled_image.width() == image.width() * scale_factor);
+		BOOST_CHECK(scaled_image.height() == image.height() * scale_factor);
+	}
 }
 
 BOOST_AUTO_TEST_CASE(scale_frame_image_test)
 {
-	thread_pool::get()->co_spawn_sync([]() -> boost::asio::awaitable<void> {
-		QImage image(360, 864, QImage::Format_RGBA8888);
-		image.fill(Qt::black);
+	QImage image(360, 864, QImage::Format_RGBA8888);
+	image.fill(Qt::black);
 
-		const QSize frame_size(72, 72);
+	const QSize frame_size(72, 72);
 
-		for (int scale_factor = 2; scale_factor <= 5; ++scale_factor) {
-			const QImage scaled_image = co_await image::scale<QImage::Format_RGBA8888>(image, centesimal_int(scale_factor), frame_size, [](const size_t factor, const uint32_t *src, uint32_t *tgt, const int src_width, const int src_height) {
-				xbrz::scale(factor, src, tgt, src_width, src_height);
-			});
+	for (int scale_factor = 2; scale_factor <= 5; ++scale_factor) {
+		const QImage scaled_image = image::scale<QImage::Format_RGBA8888>(image, centesimal_int(scale_factor), frame_size, [](const size_t factor, const uint32_t *src, uint32_t *tgt, const int src_width, const int src_height) {
+			xbrz::scale(factor, src, tgt, src_width, src_height);
+		});
 
-			BOOST_CHECK(scaled_image.width() == image.width() * scale_factor);
-			BOOST_CHECK(scaled_image.height() == image.height() * scale_factor);
-		}
-	});
+		BOOST_CHECK(scaled_image.width() == image.width() * scale_factor);
+		BOOST_CHECK(scaled_image.height() == image.height() * scale_factor);
+	}
 }
