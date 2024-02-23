@@ -984,8 +984,8 @@ void character::save() const
 		fprintf(fd, "})\n\n");
 
 		fclose(fd);
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 
 		const std::string upper_error_message = "Failed to save persistent data for character \"" + this->get_identifier() + "\".";
 		log::log_error(upper_error_message);

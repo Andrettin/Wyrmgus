@@ -841,8 +841,8 @@ boost::asio::awaitable<void> NetworkEvent()
 
 	try {
 		len = co_await network_manager::get()->get_file_descriptor()->Recv(buf, sizeof(buf), &host);
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 		DebugPrint("Server/Client gone?\n");
 		// just hope for an automatic recover right now..
 		NetworkInSync = false;

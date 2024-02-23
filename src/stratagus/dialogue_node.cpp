@@ -300,8 +300,8 @@ std::string dialogue_node::get_title_string(const CUnit *speaker_unit, const tex
 
 	try {
 		title = text_processor.process_text(this->title, true);
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 		title = this->title;
 	}
 
@@ -343,8 +343,8 @@ std::string dialogue_node::get_text(const text_processor &text_processor) const
 
 	try {
 		text = text_processor.process_text(this->text, true);
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 		text = this->text;
 	}
 

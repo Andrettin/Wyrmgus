@@ -114,8 +114,8 @@ void quest::load_quest_completion_scope(const gsml_data &scope)
 			if (difficulty > quest->get_highest_completed_difficulty()) {
 				quest->set_highest_completed_difficulty(difficulty);
 			}
-		} catch (const std::exception &exception) {
-			exception::report(exception);
+		} catch (...) {
+			exception::report(std::current_exception());
 			log::log_error("Failed to load completion data for quest \"" + key + "\".");
 		}
 	});
@@ -165,8 +165,8 @@ void quest::save_quest_completion()
 
 	try {
 		data.print_to_file(quests_filepath);
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 		log::log_error("Failed to save quest completion file.");
 	}
 }

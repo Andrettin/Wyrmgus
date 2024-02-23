@@ -69,8 +69,8 @@ void achievement::load_achievements()
 		try {
 			achievement *achievement = achievement::get(key.toStdString());
 			achievement->obtain(false, false);
-		} catch (const std::exception &exception) {
-			exception::report(exception);
+		} catch (...) {
+			exception::report(std::current_exception());
 			log::log_error("Failed to load data for achievement \"" + key.toStdString() + "\".");
 		}
 	}
@@ -91,8 +91,8 @@ void achievement::save_achievements()
 
 	try {
 		data.print_to_file(achievements_filepath);
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 		log::log_error("Failed to save achievements file.");
 	}
 }

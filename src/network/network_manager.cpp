@@ -93,8 +93,8 @@ boost::asio::awaitable<bool> network_manager::setup_server_address(const std::st
 			emit server_address_setup_completed(false);
 			co_return false;
 		}
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 		emit server_address_setup_completed(false);
 	}
 

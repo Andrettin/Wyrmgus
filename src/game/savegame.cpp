@@ -75,8 +75,8 @@ int SaveGame(const std::string &file_url_str)
 
 	try {
 		game::get()->save(filepath);
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 		return -1;
 	}
 

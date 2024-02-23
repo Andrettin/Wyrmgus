@@ -111,8 +111,8 @@ QVariant unit_list_model::data(const QModelIndex &index, const int role) const
 			default:
 				throw std::runtime_error("Invalid unit list model role: " + std::to_string(role) + ".");
 		}
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 	}
 
 	return QVariant();

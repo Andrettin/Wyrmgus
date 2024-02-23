@@ -81,8 +81,8 @@ QImage icon_image_provider::requestImage(const QString &id, QSize *size, const Q
 		}
 
 		return image;
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 		return QImage();
 	}
 }

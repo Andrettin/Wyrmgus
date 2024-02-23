@@ -428,8 +428,8 @@ boost::asio::awaitable<void> server::init_game()
 
 			try {
 				co_await this->socket->Recv(buf, sizeof(buf), &host);
-			} catch (const std::exception &exception) {
-				exception::report(exception);
+			} catch (...) {
+				exception::report(std::current_exception());
 				log::log_error("Receive ack failed.");
 				continue;
 			}

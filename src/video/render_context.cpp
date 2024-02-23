@@ -61,8 +61,8 @@ void render_context::run(renderer *renderer)
 		for (const std::function<void(wyrmgus::renderer *)> &command : commands) {
 			command(renderer);
 		}
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 
 		//clear the problematic commands
 		std::lock_guard<std::mutex> lock(this->mutex);

@@ -840,8 +840,8 @@ void ApplyCampaignMap(const std::string &campaign_ident)
 				std::throw_with_nested(std::runtime_error("Failed to apply map template \"" + map_template->get_identifier() + "\"."));
 			}
 		}
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 		log::log_error("Failed to apply campaign map for campaign \"" + campaign_ident + "\".");
 		std::terminate();
 	}

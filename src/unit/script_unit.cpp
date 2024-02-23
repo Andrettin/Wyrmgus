@@ -895,8 +895,8 @@ static int CclCreateUnit(lua_State *l)
 			QPoint res_pos;
 			try {
 				res_pos = FindNearestDrop(*unit->Type, ipos, heading, z, unit->Type->BoolFlag[BUILDING_INDEX].value && GameCycle > 0, GameCycle == 0); //place buildings with a certain distance of each other, if the game cycle is greater than 0 (so if they weren't intentionally placed side-by-side for a map)
-			} catch (const std::exception &exception) {
-				wyrmgus::exception::report(exception);
+			} catch (...) {
+				wyrmgus::exception::report(std::current_exception());
 
 				//no suitable location found
 				unit->Remove(nullptr);

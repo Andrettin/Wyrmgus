@@ -82,8 +82,8 @@ boost::asio::awaitable<int> CMetaClient::Init()
 
 	try {
 		co_await metaSocket.Connect(metaServerHost);
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 		log::log_error("METACLIENT: Unable to connect to host " + metaServerHost.toString());
 		MetaClient.Close();
 		co_return -1;

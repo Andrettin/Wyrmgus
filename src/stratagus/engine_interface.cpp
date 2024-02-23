@@ -169,8 +169,8 @@ void engine_interface::play_sound(const QString &sound_identifier)
 		event_loop::get()->post([sound]() {
 			PlayGameSound(sound, MaxSampleVolume);
 		});
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 	}
 }
 
@@ -182,8 +182,8 @@ void engine_interface::play_music(const QString &type_str)
 		event_loop::get()->post([type]() {
 			music_player::get()->play_music_type(type);
 		});
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 	}
 }
 
@@ -361,8 +361,8 @@ void engine_interface::load_map_infos()
 
 			return lhs->get_setup_filepath() < rhs->get_setup_filepath();
 		});
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 	}
 }
 
@@ -627,8 +627,8 @@ QObject *engine_interface::get_link_target(const QString &link_str) const
 		}
 
 		return object;
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 		return nullptr;
 	}
 }
@@ -791,8 +791,8 @@ void engine_interface::crop_image_frames(const QString &filepath, const QSize &s
 		QImage image(filepath);
 		image = image::crop_frames(image, src_frame_size, min_size);
 		image.save(filepath);
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 	}
 }
 

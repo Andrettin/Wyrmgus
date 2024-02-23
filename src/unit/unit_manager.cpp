@@ -92,8 +92,8 @@ void unit_manager::clean_units()
 	for (CUnit *unit : units) {
 		try {
 			unit->Release(true);
-		} catch (const std::exception &exception) {
-			exception::report(exception);
+		} catch (...) {
+			exception::report(std::current_exception());
 		}
 	}
 

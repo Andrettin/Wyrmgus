@@ -183,8 +183,8 @@ int main(int argc, char **argv)
 				event_loop::get()->co_spawn([argc, argv]() -> boost::asio::awaitable<void> {
 					try {
 						co_await stratagusMain(argc, argv);
-					} catch (const std::exception &exception) {
-						exception::report(exception);
+					} catch (...) {
+						exception::report(std::current_exception());
 						QMetaObject::invokeMethod(QApplication::instance(), [] { QApplication::exit(EXIT_FAILURE); }, Qt::QueuedConnection);
 					}
 				});
@@ -198,8 +198,8 @@ int main(int argc, char **argv)
 		stratagus_on_exit_cleanup();
 
 		return result;
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 		return -1;
 	}
 }

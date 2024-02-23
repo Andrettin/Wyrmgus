@@ -176,8 +176,8 @@ std::string dialogue_option::get_tooltip(const context &ctx) const
 
 		try {
 			tooltip = text_processor.process_text(this->tooltip, true);
-		} catch (const std::exception &exception) {
-			exception::report(exception);
+		} catch (...) {
+			exception::report(std::current_exception());
 			tooltip = this->tooltip;
 		}
 

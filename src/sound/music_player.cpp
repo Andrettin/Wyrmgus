@@ -105,8 +105,8 @@ void music_player::play_music(const music *music)
 	//preload the music with all its submusic, so that transition between them is seamless
 	try {
 		this->current_music->load();
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 		return;
 	}
 
@@ -135,8 +135,8 @@ void music_player::play_sample(music_sample *sample)
 		if (!sample->is_loaded()) {
 			sample->load();
 		}
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 		return;
 	}
 

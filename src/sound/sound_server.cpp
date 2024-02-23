@@ -268,8 +268,8 @@ int PlaySample(wyrmgus::sample *sample, Origin *origin)
 			if (!sample->is_loaded()) {
 				sample->load();
 			}
-		} catch (const std::exception &exception) {
-			exception::report(exception);
+		} catch (...) {
+			exception::report(std::current_exception());
 			return -1;
 		}
 
@@ -375,8 +375,8 @@ static void InitSdlSound()
 			default:
 				throw std::runtime_error("Unexpected sample type: " + std::to_string(format.sampleType()));
 		}
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 		//use the default format if we failed to derive information for one from the QAudioFormat
 		sdl_audio_format = MIX_DEFAULT_FORMAT;
 	}
@@ -406,8 +406,8 @@ void InitSound()
 	try {
 		InitSdlSound();
 		SoundInitialized = true;
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 		SoundInitialized = false;
 		return;
 	}

@@ -521,8 +521,8 @@ boost::asio::awaitable<void> stratagusMain(int argc, char **argv)
 				co_await WaitEventsOneFrame();
 			}
 		}
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 		exit_code = EXIT_FAILURE;
 	}
 
@@ -534,8 +534,8 @@ void load_database(const bool initial_definition)
 	thread_pool::get()->co_spawn_sync([initial_definition]() -> boost::asio::awaitable<void> {
 		try {
 			co_await database::get()->load(initial_definition);
-		} catch (const std::exception &exception) {
-			exception::report(exception);
+		} catch (...) {
+			exception::report(std::current_exception());
 			log::log_error("Error loading database.");
 			std::terminate();
 		}

@@ -961,8 +961,8 @@ static int WriteMapPresentation(const std::filesystem::path &map_filepath, CMap 
 
 	try {
 		data.print_to_file(map_filepath);
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 		log::log_error("Failed to write map presentation.");
 		return -1;
 	}

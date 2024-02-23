@@ -179,8 +179,8 @@ QVariant map_grid_model::data(const QModelIndex &index, const int role) const
 			default:
 				throw std::runtime_error("Invalid map grid model role: " + std::to_string(role) + ".");
 		}
-	} catch (const std::exception &exception) {
-		exception::report(exception);
+	} catch (...) {
+		exception::report(std::current_exception());
 	}
 
 	return QVariant();
