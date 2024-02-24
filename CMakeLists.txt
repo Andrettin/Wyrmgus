@@ -40,6 +40,7 @@ add_compile_definitions(
 set(STRATAGUS_VERSION ${CMAKE_PROJECT_VERSION})
 
 add_subdirectory(archimedes)
+add_subdirectory(src/third_party/toluapp)
 
 # Stratagus sources
 
@@ -51,6 +52,7 @@ include_directories(
 	src/guichan/include/guichan
 	src/stratagus
 	src/third_party
+	src/third_party/toluapp/include
 	src/third_party/xbrz/include
 	${CMAKE_CURRENT_BINARY_DIR}
 )
@@ -1364,7 +1366,6 @@ find_package(Qt6 6.5 COMPONENTS Quick REQUIRED) #licensed under the GPL 2.0 (as 
 find_package(Lua51 REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_mixer REQUIRED)
-find_package(Tolua++ REQUIRED)
 find_package(ZLIB REQUIRED)
 
 find_package(X11)
@@ -1440,7 +1441,6 @@ include_directories(
 	${LUA_INCLUDE_DIR}
 	${SDL2_INCLUDE_DIR}
 	${SDL2_MIXER_INCLUDE_DIR}
-	${TOLUA++_INCLUDE_DIR}
 	${ZLIB_INCLUDE_DIRS}
 )
 
@@ -1458,8 +1458,8 @@ set(wyrmgus_LIBS
 	${LUA_LIBRARIES}
 	${SDL2_LIBRARY}
 	${SDL2_MIXER_LIBRARY}
-	${TOLUA++_LIBRARY}
 	${ZLIB_LIBRARIES}
+	toluapp_lib
 	${QT_LIBRARIES}
 	archimedes
 )
@@ -1721,7 +1721,7 @@ else()
 endif()
 
 add_custom_command(OUTPUT tolua.cpp
-	COMMAND ${TOLUA++_APP} ARGS -L stratagus.lua -o ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp stratagus.pkg
+	COMMAND $<TARGET_FILE:toluapp> ARGS -L stratagus.lua -o ${CMAKE_CURRENT_BINARY_DIR}/tolua.cpp stratagus.pkg
 	DEPENDS ${tolua_FILES}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/tolua
 	VERBATIM
