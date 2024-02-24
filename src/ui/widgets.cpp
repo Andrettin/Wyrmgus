@@ -2501,34 +2501,37 @@ MenuScreen::MenuScreen() : Container()
 */
 void MenuScreen::run(const bool loop)
 {
-	event_loop::get()->co_spawn([this, loop]() -> boost::asio::awaitable<void> {
-		runLoop = loop;
-		running = true;
+	this->run_coro(loop);
+}
 
-		CurrentCursorState = CursorState::Point;
-		cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
-		CursorOn = cursor_on::unknown;
+QCoro::Task<void> MenuScreen::run_coro(const bool loop)
+{
+	runLoop = loop;
+	running = true;
 
-		if (this->getDrawMenusUnder()) {
-			engine_interface::get()->change_lua_dialog_open_count(1);
+	CurrentCursorState = CursorState::Point;
+	cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
+	CursorOn = cursor_on::unknown;
+
+	if (this->getDrawMenusUnder()) {
+		engine_interface::get()->change_lua_dialog_open_count(1);
+	}
+
+	if (loop) {
+		const EventCallback *old_callbacks = GetCallbacks();
+		SetCallbacks(&GuichanCallbacks);
+		while (runLoop && GameResult != GameExit) {
+			UpdateDisplay();
+			CheckMusicFinished();
+
+			co_await WaitEventsOneFrame();
 		}
-
-		if (loop) {
-			const EventCallback *old_callbacks = GetCallbacks();
-			SetCallbacks(&GuichanCallbacks);
-			while (runLoop && GameResult != GameExit) {
-				UpdateDisplay();
-				CheckMusicFinished();
-
-				co_await WaitEventsOneFrame();
-			}
-			SetCallbacks(old_callbacks);
-			Gui->setTop(this->oldtop);
-		} else {
-			SetCallbacks(&GuichanCallbacks);
-			MenuStack.push(this);
-		}
-	});
+		SetCallbacks(old_callbacks);
+		Gui->setTop(this->oldtop);
+	} else {
+		SetCallbacks(&GuichanCallbacks);
+		MenuStack.push(this);
+	}
 }
 
 /**

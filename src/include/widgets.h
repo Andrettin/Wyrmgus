@@ -477,6 +477,7 @@ public:
 	MenuScreen();
 
 	void run(const bool loop = true);
+	QCoro::Task<void> run_coro(const bool loop);
 
 	void stop(bool stopAll = false);
 

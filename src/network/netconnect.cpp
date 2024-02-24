@@ -70,7 +70,7 @@ int NoRandomPlacementMultiplayer = 0; /// Disable the random placement of player
 ** @param port Port of host to send to (network byte order).
 ** @param msg The message to send
 */
-boost::asio::awaitable<void> NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg)
+QCoro::Task<void> NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg)
 {
 	auto buf = std::make_unique<unsigned char[]>(msg.Size());
 	msg.Serialize(buf.get());
@@ -86,7 +86,7 @@ boost::asio::awaitable<void> NetworkSendICMessage(CUDPSocket &socket, const CHos
 **
 **  @return 1 if packet is an InitConfig message, 0 otherwise
 */
-boost::asio::awaitable<int> NetworkParseSetupEvent(const std::array<unsigned char, 1024> &buf, const CHost &host)
+QCoro::Task<int> NetworkParseSetupEvent(const std::array<unsigned char, 1024> &buf, const CHost &host)
 {
 	assert_throw(NetConnectRunning != 0);
 

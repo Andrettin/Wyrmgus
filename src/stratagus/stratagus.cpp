@@ -212,6 +212,8 @@ extern void beos_init(int argc, char **argv);
 
 #include "missile.h" //for FreeBurningBuildingFrames
 
+#include <qcoro/core/qcorotimer.h>
+
 #ifdef USE_WIN32
 #include <windows.h>
 #include <dbghelp.h>
@@ -334,7 +336,7 @@ void PrintLicense()
 **
 **  @param err  Error code to pass to shell.
 */
-boost::asio::awaitable<void> Exit(const int err)
+QCoro::Task<void> Exit(const int err)
 {
 	if (GameRunning && err != EXIT_FAILURE) {
 		StopGame(GameExit);
@@ -434,7 +436,7 @@ void stratagus_on_exit_cleanup()
 **  @param argc  Number of arguments.
 **  @param argv  Vector of arguments.
 */
-boost::asio::awaitable<void> stratagusMain(int argc, char **argv)
+QCoro::Task<void> stratagusMain(int argc, char **argv)
 {
 	Q_UNUSED(argc)
 	Q_UNUSED(argv)
@@ -513,7 +515,7 @@ boost::asio::awaitable<void> stratagusMain(int argc, char **argv)
 	try {
 		while (GameResult != GameExit) {
 			if (GameRunning || CEditor::get()->is_running()) {
-				co_await event_loop::get()->await_ms(1000);
+				co_await QCoro::sleepFor(std::chrono::milliseconds(1000));
 			} else {
 				UpdateDisplay();
 				CheckMusicFinished();
@@ -531,14 +533,12 @@ boost::asio::awaitable<void> stratagusMain(int argc, char **argv)
 
 void load_database(const bool initial_definition)
 {
-	thread_pool::get()->co_spawn_sync([initial_definition]() -> boost::asio::awaitable<void> {
-		try {
-			co_await database::get()->load(initial_definition);
-		} catch (...) {
-			exception::report(std::current_exception());
-			log::log_error("Error loading database.");
-			std::terminate();
-		}
+	database::get()->load(initial_definition).then([]() {
+		//do nothing
+	}, [](const std::exception &exception) {
+		exception::report(std::current_exception());
+		log::log_error("Error loading database.");
+		std::terminate();
 	});
 }
 

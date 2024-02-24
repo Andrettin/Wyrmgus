@@ -115,7 +115,7 @@ void TitleScreen::ShowLabels(std::vector<std::function<void(renderer *)>> &rende
 	}
 }
 
-boost::asio::awaitable<void> TitleScreen::ShowTitleImage(std::vector<std::function<void(renderer *)>> &render_commands) const
+QCoro::Task<void> TitleScreen::ShowTitleImage(std::vector<std::function<void(renderer *)>> &render_commands) const
 {
 	const EventCallback *old_callbacks = GetCallbacks();
 	EventCallback callbacks;
@@ -153,7 +153,7 @@ boost::asio::awaitable<void> TitleScreen::ShowTitleImage(std::vector<std::functi
 /**
 **  Show the title screens
 */
-boost::asio::awaitable<void> ShowTitleScreens(std::vector<std::function<void(renderer *)>> &render_commands)
+QCoro::Task<void> ShowTitleScreens(std::vector<std::function<void(renderer *)>> &render_commands)
 {
 	if (TitleScreens.empty()) {
 		co_return;

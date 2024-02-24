@@ -288,7 +288,7 @@ static void InitGameCallbacks()
 }
 
 [[nodiscard]]
-static boost::asio::awaitable<void> GameLogicLoop()
+static QCoro::Task<void> GameLogicLoop()
 {
 	// Can't find a better place.
 	// FIXME: We need to find a better place!
@@ -445,7 +445,7 @@ static void DisplayLoop()
 }
 
 [[nodiscard]]
-static boost::asio::awaitable<void> SingleGameLoop()
+static QCoro::Task<void> SingleGameLoop()
 {
 	while (GameRunning) {
 		DisplayLoop();
@@ -463,7 +463,7 @@ static boost::asio::awaitable<void> SingleGameLoop()
 **  Display update.
 **  Input/Network/Sound.
 */
-boost::asio::awaitable<void> GameMainLoop()
+QCoro::Task<void> GameMainLoop()
 {
 	const EventCallback *old_callbacks;
 
@@ -492,7 +492,7 @@ boost::asio::awaitable<void> GameMainLoop()
 	//run the display loop once, so that the map is visible when we start
 	DisplayLoop();
 
-	co_await thread_pool::get()->await_future(engine_interface::get()->get_map_view_created_future());
+	co_await engine_interface::get()->get_map_view_created_future();
 
 	engine_interface::get()->reset_map_view_created_promise();
 	engine_interface::get()->set_waiting_for_interface(false);

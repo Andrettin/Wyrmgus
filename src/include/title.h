@@ -51,7 +51,7 @@ class TitleScreen final
 {
 public:
 	[[nodiscard]]
-	boost::asio::awaitable<void> ShowTitleImage(std::vector<std::function<void(renderer *)>> &render_commands) const;
+	QCoro::Task<void> ShowTitleImage(std::vector<std::function<void(renderer *)>> &render_commands) const;
 
 private:
 	void ShowLabels(std::vector<std::function<void(renderer *)>> &render_commands) const;
@@ -68,4 +68,4 @@ public:
 extern std::vector<TitleScreen> TitleScreens;          /// File for title screen
 
 [[nodiscard]]
-extern boost::asio::awaitable<void> ShowTitleScreens(std::vector<std::function<void(renderer *)>> &render_commands);
+extern QCoro::Task<void> ShowTitleScreens(std::vector<std::function<void(renderer *)>> &render_commands);

@@ -82,6 +82,16 @@
 #include <QQmlContext>
 #pragma warning(pop)
 
+static QCoro::Task<void> start_stratagus(const int argc, char **argv)
+{
+	try {
+		co_await stratagusMain(argc, argv);
+	} catch (...) {
+		exception::report(std::current_exception());
+		QMetaObject::invokeMethod(QApplication::instance(), [] { QApplication::exit(EXIT_FAILURE); }, Qt::QueuedConnection);
+	}
+}
+
 int main(int argc, char **argv)
 {
 	using namespace wyrmgus;
@@ -180,14 +190,7 @@ int main(int argc, char **argv)
 					QCoreApplication::exit(-1);
 				}
 
-				event_loop::get()->co_spawn([argc, argv]() -> boost::asio::awaitable<void> {
-					try {
-						co_await stratagusMain(argc, argv);
-					} catch (...) {
-						exception::report(std::current_exception());
-						QMetaObject::invokeMethod(QApplication::instance(), [] { QApplication::exit(EXIT_FAILURE); }, Qt::QueuedConnection);
-					}
-				});
+				start_stratagus(argc, argv);
 			}, Qt::QueuedConnection);
 		engine.load(url);
 

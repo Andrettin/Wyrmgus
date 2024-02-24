@@ -55,7 +55,7 @@
 **  @return 0 if the versions match, -1 otherwise
 */
 [[nodiscard]]
-static boost::asio::awaitable<int> CheckVersions(const CInitMessage_Hello &msg, CUDPSocket &socket, const CHost &host)
+static QCoro::Task<int> CheckVersions(const CInitMessage_Hello &msg, CUDPSocket &socket, const CHost &host)
 {
 	if (msg.Stratagus != StratagusVersion) {
 		const std::string hostStr = host.toString();
@@ -141,7 +141,7 @@ void server::init(const std::string &name, CUDPSocket *socket, const int open_sl
 
 void server::set_fog_of_war(const bool fow)
 {
-	event_loop::get()->post([this, fow]() {
+	QTimer::singleShot(0, [this, fow]() {
 		const uint8_t fow_uint8 = static_cast<uint8_t>(fow);
 
 		this->setup->FogOfWar = fow_uint8;
@@ -154,7 +154,7 @@ void server::set_fog_of_war(const bool fow)
 
 void server::set_reveal_map(const bool reveal_map)
 {
-	event_loop::get()->post([this, reveal_map]() {
+	QTimer::singleShot(0, [this, reveal_map]() {
 		const uint8_t reveal_map_uint8 = static_cast<uint8_t>(reveal_map);
 
 		this->setup->RevealMap = reveal_map_uint8;
@@ -167,7 +167,7 @@ void server::set_reveal_map(const bool reveal_map)
 
 void server::set_computer_opponents(const bool value)
 {
-	event_loop::get()->post([this, value]() {
+	QTimer::singleShot(0, [this, value]() {
 		const uint8_t value_uint8 = static_cast<uint8_t>(value);
 
 		this->setup->Opponents = value_uint8;
@@ -178,7 +178,7 @@ void server::set_computer_opponents(const bool value)
 
 void server::set_player_civilization(const int player_index, const int civilization_index)
 {
-	event_loop::get()->post([this, player_index, civilization_index]() {
+	QTimer::singleShot(0, [this, player_index, civilization_index]() {
 		this->setup->Race[player_index] = civilization_index;
 
 		GameSettings.Presets[player_index].Race = civilization_index;
@@ -189,7 +189,7 @@ void server::set_player_civilization(const int player_index, const int civilizat
 
 void server::set_resources_option(const int value)
 {
-	event_loop::get()->post([this, value]() {
+	QTimer::singleShot(0, [this, value]() {
 		const uint8_t value_uint8 = static_cast<uint8_t>(value);
 
 		this->setup->ResourcesOption = value_uint8;
@@ -202,7 +202,7 @@ void server::set_resources_option(const int value)
 
 void server::set_difficulty(const int difficulty)
 {
-	event_loop::get()->post([this, difficulty]() {
+	QTimer::singleShot(0, [this, difficulty]() {
 		const uint8_t difficulty_uint8 = static_cast<uint8_t>(difficulty);
 
 		this->setup->Difficulty = difficulty_uint8;
@@ -213,24 +213,22 @@ void server::set_difficulty(const int difficulty)
 	});
 }
 
-void server::start_game()
+QCoro::Task<void> server::start_game_coro()
 {
-	event_loop::get()->co_spawn([this]() -> boost::asio::awaitable<void> {
-		CMap::get()->NoFogOfWar = !static_cast<bool>(this->get_setup().FogOfWar);
+	CMap::get()->NoFogOfWar = !static_cast<bool>(this->get_setup().FogOfWar);
 
-		if (static_cast<bool>(this->get_setup().RevealMap)) {
-			FlagRevealMap = 1;
-		}
+	if (static_cast<bool>(this->get_setup().RevealMap)) {
+		FlagRevealMap = 1;
+	}
 
-		co_await this->init_game();
+	co_await this->init_game();
 
-		network_manager::get()->prepare_game_settings(this->get_setup());
+	network_manager::get()->prepare_game_settings(this->get_setup());
 
-		co_await game::get()->run_map(path::from_string(NetworkMapName));
-	});
+	co_await game::get()->run_map(path::from_string(NetworkMapName));
 }
 
-boost::asio::awaitable<void> server::init_game()
+QCoro::Task<void> server::init_game()
 {
 	assert_throw(this->setup->CompOpt[0] == 0);
 
@@ -504,21 +502,21 @@ bool server::is_player_ready(const int player_index) const
 	return static_cast<bool>(this->setup->Ready[player_index]);
 }
 
-boost::asio::awaitable<void> server::Send_AreYouThere(const multiplayer_host &host)
+QCoro::Task<void> server::Send_AreYouThere(const multiplayer_host &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMAYT); // AreYouThere
 
 	co_await NetworkSendICMessage(*socket, CHost(host.Host, host.Port), message);
 }
 
-boost::asio::awaitable<void> server::Send_GameFull(const CHost &host)
+QCoro::Task<void> server::Send_GameFull(const CHost &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMGameFull);
 
 	co_await NetworkSendICMessage(*socket, host, message);
 }
 
-boost::asio::awaitable<void> server::Send_Welcome(const multiplayer_host &host, int index)
+QCoro::Task<void> server::Send_Welcome(const multiplayer_host &host, int index)
 {
 	CInitMessage_Welcome message;
 
@@ -533,7 +531,7 @@ boost::asio::awaitable<void> server::Send_Welcome(const multiplayer_host &host, 
 	co_await NetworkSendICMessage(*socket, CHost(host.Host, host.Port), message);
 }
 
-boost::asio::awaitable<void> server::Send_Resync(const multiplayer_host &host, int hostIndex)
+QCoro::Task<void> server::Send_Resync(const multiplayer_host &host, int hostIndex)
 {
 	CInitMessage_Resync message;
 
@@ -546,28 +544,28 @@ boost::asio::awaitable<void> server::Send_Resync(const multiplayer_host &host, i
 	co_await NetworkSendICMessage(*socket, CHost(host.Host, host.Port), message);
 }
 
-boost::asio::awaitable<void> server::Send_Map(const multiplayer_host &host)
+QCoro::Task<void> server::Send_Map(const multiplayer_host &host)
 {
 	const CInitMessage_Map message(NetworkMapName.c_str(), CMap::get()->Info->MapUID);
 
 	co_await NetworkSendICMessage(*socket, CHost(host.Host, host.Port), message);
 }
 
-boost::asio::awaitable<void> server::Send_State(const multiplayer_host &host)
+QCoro::Task<void> server::Send_State(const multiplayer_host &host)
 {
 	const CInitMessage_State message(MessageInit_FromServer, *this->setup);
 
 	co_await NetworkSendICMessage(*socket, CHost(host.Host, host.Port), message);
 }
 
-boost::asio::awaitable<void> server::Send_GoodBye(const multiplayer_host &host)
+QCoro::Task<void> server::Send_GoodBye(const multiplayer_host &host)
 {
 	const CInitMessage_Header message(MessageInit_FromServer, ICMGoodBye);
 
 	co_await NetworkSendICMessage(*socket, CHost(host.Host, host.Port), message);
 }
 
-boost::asio::awaitable<void> server::Update(unsigned long frameCounter)
+QCoro::Task<void> server::Update(unsigned long frameCounter)
 {
 	for (int i = 1; i < PlayerMax - 1; ++i) {
 		if (Hosts[i].PlyNr && Hosts[i].Host && Hosts[i].Port) {
@@ -584,7 +582,7 @@ boost::asio::awaitable<void> server::Update(unsigned long frameCounter)
 	}
 }
 
-boost::asio::awaitable<void> server::Parse(unsigned long frameCounter, const unsigned char *buf, const CHost &host)
+QCoro::Task<void> server::Parse(unsigned long frameCounter, const unsigned char *buf, const CHost &host)
 {
 	const unsigned char msgsubtype = buf[1];
 	int index = FindHostIndexBy(host);
@@ -673,7 +671,7 @@ void server::mark_clients_as_resync()
 **
 **  @return host index
 */
-boost::asio::awaitable<int> server::Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host)
+QCoro::Task<int> server::Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host)
 {
 	if (h == -1) { // it is a new client
 		for (int i = 1; i < PlayerMax - 1; ++i) {
@@ -727,7 +725,7 @@ boost::asio::awaitable<int> server::Parse_Hello(int h, const CInitMessage_Hello 
 **
 **  @param h slot number of host msg originates from
 */
-boost::asio::awaitable<void> server::Parse_Resync(const int h)
+QCoro::Task<void> server::Parse_Resync(const int h)
 {
 	switch (networkStates[h].State) {
 	case ccs_mapinfo:
@@ -759,7 +757,7 @@ boost::asio::awaitable<void> server::Parse_Resync(const int h)
 **
 **  @param h slot number of host msg originates from
 */
-boost::asio::awaitable<void> server::Parse_Waiting(const int h)
+QCoro::Task<void> server::Parse_Waiting(const int h)
 {
 	switch (networkStates[h].State) {
 		// client has recvd welcome and is waiting for info
@@ -817,7 +815,7 @@ boost::asio::awaitable<void> server::Parse_Waiting(const int h)
 **
 **  @param h slot number of host msg originates from
 */
-boost::asio::awaitable<void> server::Parse_Map(const int h)
+QCoro::Task<void> server::Parse_Map(const int h)
 {
 	switch (networkStates[h].State) {
 		// client has recvd map info waiting for state info
@@ -848,7 +846,7 @@ boost::asio::awaitable<void> server::Parse_Map(const int h)
 **  @param h slot number of host msg originates from
 **  @param msg message received
 */
-boost::asio::awaitable<void> server::Parse_State(const int h, const CInitMessage_State &msg)
+QCoro::Task<void> server::Parse_State(const int h, const CInitMessage_State &msg)
 {
 	bool player_ready_changed = false;
 
@@ -905,7 +903,7 @@ boost::asio::awaitable<void> server::Parse_State(const int h, const CInitMessage
 **
 **  @param h slot number of host msg originates from
 */
-boost::asio::awaitable<void> server::Parse_GoodBye(const int h)
+QCoro::Task<void> server::Parse_GoodBye(const int h)
 {
 	switch (networkStates[h].State) {
 		default:

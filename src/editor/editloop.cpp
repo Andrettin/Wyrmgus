@@ -2206,7 +2206,7 @@ static void EditorCallbackExit()
 /**
 **  Create editor.
 */
-boost::asio::awaitable<void> CEditor::Init()
+QCoro::Task<void> CEditor::Init()
 {
 	// Load and evaluate the editor configuration file
 	const std::string filename = LibraryFileName(parameters::get()->luaEditorStartFilename.c_str());
@@ -2301,13 +2301,12 @@ boost::asio::awaitable<void> CEditor::Init()
 	}
 
 	//create the game in another thread, to not block the main one while it is loading
-	co_await thread_pool::get()->co_spawn_awaitable([]() -> boost::asio::awaitable<void> {
+	co_await QtConcurrent::run([]() {
 		if (CurrentMapPath.empty()) {
 			CreateGame("", CMap::get());
 		} else {
 			CreateGame(CurrentMapPath, CMap::get());
 		}
-		co_return;
 	});
 
 	ReplayRevealMap = 1;
@@ -2406,7 +2405,7 @@ std::string get_user_maps_path()
 /**
 **  Editor main event loop.
 */
-boost::asio::awaitable<void> EditorMainLoop()
+QCoro::Task<void> EditorMainLoop()
 {
 	const centesimal_int &scale_factor = preferences::get()->get_scale_factor();
 
@@ -2475,7 +2474,7 @@ boost::asio::awaitable<void> EditorMainLoop()
 	game::get()->set_running(true); //should use something different instead?
 
 	engine_interface::get()->set_waiting_for_interface(true);
-	co_await thread_pool::get()->await_future(engine_interface::get()->get_map_view_created_future());
+	co_await engine_interface::get()->get_map_view_created_future();
 	engine_interface::get()->reset_map_view_created_promise();
 	engine_interface::get()->set_waiting_for_interface(false);
 

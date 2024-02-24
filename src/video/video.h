@@ -594,7 +594,7 @@ extern const EventCallback *GetCallbacks();
 
 /// Process all system events. Returns if the time for a frame is over
 [[nodiscard]]
-extern boost::asio::awaitable<void> WaitEventsOneFrame();
+extern QCoro::Task<void> WaitEventsOneFrame();
 
 /// Push current clipping.
 extern void PushClipping();

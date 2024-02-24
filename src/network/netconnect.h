@@ -93,18 +93,18 @@ extern int NoRandomPlacementMultiplayer;
 
 template <typename T>
 [[nodiscard]]
-inline boost::asio::awaitable<void> NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const T &msg)
+inline QCoro::Task<void> NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const T &msg)
 {
 	std::unique_ptr<const unsigned char[]> buf = msg.Serialize();
 	co_await socket.Send(host, buf.get(), msg.Size());
 }
 
 [[nodiscard]]
-extern boost::asio::awaitable<void> NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg);
+extern QCoro::Task<void> NetworkSendICMessage(CUDPSocket &socket, const CHost &host, const CInitMessage_Header &msg);
 
 extern int FindHostIndexBy(const CHost &host);
 
 [[nodiscard]]
-extern boost::asio::awaitable<int> NetworkParseSetupEvent(const std::array<unsigned char, 1024> &buf, const CHost &host);  /// Parse a network connect event
+extern QCoro::Task<int> NetworkParseSetupEvent(const std::array<unsigned char, 1024> &buf, const CHost &host);  /// Parse a network connect event
 
 extern void NetworkDetachFromServer();      /// Menu Loop: Client: Send GoodBye to the server and detach

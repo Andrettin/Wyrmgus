@@ -257,7 +257,7 @@ int game::get_cycles_per_year() const
 	return defines::get()->get_cycles_per_year(this->get_current_year());
 }
 
-boost::asio::awaitable<void> game::run_map(const std::filesystem::path &filepath)
+QCoro::Task<void> game::run_map(const std::filesystem::path filepath)
 {
 	engine_interface::get()->set_loading_message("Starting Game...");
 
@@ -283,24 +283,20 @@ boost::asio::awaitable<void> game::run_map(const std::filesystem::path &filepath
 	CurrentQuest = nullptr;
 }
 
-void game::run_map_async(const QString &filepath)
+QCoro::QmlTask game::run_map_async(const QString &filepath)
 {
-	event_loop::get()->co_spawn([this, filepath]() -> boost::asio::awaitable<void> {
-		co_await this->run_map(path::from_qstring(filepath));
-	});
+	return this->run_map(path::from_qstring(filepath));
 }
 
-void game::run_campaign_async(campaign *campaign)
+QCoro::Task<void> game::run_campaign_coro(campaign *campaign)
 {
-	event_loop::get()->co_spawn([this, campaign]() -> boost::asio::awaitable<void> {
-		if (this->get_current_campaign() != nullptr) {
-			//already running
-			co_return;
-		}
+	if (this->get_current_campaign() != nullptr) {
+		//already running
+		co_return;
+	}
 
-		this->set_current_campaign(campaign);
-		co_await this->run_map(database::get()->get_campaign_map_filepath());
-	});
+	this->set_current_campaign(campaign);
+	co_await this->run_map(database::get()->get_campaign_map_filepath());
 }
 
 void game::apply_player_history()
@@ -806,7 +802,7 @@ void SaveGameSettings(CFile &file)
 	file.printf("\n");
 }
 
-boost::asio::awaitable<void> StartMap(const std::filesystem::path &filepath, const bool clean)
+QCoro::Task<void> StartMap(const std::filesystem::path &filepath, const bool clean)
 {
 	try {
 		std::string nc, rc;
@@ -833,9 +829,8 @@ boost::asio::awaitable<void> StartMap(const std::filesystem::path &filepath, con
 		GameEstablishing = true;
 
 		//create the game in another thread, to not block the main one while it is loading
-		co_await thread_pool::get()->co_spawn_awaitable([&filepath]() -> boost::asio::awaitable<void> {
+		co_await QtConcurrent::run([&filepath]() {
 			CreateGame(filepath, CMap::get());
-			co_return;
 		});
 
 		//Wyrmgus start

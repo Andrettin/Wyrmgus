@@ -30,10 +30,10 @@ class CHost final
 {
 public:
 	[[nodiscard]]
-	static boost::asio::awaitable<void> from_host_name_and_port(CHost &host, const std::string_view &host_name, const uint16_t port);
+	static QCoro::Task<void> from_host_name_and_port(CHost &host, const std::string_view &host_name, const uint16_t port);
 
 	[[nodiscard]]
-	static boost::asio::awaitable<CHost> from_host_name_and_port(const std::string_view &host_name, const uint16_t port)
+	static QCoro::Task<CHost> from_host_name_and_port(const std::string_view &host_name, const uint16_t port)
 	{
 		//create a host instance from a host name and a port in host byte order 
 		CHost host;
@@ -97,10 +97,10 @@ public:
 	void Close();
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Send(const CHost &host, const void *buf, unsigned int len);
+	QCoro::Task<void> Send(const CHost &host, const void *buf, unsigned int len);
 
 	[[nodiscard]]
-	boost::asio::awaitable<size_t> Recv(std::array<unsigned char, 1024> &buf, int len, CHost *hostFrom);
+	QCoro::Task<size_t> Recv(std::array<unsigned char, 1024> &buf, int len, CHost *hostFrom);
 
 	void SetNonBlocking();
 
@@ -108,7 +108,7 @@ public:
 	size_t HasDataToRead();
 
 	[[nodiscard]]
-	boost::asio::awaitable<size_t> WaitForDataToRead(const int timeout);
+	QCoro::Task<size_t> WaitForDataToRead(const int timeout);
 
 	bool IsValid() const;
 
@@ -129,18 +129,18 @@ public:
 	void Close();
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Connect(const CHost &host);
+	QCoro::Task<void> Connect(const CHost &host);
 
 	[[nodiscard]]
-	boost::asio::awaitable<size_t> Send(const void *buf, unsigned int len);
+	QCoro::Task<size_t> Send(const void *buf, unsigned int len);
 
 	[[nodiscard]]
-	boost::asio::awaitable<size_t> Recv(std::array<char, 1024> &buf);
+	QCoro::Task<size_t> Recv(std::array<char, 1024> &buf);
 
 	void SetNonBlocking();
 
 	[[nodiscard]]
-	boost::asio::awaitable<size_t> WaitForDataToRead(const int timeout);
+	QCoro::Task<size_t> WaitForDataToRead(const int timeout);
 
 	bool IsValid() const;
 private:

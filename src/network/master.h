@@ -46,15 +46,15 @@ public:
 	void SetMetaServer(const std::string host, const int port);
 
 	[[nodiscard]]
-	boost::asio::awaitable<int> Init();
+	QCoro::Task<int> Init();
 
 	void Close();
 
 	[[nodiscard]]
-	boost::asio::awaitable<int> Send(const std::string cmd);
+	QCoro::Task<int> Send(const std::string cmd);
 
 	[[nodiscard]]
-	boost::asio::awaitable<int> Recv();
+	QCoro::Task<int> Recv();
 
 	int GetLastRecvState() const { return lastRecvState; }
 	int GetLogSize() const { return events.size(); }

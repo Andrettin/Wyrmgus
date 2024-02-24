@@ -63,7 +63,7 @@ CEditor::CEditor() : SelectedPlayer(PlayerNumNeutral), State(EditorStateType::Ed
 **
 **  @param filename  Map to load, null to create a new map
 */
-boost::asio::awaitable<void> CEditor::start(const std::filesystem::path &filepath)
+QCoro::Task<void> CEditor::start(const std::filesystem::path filepath)
 {
 	std::string nc, rc;
 
@@ -94,7 +94,7 @@ boost::asio::awaitable<void> CEditor::start(const std::filesystem::path &filepat
 	CleanPlayers();
 }
 
-boost::asio::awaitable<void> CEditor::start_new(const std::string &name, const QSize &map_size)
+QCoro::Task<void> CEditor::start_new(const std::string name, const QSize map_size)
 {
 	auto map_info = make_qunique<wyrmgus::map_info>();
 	map_info->set_name(name);
@@ -106,23 +106,19 @@ boost::asio::awaitable<void> CEditor::start_new(const std::string &name, const Q
 	co_await this->start("");
 }
 
-void CEditor::start_async(const QString &filepath)
+QCoro::QmlTask CEditor::start_async(const QString &filepath)
 {
-	event_loop::get()->co_spawn([this, filepath]() -> boost::asio::awaitable<void> {
-		co_await this->start(path::from_qstring(filepath));
-	});
+	return this->start(path::from_qstring(filepath));
 }
 
-void CEditor::start_new_async(const QString &name, const int map_width, const int map_height)
+QCoro::QmlTask CEditor::start_new_async(const QString &name, const int map_width, const int map_height)
 {
-	event_loop::get()->co_spawn([this, name, map_width, map_height]() -> boost::asio::awaitable<void> {
-		co_await this->start_new(name.toStdString(), QSize(map_width, map_height));
-	});
+	return this->start_new(name.toStdString(), QSize(map_width, map_height));
 }
 
 void CEditor::set_running_async(const bool running)
 {
-	event_loop::get()->post([this, running]() {
+	QTimer::singleShot(0, [this, running]() {
 		this->set_running(running);
 	});
 }

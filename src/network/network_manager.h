@@ -56,15 +56,32 @@ public:
 	void reset();
 
 	[[nodiscard]]
-	boost::asio::awaitable<bool> setup_server_address(const std::string &server_address, int port);
+	QCoro::Task<bool> setup_server_address(const std::string server_address, int port);
 
-	Q_INVOKABLE void setup_server_address(const QString &server_address, const int port = 0);
+	Q_INVOKABLE QCoro::QmlTask setup_server_address(const QString &server_address, const int port = 0)
+	{
+		return this->setup_server_address(server_address.toStdString(), port);
+	}
 
 	Q_INVOKABLE void init_client_connect();
-	Q_INVOKABLE void process_client_request();
+
+	Q_INVOKABLE QCoro::QmlTask process_client_request()
+	{
+		return this->process_client_request_coro();
+	}
+
+	[[nodiscard]]
+	QCoro::Task<void> process_client_request_coro();
 
 	Q_INVOKABLE void init_server_connect(const QString &map_filepath_qstr, const int open_slots);
-	Q_INVOKABLE void process_server_request();
+
+	Q_INVOKABLE QCoro::QmlTask process_server_request()
+	{
+		return this->process_server_request_coro();
+	}
+
+	[[nodiscard]]
+	QCoro::Task<void> process_server_request_coro();
 
 	void prepare_game_settings(const multiplayer_setup &setup);
 

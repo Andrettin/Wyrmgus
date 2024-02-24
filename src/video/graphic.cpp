@@ -55,7 +55,6 @@
 #include "util/log_util.h"
 #include "util/point_util.h"
 #include "util/set_util.h"
-#include "util/thread_pool.h"
 #include "video/font.h"
 #include "video/render_context.h"
 #include "video/renderer.h"

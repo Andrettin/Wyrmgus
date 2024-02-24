@@ -190,10 +190,17 @@ public:
 	}
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> run_map(const std::filesystem::path &filepath);
+	QCoro::Task<void> run_map(const std::filesystem::path filepath);
 
-	Q_INVOKABLE void run_map_async(const QString &filepath);
-	Q_INVOKABLE void run_campaign_async(wyrmgus::campaign *campaign);
+	Q_INVOKABLE QCoro::QmlTask run_map_async(const QString &filepath);
+
+	Q_INVOKABLE QCoro::QmlTask run_campaign_async(wyrmgus::campaign *campaign)
+	{
+		return this->run_campaign_coro(campaign);
+	}
+
+	[[nodiscard]]
+	QCoro::Task<void> run_campaign_coro(campaign *campaign);
 
 	void apply_player_history();
 
@@ -322,10 +329,10 @@ extern void LoadGame(const std::filesystem::path &filepath); /// Load saved game
 extern int SaveGame(const std::string &file_url_str); /// Save game
 
 [[nodiscard]]
-extern boost::asio::awaitable<void> StartSavedGame(const std::filesystem::path &filepath);
+extern QCoro::Task<void> StartSavedGame(const std::filesystem::path &filepath);
 
 [[nodiscard]]
-extern boost::asio::awaitable<void> load_game(const std::filesystem::path &filepath);
+extern QCoro::Task<void> load_game(const std::filesystem::path &filepath);
 
 extern void set_load_game_file(const std::filesystem::path &filepath);
 extern std::filesystem::path load_game_file;
@@ -341,7 +348,7 @@ extern void FreeAllContainers();
 extern void SaveGameSettings(CFile &file);             /// Save game settings
 
 [[nodiscard]]
-extern boost::asio::awaitable<void> StartMap(const std::filesystem::path &filepath, const bool clean);
+extern QCoro::Task<void> StartMap(const std::filesystem::path &filepath, const bool clean);
 
 extern std::string GameName;                /// Name of the game
 extern std::string FullGameName;            /// Full Name of the game

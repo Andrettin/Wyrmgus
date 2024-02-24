@@ -320,7 +320,7 @@ static int PlayerQuit[PlayerMax];          /// Player quit
 **  @param numcommands  Number of commands.
 */
 [[nodiscard]]
-static boost::asio::awaitable<void> NetworkBroadcast(const CNetworkPacket &packet, int numcommands, int player = 255)
+static QCoro::Task<void> NetworkBroadcast(const CNetworkPacket &packet, int numcommands, int player = 255)
 {
 	const unsigned int size = packet.Size(numcommands);
 	auto buf = std::make_unique<unsigned char[]>(size);
@@ -347,7 +347,7 @@ static boost::asio::awaitable<void> NetworkBroadcast(const CNetworkPacket &packe
 **  @param ncq  Outgoing network queue start.
 */
 [[nodiscard]]
-static boost::asio::awaitable<void> NetworkSendPacket(const std::array<CNetworkCommandQueue, MaxNetworkCommands> &ncq)
+static QCoro::Task<void> NetworkSendPacket(const std::array<CNetworkCommandQueue, MaxNetworkCommands> &ncq)
 {
 	try {
 		CNetworkPacket packet;
@@ -663,7 +663,7 @@ static bool IsNetworkCommandReady(unsigned long gameNetCycle)
 }
 
 [[nodiscard]]
-static boost::asio::awaitable<void> ParseResendCommand(const CNetworkPacket &packet)
+static QCoro::Task<void> ParseResendCommand(const CNetworkPacket &packet)
 {
 	// Destination cycle (time to execute).
 	unsigned long n = ((GameCycle + 128) & ~0xFF) | packet.Header.Cycle;
@@ -745,7 +745,7 @@ static bool IsAValidCommand(const CNetworkPacket &packet, int index, const int p
 }
 
 [[nodiscard]]
-static boost::asio::awaitable<void> NetworkParseInGameEvent(const std::array<unsigned char, 1024> &buf, int len, const CHost &host)
+static QCoro::Task<void> NetworkParseInGameEvent(const std::array<unsigned char, 1024> &buf, int len, const CHost &host)
 {
 	CNetworkPacket packet;
 	int commands;
@@ -826,7 +826,7 @@ static boost::asio::awaitable<void> NetworkParseInGameEvent(const std::array<uns
 **  Called if message for the network is ready.
 **  (by WaitEventsOneFrame)
 */
-boost::asio::awaitable<void> NetworkEvent()
+QCoro::Task<void> NetworkEvent()
 {
 	if (!IsNetworkGame()) {
 		NetworkInSync = true;
@@ -867,7 +867,7 @@ boost::asio::awaitable<void> NetworkEvent()
 /**
 **  Quit the game.
 */
-boost::asio::awaitable<void> NetworkQuitGame()
+QCoro::Task<void> NetworkQuitGame()
 {
 	if (!CPlayer::GetThisPlayer() || IsNetworkGame() == false) {
 		co_return;
@@ -995,7 +995,7 @@ static void NetworkExecCommand(const CNetworkCommandQueue &ncq)
 **  Network send commands.
 */
 [[nodiscard]]
-static boost::asio::awaitable<void> NetworkSendCommands(unsigned long gameNetCycle)
+static QCoro::Task<void> NetworkSendCommands(unsigned long gameNetCycle)
 {
 	// No command available, send sync.
 	int numcommands = 0;
@@ -1069,7 +1069,7 @@ static void NetworkExecCommands(unsigned long gameNetCycle)
 /**
 **  Handle network commands.
 */
-boost::asio::awaitable<void> NetworkCommands()
+QCoro::Task<void> NetworkCommands()
 {
 	if (!IsNetworkGame()) {
 		co_return;
@@ -1085,7 +1085,7 @@ boost::asio::awaitable<void> NetworkCommands()
 }
 
 [[nodiscard]]
-static boost::asio::awaitable<void> CheckPlayerThatTimeOut(int hostIndex)
+static QCoro::Task<void> CheckPlayerThatTimeOut(int hostIndex)
 {
 	const int playerIndex = Hosts[hostIndex].PlyNr;
 	const unsigned long lastFrame = NetworkLastFrame[playerIndex];
@@ -1129,7 +1129,7 @@ static boost::asio::awaitable<void> CheckPlayerThatTimeOut(int hostIndex)
 **  We need only send to the clients, that have not delivered the packet.
 */
 [[nodiscard]]
-static boost::asio::awaitable<void> NetworkResendCommands()
+static QCoro::Task<void> NetworkResendCommands()
 {
 #ifdef DEBUG
 	++NetworkStat.resentPacketCount;
@@ -1146,7 +1146,7 @@ static boost::asio::awaitable<void> NetworkResendCommands()
 	co_await NetworkBroadcast(packet, 1);
 }
 
-boost::asio::awaitable<void> NetworkRecover()
+QCoro::Task<void> NetworkRecover()
 {
 	if (HostsCount == 0) {
 		NetworkInSync = true;

@@ -1021,7 +1021,7 @@ int SaveReplay(const std::string &filename)
 	return 0;
 }
 
-boost::asio::awaitable<void> StartReplay(const std::filesystem::path &filepath, const bool reveal)
+QCoro::Task<void> StartReplay(const std::filesystem::path &filepath, const bool reveal)
 {
 	CleanPlayers();
 	LoadReplay(filepath);

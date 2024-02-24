@@ -57,7 +57,7 @@ extern void CleanReplayLog();
 extern void SaveReplayList(CFile &file);
 
 [[nodiscard]]
-extern boost::asio::awaitable<void> StartReplay(const std::filesystem::path &filepath, const bool reveal);
+extern QCoro::Task<void> StartReplay(const std::filesystem::path &filepath, const bool reveal);
 
 /// Register ccl functions related to network
 extern void ReplayCclRegister();

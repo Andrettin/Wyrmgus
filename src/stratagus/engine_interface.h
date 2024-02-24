@@ -181,19 +181,20 @@ public:
 
 	Q_INVOKABLE void exit();
 
-	std::future<void> get_map_view_created_future()
+	QFuture<void> get_map_view_created_future()
 	{
-		return this->map_view_created_promise.get_future();
+		return this->map_view_created_promise.future();
 	}
 
 	Q_INVOKABLE void on_map_view_created()
 	{
-		this->map_view_created_promise.set_value();
+		this->map_view_created_promise.finish();
 	}
 
 	void reset_map_view_created_promise()
 	{
-		this->map_view_created_promise = std::promise<void>();
+		this->map_view_created_promise = QPromise<void>();
+		this->map_view_created_promise.start();
 	}
 
 	bool is_waiting_for_interface() const
@@ -345,8 +346,8 @@ public:
 		this->set_lua_dialog_open_count(this->open_lua_dialog_count + change);
 	}
 
-	Q_INVOKABLE void load_game(const QUrl &file_url);
-	void load_game_deferred(const std::filesystem::path &filepath);
+	Q_INVOKABLE QCoro::QmlTask load_game(const QUrl &file_url);
+	QCoro::Task<void> load_game_deferred(const std::filesystem::path &filepath);
 
 	Q_INVOKABLE void check_achievements();
 
@@ -381,7 +382,7 @@ signals:
 
 private:
 	bool running = false;
-	std::promise<void> map_view_created_promise;
+	QPromise<void> map_view_created_promise;
 	std::atomic<bool> waiting_for_interface = false;
 	std::queue<std::unique_ptr<QInputEvent>> stored_input_events;
 	QRect cursor_restriction_rect;

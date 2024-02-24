@@ -87,7 +87,7 @@ client::~client()
 ** @param msecs  microseconds to delay
 */
 template <typename T>
-boost::asio::awaitable<void> client::SendRateLimited(const T &msg, unsigned long tick, unsigned long msecs)
+QCoro::Task<void> client::SendRateLimited(const T &msg, unsigned long tick, unsigned long msecs)
 {
 	const unsigned long now = tick;
 	if (now - networkState.LastFrame < msecs) {
@@ -110,7 +110,7 @@ boost::asio::awaitable<void> client::SendRateLimited(const T &msg, unsigned long
 }
 
 template<>
-boost::asio::awaitable<void> client::SendRateLimited<CInitMessage_Header>(const CInitMessage_Header &msg, unsigned long tick, unsigned long msecs)
+QCoro::Task<void> client::SendRateLimited<CInitMessage_Header>(const CInitMessage_Header &msg, unsigned long tick, unsigned long msecs)
 {
 	const unsigned long now = tick;
 	if (now - networkState.LastFrame < msecs) {
@@ -182,7 +182,7 @@ int client::get_difficulty() const
 
 void client::set_civilization(const int civilization_index)
 {
-	event_loop::get()->post([this, civilization_index]() {
+	QTimer::singleShot(0, [this, civilization_index]() {
 		GameSettings.Presets[NetLocalHostsSlot].Race = civilization_index;
 		this->local_setup->Race[NetLocalHostsSlot] = static_cast<int8_t>(civilization_index);
 	});
@@ -190,29 +190,27 @@ void client::set_civilization(const int civilization_index)
 
 void client::set_ready(const bool ready)
 {
-	event_loop::get()->post([this, ready]() {
+	QTimer::singleShot(0, [this, ready]() {
 		this->local_setup->Ready[NetLocalHostsSlot] = static_cast<uint8_t>(ready);
 	});
 }
 
-void client::start_game()
+QCoro::Task<void> client::start_game_coro()
 {
-	event_loop::get()->co_spawn([this]() -> boost::asio::awaitable<void> {
-		CPlayer::SetThisPlayer(CPlayer::Players[1].get());
+	CPlayer::SetThisPlayer(CPlayer::Players[1].get());
 
-		CMap::get()->NoFogOfWar = !this->has_fog_of_war();
+	CMap::get()->NoFogOfWar = !this->has_fog_of_war();
 
-		if (this->is_reveal_map_enabled()) {
-			FlagRevealMap = 1;
-		}
+	if (this->is_reveal_map_enabled()) {
+		FlagRevealMap = 1;
+	}
 
-		network_manager::get()->prepare_game_settings(this->get_server_setup());
+	network_manager::get()->prepare_game_settings(this->get_server_setup());
 
-		co_await game::get()->run_map(path::from_string(NetworkMapName));
-	});
+	co_await game::get()->run_map(path::from_string(NetworkMapName));
 }
 
-boost::asio::awaitable<bool> client::Update_disconnected()
+QCoro::Task<bool> client::Update_disconnected()
 {
 	assert_throw(networkState.State == ccs_disconnected);
 	const CInitMessage_Header message(MessageInit_FromClient, ICMSeeYou);
@@ -225,7 +223,7 @@ boost::asio::awaitable<bool> client::Update_disconnected()
 	co_return false;
 }
 
-boost::asio::awaitable<bool> client::Update_detaching(unsigned long tick)
+QCoro::Task<bool> client::Update_detaching(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_detaching);
 
@@ -239,7 +237,7 @@ boost::asio::awaitable<bool> client::Update_detaching(unsigned long tick)
 	}
 }
 
-boost::asio::awaitable<bool> client::Update_connecting(unsigned long tick)
+QCoro::Task<bool> client::Update_connecting(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_connecting);
 
@@ -253,7 +251,7 @@ boost::asio::awaitable<bool> client::Update_connecting(unsigned long tick)
 	}
 }
 
-boost::asio::awaitable<bool> client::Update_connected(unsigned long tick)
+QCoro::Task<bool> client::Update_connected(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_connected);
 
@@ -273,7 +271,7 @@ static bool IsLocalSetupInSync(const multiplayer_setup &state1, const multiplaye
 		&& state1.Ready[index] == state2.Ready[index]);
 }
 
-boost::asio::awaitable<bool> client::Update_synced(unsigned long tick)
+QCoro::Task<bool> client::Update_synced(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_synced);
 
@@ -286,7 +284,7 @@ boost::asio::awaitable<bool> client::Update_synced(unsigned long tick)
 	co_return true;
 }
 
-boost::asio::awaitable<bool> client::Update_changed(unsigned long tick)
+QCoro::Task<bool> client::Update_changed(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_changed);
 
@@ -300,7 +298,7 @@ boost::asio::awaitable<bool> client::Update_changed(unsigned long tick)
 	}
 }
 
-boost::asio::awaitable<bool> client::Update_async(unsigned long tick)
+QCoro::Task<bool> client::Update_async(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_async);
 
@@ -314,7 +312,7 @@ boost::asio::awaitable<bool> client::Update_async(unsigned long tick)
 	}
 }
 
-boost::asio::awaitable<bool> client::Update_mapinfo(unsigned long tick)
+QCoro::Task<bool> client::Update_mapinfo(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_mapinfo);
 
@@ -329,7 +327,7 @@ boost::asio::awaitable<bool> client::Update_mapinfo(unsigned long tick)
 	}
 }
 
-boost::asio::awaitable<bool> client::Update_badmap(unsigned long tick)
+QCoro::Task<bool> client::Update_badmap(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_badmap);
 
@@ -343,7 +341,7 @@ boost::asio::awaitable<bool> client::Update_badmap(unsigned long tick)
 	}
 }
 
-boost::asio::awaitable<bool> client::Update_goahead(unsigned long tick)
+QCoro::Task<bool> client::Update_goahead(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_goahead);
 
@@ -357,7 +355,7 @@ boost::asio::awaitable<bool> client::Update_goahead(unsigned long tick)
 	}
 }
 
-boost::asio::awaitable<bool> client::Update_started(unsigned long tick)
+QCoro::Task<bool> client::Update_started(unsigned long tick)
 {
 	assert_throw(networkState.State == ccs_started);
 
@@ -369,63 +367,63 @@ boost::asio::awaitable<bool> client::Update_started(unsigned long tick)
 	}
 }
 
-boost::asio::awaitable<void> client::Send_Go(unsigned long tick)
+QCoro::Task<void> client::Send_Go(unsigned long tick)
 {
 	const CInitMessage_Header message(MessageInit_FromClient, ICMGo);
 
 	co_await SendRateLimited(message, tick, 250);
 }
 
-boost::asio::awaitable<void> client::Send_Config(unsigned long tick)
+QCoro::Task<void> client::Send_Config(unsigned long tick)
 {
 	const CInitMessage_Header message(MessageInit_FromClient, ICMConfig);
 
 	co_await SendRateLimited(message, tick, 250);
 }
 
-boost::asio::awaitable<void> client::Send_MapUidMismatch(unsigned long tick)
+QCoro::Task<void> client::Send_MapUidMismatch(unsigned long tick)
 {
 	const CInitMessage_Header message(MessageInit_FromClient, ICMMapUidMismatch); // MAP Uid doesn't match
 
 	co_await SendRateLimited(message, tick, 650);
 }
 
-boost::asio::awaitable<void> client::Send_Map(unsigned long tick)
+QCoro::Task<void> client::Send_Map(unsigned long tick)
 {
 	const CInitMessage_Header message(MessageInit_FromClient, ICMMap);
 
 	co_await SendRateLimited(message, tick, 650);
 }
 
-boost::asio::awaitable<void> client::Send_Resync(unsigned long tick)
+QCoro::Task<void> client::Send_Resync(unsigned long tick)
 {
 	const CInitMessage_Header message(MessageInit_FromClient, ICMResync);
 
 	co_await SendRateLimited(message, tick, 450);
 }
 
-boost::asio::awaitable<void> client::Send_State(unsigned long tick)
+QCoro::Task<void> client::Send_State(unsigned long tick)
 {
 	const CInitMessage_State message(MessageInit_FromClient, *this->local_setup);
 
 	co_await SendRateLimited(message, tick, 450);
 }
 
-boost::asio::awaitable<void> client::Send_Waiting(unsigned long tick, unsigned long msec)
+QCoro::Task<void> client::Send_Waiting(unsigned long tick, unsigned long msec)
 {
 	const CInitMessage_Header message(MessageInit_FromClient, ICMWaiting);
 
 	co_await SendRateLimited(message, tick, msec);
 }
 
-boost::asio::awaitable<void> client::Send_Hello(unsigned long tick)
+QCoro::Task<void> client::Send_Hello(unsigned long tick)
 {
 	const CInitMessage_Hello message(name.c_str());
 
 	co_await SendRateLimited(message, tick, 500);
 }
 
-boost::asio::awaitable<void> client::Send_GoodBye(unsigned long tick)
+QCoro::Task<void> client::Send_GoodBye(unsigned long tick)
 {
 	const CInitMessage_Header message(MessageInit_FromClient, ICMGoodBye);
 
@@ -435,7 +433,7 @@ boost::asio::awaitable<void> client::Send_GoodBye(unsigned long tick)
 /*
 ** @return false when client has finished.
 */
-boost::asio::awaitable<bool> client::Update(unsigned long tick)
+QCoro::Task<bool> client::Update(unsigned long tick)
 {
 	switch (networkState.State) {
 		case ccs_disconnected:
@@ -519,7 +517,7 @@ void client::SetServerHost(std::unique_ptr<CHost> &&host)
 	this->serverHost = std::move(host);
 }
 
-boost::asio::awaitable<bool> client::Parse(const std::array<unsigned char, 1024> &buf)
+QCoro::Task<bool> client::Parse(const std::array<unsigned char, 1024> &buf)
 {
 	CInitMessage_Header header;
 	header.Deserialize(buf.data());
@@ -817,7 +815,7 @@ void client::Parse_EngineMismatch(const unsigned char *buf)
 **
 ** @param msg message received
 */
-boost::asio::awaitable<void> client::Parse_AreYouThere()
+QCoro::Task<void> client::Parse_AreYouThere()
 {
 	const CInitMessage_Header message(MessageInit_FromClient, ICMIAH); // IAmHere
 

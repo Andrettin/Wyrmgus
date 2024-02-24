@@ -83,7 +83,7 @@ int SaveGame(const std::string &file_url_str)
 	return 0;
 }
 
-boost::asio::awaitable<void> StartSavedGame(const std::filesystem::path &filepath)
+QCoro::Task<void> StartSavedGame(const std::filesystem::path &filepath)
 {
 	SaveGameLoading = true;
 	LoadGame(filepath);
@@ -91,7 +91,7 @@ boost::asio::awaitable<void> StartSavedGame(const std::filesystem::path &filepat
 	co_await StartMap(filepath, false);
 }
 
-boost::asio::awaitable<void> load_game(const std::filesystem::path &filepath)
+QCoro::Task<void> load_game(const std::filesystem::path &filepath)
 {
 	engine_interface::get()->set_loading_message("Loading Saved Game...");
 

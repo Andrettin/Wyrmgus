@@ -63,7 +63,7 @@ CMetaClient::~CMetaClient()
 **
 **  @return  -1 fail, 0 success.
 */
-boost::asio::awaitable<int> CMetaClient::Init()
+QCoro::Task<int> CMetaClient::Init()
 {
 	if (metaPort == -1) {
 		co_return -1;
@@ -128,7 +128,7 @@ void CMetaClient::Close()
 **
 **  @returns     -1 if failed, otherwise length of command
 */
-boost::asio::awaitable<int> CMetaClient::Send(const std::string cmd)
+QCoro::Task<int> CMetaClient::Send(const std::string cmd)
 {
 	int ret = -1;
 	std::string mes(cmd);
@@ -150,7 +150,7 @@ boost::asio::awaitable<int> CMetaClient::Send(const std::string cmd)
 **
 **  @return error or number of bytes
 */
-boost::asio::awaitable<int> CMetaClient::Recv()
+QCoro::Task<int> CMetaClient::Recv()
 {
 	if (co_await metaSocket.WaitForDataToRead(5000) == 0) {
 		co_return -1;
@@ -173,5 +173,5 @@ boost::asio::awaitable<int> CMetaClient::Recv()
 	log->entry = cmd;
 	this->events.push_back(std::move(log));
 	lastRecvState = n;
-	co_return n;
+	co_return static_cast<int>(n);
 }

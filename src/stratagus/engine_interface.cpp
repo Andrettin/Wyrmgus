@@ -156,7 +156,7 @@ QString engine_interface::get_user_maps_path() const
 
 void engine_interface::call_lua_command(const QString &command)
 {
-	event_loop::get()->post([command]() {
+	QTimer::singleShot(0, [command]() {
 		CclCommand(command.toStdString());
 	});
 }
@@ -166,7 +166,7 @@ void engine_interface::play_sound(const QString &sound_identifier)
 	try {
 		const sound *sound = sound::get(sound_identifier.toStdString());
 
-		event_loop::get()->post([sound]() {
+		QTimer::singleShot(0, [sound]() {
 			PlayGameSound(sound, MaxSampleVolume);
 		});
 	} catch (...) {
@@ -179,7 +179,7 @@ void engine_interface::play_music(const QString &type_str)
 	try {
 		const music_type type = enum_converter<music_type>::to_enum(type_str.toStdString());
 
-		event_loop::get()->post([type]() {
+		QTimer::singleShot(0, [type]() {
 			music_player::get()->play_music_type(type);
 		});
 	} catch (...) {
@@ -189,7 +189,7 @@ void engine_interface::play_music(const QString &type_str)
 
 void engine_interface::exit()
 {
-	event_loop::get()->post([]() {
+	QTimer::singleShot(0, []() {
 		if (CEditor::get()->is_running()) {
 			CEditor::get()->set_running(false);
 			GameResult = GameExit;
@@ -744,28 +744,26 @@ map_info *engine_interface::get_map_info() const
 
 void engine_interface::set_modal_dialog_open_async(const bool value)
 {
-	event_loop::get()->post([this, value]() {
+	QTimer::singleShot(0, [this, value]() {
 		this->set_cursor_restriction_rect(QRect());
 		cursor::set_current_cursor(UI.get_cursor(cursor_type::point), true);
 		this->modal_dialog_open = value;
 	});
 }
 
-void engine_interface::load_game(const QUrl &file_url)
+QCoro::QmlTask engine_interface::load_game(const QUrl &file_url)
 {
-	this->load_game_deferred(path::from_qurl(file_url));
+	return this->load_game_deferred(path::from_qurl(file_url));
 }
 
-void engine_interface::load_game_deferred(const std::filesystem::path &filepath)
+QCoro::Task<void> engine_interface::load_game_deferred(const std::filesystem::path &filepath)
 {
-	event_loop::get()->co_spawn([filepath]() -> boost::asio::awaitable<void> {
-		co_await ::load_game(filepath);
-	});
+	co_await ::load_game(filepath);
 }
 
 void engine_interface::check_achievements()
 {
-	event_loop::get()->post([]() {
+	QTimer::singleShot(0, []() {
 		achievement::check_achievements();
 	});
 }

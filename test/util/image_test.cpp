@@ -29,7 +29,6 @@
 #include "util/image_util.h"
 
 #include "util/fractional_int.h"
-#include "util/thread_pool.h"
 
 #include "xbrz/include/xbrz.h"
 

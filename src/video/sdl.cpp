@@ -69,6 +69,8 @@
 #include "widgets.h"
 
 #pragma warning(push, 0)
+#include <qcoro/core/qcorotimer.h>
+
 #include <QWindow>
 #pragma warning(pop)
 
@@ -818,7 +820,7 @@ static SDL_Event qevent_to_sdl_event(std::unique_ptr<QInputEvent> &&qevent)
 **  All events available are fetched. Sound and network only if available.
 **  Returns if the time for one frame is over.
 */
-boost::asio::awaitable<void> WaitEventsOneFrame()
+QCoro::Task<void> WaitEventsOneFrame()
 {
 	++FrameCounter;
 
@@ -899,7 +901,7 @@ boost::asio::awaitable<void> WaitEventsOneFrame()
 		ticks = SDL_GetTicks();
 		if (!interrupts && ticks < NextFrameTicks) {
 			const uint64_t ms = static_cast<uint64_t>(NextFrameTicks - ticks);
-			co_await event_loop::get()->await_ms(ms);
+			co_await QCoro::sleepFor(std::chrono::milliseconds(ms));
 			ticks = SDL_GetTicks();
 		}
 		while (ticks >= (unsigned long)(NextFrameTicks)) {

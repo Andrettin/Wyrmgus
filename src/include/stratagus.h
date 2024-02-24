@@ -169,18 +169,18 @@ extern unsigned long GameCycle;				/// Game simulation cycle counter
 extern unsigned long FastForwardCycle;		/// Game Replay Fast Forward Counter
 
 [[nodiscard]]
-extern boost::asio::awaitable<void> Exit(const int err);                  /// Exit
+extern QCoro::Task<void> Exit(const int err);                  /// Exit
 
 extern void UpdateDisplay();            /// Game display update
 extern void DrawMapArea(std::vector<std::function<void(wyrmgus::renderer *)>> &render_commands); //draw the map area
 
 [[nodiscard]]
-extern boost::asio::awaitable<void> GameMainLoop(); //game main loop
+extern QCoro::Task<void> GameMainLoop(); //game main loop
 
 extern void stratagus_on_exit_cleanup();
 
 [[nodiscard]]
-extern boost::asio::awaitable<void> stratagusMain(int argc, char **argv); /// main entry
+extern QCoro::Task<void> stratagusMain(int argc, char **argv); /// main entry
 
 //Wyrmgus start
 enum Difficulties {

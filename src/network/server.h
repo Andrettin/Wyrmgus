@@ -53,10 +53,10 @@ public:
 	void init(const std::string &name, CUDPSocket *socket, const int open_slots);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Update(unsigned long frameCounter);
+	QCoro::Task<void> Update(unsigned long frameCounter);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Parse(unsigned long frameCounter, const unsigned char *buf, const CHost &host);
+	QCoro::Task<void> Parse(unsigned long frameCounter, const unsigned char *buf, const CHost &host);
 
 	void resync_clients();
 
@@ -78,10 +78,16 @@ public:
 	Q_INVOKABLE void set_resources_option(const int value);
 	Q_INVOKABLE void set_difficulty(const int difficulty);
 
-	Q_INVOKABLE void start_game();
+	Q_INVOKABLE QCoro::QmlTask start_game()
+	{
+		return this->start_game_coro();
+	}
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> init_game();
+	QCoro::Task<void> start_game_coro();
+
+	[[nodiscard]]
+	QCoro::Task<void> init_game();
 
 	bool is_ready_to_start() const
 	{
@@ -104,45 +110,45 @@ public:
 
 private:
 	[[nodiscard]]
-	boost::asio::awaitable<int> Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host);
+	QCoro::Task<int> Parse_Hello(int h, const CInitMessage_Hello &msg, const CHost &host);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Parse_Resync(const int h);
+	QCoro::Task<void> Parse_Resync(const int h);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Parse_Waiting(const int h);
+	QCoro::Task<void> Parse_Waiting(const int h);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Parse_Map(const int h);
+	QCoro::Task<void> Parse_Map(const int h);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Parse_State(const int h, const CInitMessage_State &msg);
+	QCoro::Task<void> Parse_State(const int h, const CInitMessage_State &msg);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Parse_GoodBye(const int h);
+	QCoro::Task<void> Parse_GoodBye(const int h);
 
 	void Parse_SeeYou(const int h);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Send_AreYouThere(const multiplayer_host &host);
+	QCoro::Task<void> Send_AreYouThere(const multiplayer_host &host);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Send_GameFull(const CHost &host);
+	QCoro::Task<void> Send_GameFull(const CHost &host);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Send_Welcome(const multiplayer_host &host, int hostIndex);
+	QCoro::Task<void> Send_Welcome(const multiplayer_host &host, int hostIndex);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Send_Resync(const multiplayer_host &host, int hostIndex);
+	QCoro::Task<void> Send_Resync(const multiplayer_host &host, int hostIndex);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Send_Map(const multiplayer_host &host);
+	QCoro::Task<void> Send_Map(const multiplayer_host &host);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Send_State(const multiplayer_host &host);
+	QCoro::Task<void> Send_State(const multiplayer_host &host);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Send_GoodBye(const multiplayer_host &host);
+	QCoro::Task<void> Send_GoodBye(const multiplayer_host &host);
 
 signals:
 	void ready_to_start_changed();

@@ -77,7 +77,7 @@ void network_manager::reset()
 	this->ready_player_count = 0;
 }
 
-boost::asio::awaitable<bool> network_manager::setup_server_address(const std::string &server_address, int port)
+QCoro::Task<bool> network_manager::setup_server_address(const std::string server_address, int port)
 {
 	if (port == 0) {
 		port = CNetworkParameter::Instance.default_port;
@@ -104,19 +104,12 @@ boost::asio::awaitable<bool> network_manager::setup_server_address(const std::st
 	co_return true;
 }
 
-void network_manager::setup_server_address(const QString &server_address, const int port)
-{
-	event_loop::get()->co_spawn([this, server_address, port]() -> boost::asio::awaitable<void> {
-		co_await this->setup_server_address(server_address.toStdString(), port);
-	});
-}
-
 /**
 ** Setup Network connect state machine for clients
 */
 void network_manager::init_client_connect()
 {
-	event_loop::get()->post([this]() {
+	QTimer::singleShot(0, [this]() {
 		NetConnectRunning = 2;
 		NetConnectType = 2;
 
@@ -126,13 +119,11 @@ void network_manager::init_client_connect()
 	});
 }
 
-void network_manager::process_client_request()
+QCoro::Task<void> network_manager::process_client_request_coro()
 {
-	event_loop::get()->co_spawn([this]() -> boost::asio::awaitable<void> {
-		if (co_await this->get_client()->Update(GetTicks()) == false) {
-			NetConnectRunning = 0;
-		}
-	});
+	if (co_await this->get_client()->Update(GetTicks()) == false) {
+		NetConnectRunning = 0;
+	}
 }
 
 void network_manager::init_server_connect(const QString &map_filepath_qstr, const int open_slots)
@@ -159,16 +150,14 @@ void network_manager::init_server_connect(const QString &map_filepath_qstr, cons
 	emit network_manager::get()->player_name_changed(0, Hosts[0].PlyName);
 }
 
-void network_manager::process_server_request()
+QCoro::Task<void> network_manager::process_server_request_coro()
 {
-	event_loop::get()->co_spawn([this]() -> boost::asio::awaitable<void> {
-		if (GameRunning) {
-			//game already started...
-			co_return;
-		}
+	if (GameRunning) {
+		//game already started...
+		co_return;
+	}
 
-		co_await this->get_server()->Update(FrameCounter);
-	});
+	co_await this->get_server()->Update(FrameCounter);
 }
 
 void network_manager::prepare_game_settings(const multiplayer_setup &setup)

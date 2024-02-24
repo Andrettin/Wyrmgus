@@ -65,16 +65,16 @@ extern void ExitNetwork1();  /// Cleanup network (port)
 extern void NetworkOnStartGame();  /// Initialise network data for ingame communication
 
 [[nodiscard]]
-extern boost::asio::awaitable<void> NetworkEvent();  /// Handle network events
+extern QCoro::Task<void> NetworkEvent();  /// Handle network events
 
 [[nodiscard]]
-extern boost::asio::awaitable<void> NetworkQuitGame();  /// Quit game: warn other users
+extern QCoro::Task<void> NetworkQuitGame();  /// Quit game: warn other users
 
 [[nodiscard]]
-extern boost::asio::awaitable<void> NetworkRecover();   /// Recover network
+extern QCoro::Task<void> NetworkRecover();   /// Recover network
 
 [[nodiscard]]
-extern boost::asio::awaitable<void> NetworkCommands();  /// Get all network commands
+extern QCoro::Task<void> NetworkCommands();  /// Get all network commands
 
 extern void NetworkSendChatMessage(const std::string &msg);  /// Send chat message
 /// Send network command.

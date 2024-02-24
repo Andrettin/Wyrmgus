@@ -57,10 +57,10 @@ public:
 	void SetServerHost(std::unique_ptr<CHost> &&host);
 
 	[[nodiscard]]
-	boost::asio::awaitable<bool> Parse(const std::array<unsigned char, 1024> &buf);
+	QCoro::Task<bool> Parse(const std::array<unsigned char, 1024> &buf);
 
 	[[nodiscard]]
-	boost::asio::awaitable<bool> Update(unsigned long tick);
+	QCoro::Task<bool> Update(unsigned long tick);
 
 	void DetachFromServer();
 
@@ -92,72 +92,78 @@ public:
 
 	Q_INVOKABLE void set_ready(const bool ready);
 
-	Q_INVOKABLE void start_game();
+	Q_INVOKABLE QCoro::QmlTask start_game()
+	{
+		return this->start_game_coro();
+	}
+
+	[[nodiscard]]
+	QCoro::Task<void> start_game_coro();
 
 private:
 	[[nodiscard]]
-	boost::asio::awaitable<bool> Update_disconnected();
+	QCoro::Task<bool> Update_disconnected();
 
 	[[nodiscard]]
-	boost::asio::awaitable<bool> Update_detaching(unsigned long tick);
+	QCoro::Task<bool> Update_detaching(unsigned long tick);
 
 	[[nodiscard]]
-	boost::asio::awaitable<bool> Update_connecting(unsigned long tick);
+	QCoro::Task<bool> Update_connecting(unsigned long tick);
 
 	[[nodiscard]]
-	boost::asio::awaitable<bool> Update_connected(unsigned long tick);
+	QCoro::Task<bool> Update_connected(unsigned long tick);
 
 	[[nodiscard]]
-	boost::asio::awaitable<bool> Update_synced(unsigned long tick);
+	QCoro::Task<bool> Update_synced(unsigned long tick);
 
 	[[nodiscard]]
-	boost::asio::awaitable<bool> Update_changed(unsigned long tick);
+	QCoro::Task<bool> Update_changed(unsigned long tick);
 
 	[[nodiscard]]
-	boost::asio::awaitable<bool> Update_async(unsigned long tick);
+	QCoro::Task<bool> Update_async(unsigned long tick);
 
 	[[nodiscard]]
-	boost::asio::awaitable<bool> Update_mapinfo(unsigned long tick);
+	QCoro::Task<bool> Update_mapinfo(unsigned long tick);
 
 	[[nodiscard]]
-	boost::asio::awaitable<bool> Update_badmap(unsigned long tick);
+	QCoro::Task<bool> Update_badmap(unsigned long tick);
 
 	[[nodiscard]]
-	boost::asio::awaitable<bool> Update_goahead(unsigned long tick);
+	QCoro::Task<bool> Update_goahead(unsigned long tick);
 
 	[[nodiscard]]
-	boost::asio::awaitable<bool> Update_started(unsigned long tick);
+	QCoro::Task<bool> Update_started(unsigned long tick);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Send_Go(unsigned long tick);
+	QCoro::Task<void> Send_Go(unsigned long tick);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Send_Config(unsigned long tick);
+	QCoro::Task<void> Send_Config(unsigned long tick);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Send_MapUidMismatch(unsigned long tick);
+	QCoro::Task<void> Send_MapUidMismatch(unsigned long tick);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Send_Map(unsigned long tick);
+	QCoro::Task<void> Send_Map(unsigned long tick);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Send_Resync(unsigned long tick);
+	QCoro::Task<void> Send_Resync(unsigned long tick);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Send_State(unsigned long tick);
+	QCoro::Task<void> Send_State(unsigned long tick);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Send_Waiting(unsigned long tick, unsigned long msec);
+	QCoro::Task<void> Send_Waiting(unsigned long tick, unsigned long msec);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Send_Hello(unsigned long tick);
+	QCoro::Task<void> Send_Hello(unsigned long tick);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Send_GoodBye(unsigned long tick);
+	QCoro::Task<void> Send_GoodBye(unsigned long tick);
 
 	template <typename T>
 	[[nodiscard]]
-	boost::asio::awaitable<void> SendRateLimited(const T &msg, unsigned long tick, unsigned long msecs);
+	QCoro::Task<void> SendRateLimited(const T &msg, unsigned long tick, unsigned long msecs);
 
 	void SetConfig(const CInitMessage_Config &msg);
 
@@ -171,7 +177,7 @@ private:
 	void Parse_Map(const unsigned char *buf);
 
 	[[nodiscard]]
-	boost::asio::awaitable<void> Parse_AreYouThere();
+	QCoro::Task<void> Parse_AreYouThere();
 
 signals:
 	void fog_of_war_changed();
