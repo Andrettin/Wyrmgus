@@ -218,7 +218,7 @@ bool engine_interface::eventFilter(QObject *source, QEvent *event)
 				return true;
 			}
 
-			this->store_input_event(std::make_unique<QMouseEvent>(*mouse_event));
+			this->store_input_event(std::unique_ptr<QInputEvent>(static_cast<QInputEvent *>(mouse_event->clone())));
 			return true;
 		}
 		case QEvent::HoverEnter:
@@ -235,13 +235,13 @@ bool engine_interface::eventFilter(QObject *source, QEvent *event)
 				return true;
 			}
 
-			this->store_input_event(std::make_unique<QHoverEvent>(*hover_event));
+			this->store_input_event(std::unique_ptr<QInputEvent>(static_cast<QInputEvent *>(hover_event->clone())));
 			return true;
 		}
 		case QEvent::KeyPress:
 		case QEvent::KeyRelease: {
 			const QKeyEvent *key_event = static_cast<QKeyEvent *>(event);
-			this->store_input_event(std::make_unique<QKeyEvent>(*key_event));
+			this->store_input_event(std::unique_ptr<QInputEvent>(static_cast<QInputEvent *>(key_event->clone())));
 
 			if (key_event->key() == Qt::Key_Tab || key_event->key() == Qt::Key_Backtab) {
 				return true; //consume tab events to prevent tab focus switching
