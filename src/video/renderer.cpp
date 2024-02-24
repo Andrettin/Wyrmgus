@@ -36,6 +36,7 @@
 #include <QOpenGLFramebufferObjectFormat>
 #include <QOpenGLPaintDevice>
 #include <QPainter>
+#include <QQuickOpenGLUtils>
 #include <QQuickWindow>
 #pragma warning(pop)
 
@@ -109,7 +110,7 @@ void renderer::reset_opengl()
 	this->painter.reset();
 	this->paint_device.reset();
 
-	this->fbo->window()->resetOpenGLState();
+	QQuickOpenGLUtils::resetOpenGLState();
 }
 
 void renderer::blit_texture_frame(const QOpenGLTexture *texture, const QPoint &pos, const QPoint &frame_pixel_pos, const QSize &frame_size, const bool flip, const unsigned char opacity, const int show_percent, const QSize &rendered_size)
