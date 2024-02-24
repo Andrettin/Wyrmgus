@@ -30,6 +30,25 @@
 #include "util/fractional_int.h"
 #include "util/singleton.h"
 
+Q_MOC_INCLUDE("dialogue.h")
+Q_MOC_INCLUDE("economy/resource.h")
+Q_MOC_INCLUDE("map/map_presets.h")
+Q_MOC_INCLUDE("map/map_projection.h")
+Q_MOC_INCLUDE("map/terrain_type.h")
+Q_MOC_INCLUDE("player/civilization.h")
+Q_MOC_INCLUDE("player/player_color.h")
+Q_MOC_INCLUDE("population/population_class.h")
+Q_MOC_INCLUDE("time/season_schedule.h")
+Q_MOC_INCLUDE("time/time_of_day.h")
+Q_MOC_INCLUDE("time/time_of_day_schedule.h")
+Q_MOC_INCLUDE("ui/button_level.h")
+Q_MOC_INCLUDE("ui/icon.h")
+Q_MOC_INCLUDE("ui/interface_style.h")
+Q_MOC_INCLUDE("ui/resource_icon.h")
+Q_MOC_INCLUDE("unit/unit_class.h")
+Q_MOC_INCLUDE("video/font.h")
+Q_MOC_INCLUDE("video/font_color.h")
+
 class CGraphic;
 class CPlayerColorGraphic;
 class CUpgrade;

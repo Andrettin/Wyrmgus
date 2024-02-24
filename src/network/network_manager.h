@@ -28,6 +28,10 @@
 
 #include "util/singleton.h"
 
+Q_MOC_INCLUDE("map/map_info.h")
+Q_MOC_INCLUDE("network/client.h")
+Q_MOC_INCLUDE("network/server.h")
+
 class CUDPSocket;
 
 namespace wyrmgus {

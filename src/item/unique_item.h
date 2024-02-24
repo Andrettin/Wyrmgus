@@ -29,6 +29,11 @@
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
 
+Q_MOC_INCLUDE("spell/spell.h")
+Q_MOC_INCLUDE("ui/icon.h")
+Q_MOC_INCLUDE("unit/unit_type.h")
+Q_MOC_INCLUDE("upgrade/upgrade_structs.h")
+
 class CUnit;
 class CUpgrade;
 struct lua_State;

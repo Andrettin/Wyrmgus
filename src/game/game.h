@@ -29,6 +29,9 @@
 #include "util/qunique_ptr.h"
 #include "util/singleton.h"
 
+Q_MOC_INCLUDE("game/results_info.h")
+Q_MOC_INCLUDE("quest/campaign.h")
+
 class CFile;
 class CPlayer;
 class CUnit;

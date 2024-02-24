@@ -37,6 +37,11 @@
 #include "util/point_container.h"
 #include "vec2i.h"
 
+Q_MOC_INCLUDE("map/map_projection.h")
+Q_MOC_INCLUDE("map/terrain_type.h")
+Q_MOC_INCLUDE("map/tileset.h")
+Q_MOC_INCLUDE("map/world.h")
+
 class CPlayer;
 class CUnit;
 struct lua_State;

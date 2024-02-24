@@ -30,6 +30,11 @@
 #include "language/name_variant.h"
 #include "unit/unit_class_container.h"
 
+Q_MOC_INCLUDE("player/civilization_group.h")
+Q_MOC_INCLUDE("player/player_color.h")
+Q_MOC_INCLUDE("sound/sound.h")
+Q_MOC_INCLUDE("species/species.h")
+
 class CUpgrade;
 
 namespace archimedes {

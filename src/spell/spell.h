@@ -35,6 +35,9 @@
 #include "luacallback.h"
 #include "vec2i.h"
 
+Q_MOC_INCLUDE("sound/sound.h")
+Q_MOC_INCLUDE("upgrade/upgrade_structs.h")
+
 #ifdef __MORPHOS__
 #undef Enable
 #endif

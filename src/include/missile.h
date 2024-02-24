@@ -279,6 +279,8 @@
 #include "missileconfig.h"
 #include "vec2i.h"
 
+Q_MOC_INCLUDE("sound/sound.h")
+
 class CConfigData;
 class CGraphic;
 class CUnit;

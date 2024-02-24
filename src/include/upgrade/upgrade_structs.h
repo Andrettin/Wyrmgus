@@ -37,6 +37,14 @@
 #include "stratagus.h"
 #include "unit/unit_type_container.h"
 
+Q_MOC_INCLUDE("player/civilization.h")
+Q_MOC_INCLUDE("player/civilization_group.h")
+Q_MOC_INCLUDE("player/faction.h")
+Q_MOC_INCLUDE("ui/icon.h")
+Q_MOC_INCLUDE("ui/resource_icon.h")
+Q_MOC_INCLUDE("unit/unit_type.h")
+Q_MOC_INCLUDE("upgrade/upgrade_class.h")
+
 class CPlayer;
 class CUnit;
 struct lua_State;

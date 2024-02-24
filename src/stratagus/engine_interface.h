@@ -29,6 +29,18 @@
 #include "util/qunique_ptr.h"
 #include "util/singleton.h"
 
+Q_MOC_INCLUDE("database/defines.h")
+Q_MOC_INCLUDE("database/preferences.h")
+Q_MOC_INCLUDE("editor.h")
+Q_MOC_INCLUDE("game/game.h")
+Q_MOC_INCLUDE("map/map_info.h")
+Q_MOC_INCLUDE("network/network_manager.h")
+Q_MOC_INCLUDE("parameters.h")
+Q_MOC_INCLUDE("player/player.h")
+Q_MOC_INCLUDE("time/season.h")
+Q_MOC_INCLUDE("time/time_of_day.h")
+Q_MOC_INCLUDE("ui/interface_style.h")
+
 class CEditor;
 class CPlayer;
 

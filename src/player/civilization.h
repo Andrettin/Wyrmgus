@@ -31,6 +31,10 @@
 #include "time/date.h"
 #include "ui/ui.h"
 
+Q_MOC_INCLUDE("language/language.h")
+Q_MOC_INCLUDE("ui/interface_style.h")
+Q_MOC_INCLUDE("upgrade/upgrade_structs.h")
+
 class CAiBuildingTemplate;
 class CCurrency;
 class CPlayer;

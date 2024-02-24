@@ -39,6 +39,9 @@
 #include "util/qunique_ptr.h"
 #include "vec2i.h"
 
+Q_MOC_INCLUDE("age.h")
+Q_MOC_INCLUDE("player/player_color.h")
+
 constexpr int DefaultTradeCost = 30;
 
 class CCurrency;

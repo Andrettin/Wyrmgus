@@ -29,6 +29,15 @@
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
 
+Q_MOC_INCLUDE("character.h")
+Q_MOC_INCLUDE("magic_domain.h")
+Q_MOC_INCLUDE("map/world.h")
+Q_MOC_INCLUDE("player/civilization.h")
+Q_MOC_INCLUDE("religion/pantheon.h")
+Q_MOC_INCLUDE("religion/religion.h")
+Q_MOC_INCLUDE("ui/icon.h")
+Q_MOC_INCLUDE("upgrade/upgrade_structs.h")
+
 class CUpgrade;
 struct lua_State;
 

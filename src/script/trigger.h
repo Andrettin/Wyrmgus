@@ -29,6 +29,8 @@
 #include "database/data_entry.h"
 #include "database/data_type.h"
 
+Q_MOC_INCLUDE("script/trigger_random_group.h")
+
 class CFile;
 class CPlayer;
 class CUnit;

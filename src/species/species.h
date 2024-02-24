@@ -29,6 +29,8 @@
 #include "database/data_type.h"
 #include "species/taxon_base.h"
 
+Q_MOC_INCLUDE("map/world.h")
+
 struct lua_State;
 
 extern int CclDefineSpecies(lua_State *l);

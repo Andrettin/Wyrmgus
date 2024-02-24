@@ -32,6 +32,14 @@
 #include "item/item_slot.h"
 #include "time/date.h"
 
+Q_MOC_INCLUDE("epithet.h")
+Q_MOC_INCLUDE("map/site.h")
+Q_MOC_INCLUDE("player/civilization.h")
+Q_MOC_INCLUDE("player/dynasty.h")
+Q_MOC_INCLUDE("player/faction.h")
+Q_MOC_INCLUDE("ui/icon.h")
+Q_MOC_INCLUDE("unit/unit_type.h")
+
 class CFile;
 class CPlayer;
 class CProvince;

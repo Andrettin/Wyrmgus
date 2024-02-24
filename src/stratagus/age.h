@@ -29,6 +29,8 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 
+Q_MOC_INCLUDE("ui/resource_icon.h")
+
 class CPlayer;
 
 namespace wyrmgus {

@@ -31,6 +31,15 @@
 #include "include/data_type.h"
 #include "vec2i.h"
 
+Q_MOC_INCLUDE("map/map_presets.h")
+Q_MOC_INCLUDE("map/map_template.h")
+Q_MOC_INCLUDE("player/faction.h")
+Q_MOC_INCLUDE("player/player_color.h")
+Q_MOC_INCLUDE("quest/quest.h")
+Q_MOC_INCLUDE("time/calendar.h")
+Q_MOC_INCLUDE("time/timeline.h")
+Q_MOC_INCLUDE("ui/icon.h")
+
 class LuaCallback;
 struct lua_State;
 
