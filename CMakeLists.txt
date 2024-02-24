@@ -41,6 +41,7 @@ set(STRATAGUS_VERSION ${CMAKE_PROJECT_VERSION})
 
 add_subdirectory(archimedes)
 add_subdirectory(src/third_party/toluapp)
+add_subdirectory(src/third_party/zlib)
 
 # Stratagus sources
 
@@ -54,6 +55,7 @@ include_directories(
 	src/third_party
 	src/third_party/toluapp/include
 	src/third_party/xbrz/include
+	src/third_party/zlib
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -1366,7 +1368,6 @@ find_package(Qt6 6.5 COMPONENTS Quick REQUIRED) #licensed under the GPL 2.0 (as 
 find_package(Lua51 REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_mixer REQUIRED)
-find_package(ZLIB REQUIRED)
 
 find_package(X11)
 find_package(OpenGL)
@@ -1441,7 +1442,6 @@ include_directories(
 	${LUA_INCLUDE_DIR}
 	${SDL2_INCLUDE_DIR}
 	${SDL2_MIXER_INCLUDE_DIR}
-	${ZLIB_INCLUDE_DIRS}
 )
 
 set(QT_LIBRARIES
@@ -1458,7 +1458,7 @@ set(wyrmgus_LIBS
 	${LUA_LIBRARIES}
 	${SDL2_LIBRARY}
 	${SDL2_MIXER_LIBRARY}
-	${ZLIB_LIBRARIES}
+	zlibstatic
 	toluapp_lib
 	${QT_LIBRARIES}
 	archimedes
