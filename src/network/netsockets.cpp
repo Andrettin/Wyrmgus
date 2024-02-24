@@ -324,7 +324,7 @@ public:
 			timer.cancel();
 
 			if (timed_out) {
-				co_return 0;
+				co_return 0u;
 			} else {
 				co_return this->socket->available();
 			}
