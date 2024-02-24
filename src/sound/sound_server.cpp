@@ -51,8 +51,9 @@
 #include "util/qunique_ptr.h"
 
 #pragma warning(push, 0)
-#include <QAudioDeviceInfo>
+#include <QAudioDevice>
 #include <QAudioFormat>
+#include <QMediaDevices>
 
 #include <SDL_mixer.h>
 #pragma warning(pop)
@@ -332,8 +333,8 @@ static void InitSdlSound()
 		throw std::runtime_error("Error in Mix_Init: " + std::string(Mix_GetError()));
 	}
 
-	const QAudioDeviceInfo device_info = QAudioDeviceInfo::defaultOutputDevice();
-	const QAudioFormat format = device_info.preferredFormat();
+	const QAudioDevice device = QMediaDevices::defaultAudioOutput();
+	const QAudioFormat format = device.preferredFormat();
 
 	//open the audio device, using the desired format
 	int frequency = format.sampleRate();
@@ -342,38 +343,24 @@ static void InitSdlSound()
 		frequency = MIX_DEFAULT_FREQUENCY;
 	}
 
-	uint16_t sdl_audio_format = 0;
+	SDL_AudioFormat sdl_audio_format = 0;
 
 	try {
-		switch (format.sampleSize()) {
-			case 8:
-				sdl_audio_format |= 0x0008;
+		switch (format.sampleFormat()) {
+			case QAudioFormat::UInt8: //unsigned
+				sdl_audio_format = AUDIO_U8;
 				break;
-			case 16:
-				sdl_audio_format |= 0x0010;
-
-				switch (format.byteOrder()) {
-					case QAudioFormat::LittleEndian:
-						break;
-					case QAudioFormat::BigEndian:
-						sdl_audio_format |= 0x1000;
-						break;
-					default:
-						throw std::runtime_error("Unexpected byte order: " + std::to_string(format.byteOrder()));
-				}
+			case QAudioFormat::Int16:
+				sdl_audio_format = AUDIO_S16;
+				break;
+			case QAudioFormat::Int32:
+				sdl_audio_format = AUDIO_S32;
+				break;
+			case QAudioFormat::Float:
+				sdl_audio_format = AUDIO_F32;
 				break;
 			default:
-				throw std::runtime_error("Unexpected sample size: " + std::to_string(format.sampleSize()));
-		}
-
-		switch (format.sampleType()) {
-			case QAudioFormat::UnSignedInt:
-				break;
-			case QAudioFormat::SignedInt:
-				sdl_audio_format |= 0x8000;
-				break;
-			default:
-				throw std::runtime_error("Unexpected sample type: " + std::to_string(format.sampleType()));
+				throw std::runtime_error("Unexpected sample format: " + std::to_string(format.sampleFormat()));
 		}
 	} catch (...) {
 		exception::report(std::current_exception());
