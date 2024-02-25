@@ -41,7 +41,6 @@ set(STRATAGUS_VERSION ${CMAKE_PROJECT_VERSION})
 
 add_subdirectory(archimedes)
 add_subdirectory(src/third_party/lua-5.1.5)
-add_subdirectory(src/third_party/toluapp)
 add_subdirectory(src/third_party/zlib)
 
 # Stratagus sources
@@ -55,7 +54,7 @@ include_directories(
 	src/stratagus
 	src/third_party
 	src/third_party/lua-5.1.5/src
-	src/third_party/toluapp/include
+	src/third_party/lua-5.1.5/toluapp-simple
 	src/third_party/xbrz/include
 	src/third_party/zlib
 	${CMAKE_CURRENT_BINARY_DIR}
@@ -1459,7 +1458,7 @@ set(wyrmgus_LIBS
 	${SDL2_MIXER_LIBRARY}
 	lua51_static
 	zlibstatic
-	toluapp_lib
+	toluapp51
 	${QT_LIBRARIES}
 	archimedes
 )
