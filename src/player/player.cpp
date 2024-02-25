@@ -2802,7 +2802,7 @@ void CPlayer::Clear()
 {
 	this->name.clear();
 	this->set_type(player_type::none);
-	this->Race = defines::get()->get_neutral_civilization()->ID;
+	this->Race = defines::get()->get_neutral_civilization() ? defines::get()->get_neutral_civilization()->ID : 0;
 	this->faction = nullptr;
 	this->faction_tier = faction_tier::none;
 	this->government_type = government_type::none;
