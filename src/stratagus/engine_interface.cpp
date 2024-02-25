@@ -157,7 +157,12 @@ QString engine_interface::get_user_maps_path() const
 void engine_interface::call_lua_command(const QString &command)
 {
 	QTimer::singleShot(0, [command]() {
-		CclCommand(command.toStdString());
+		try {
+			CclCommand(command.toStdString());
+		} catch (...) {
+			exception::report(std::current_exception());
+			std::terminate();
+		}
 	});
 }
 
