@@ -99,6 +99,10 @@ int main(int argc, char **argv)
 	try {
 		qInstallMessageHandler(log::log_qt_message);
 
+#ifdef Q_OS_WINDOWS
+		qputenv("QT_ENABLE_HIGHDPI_SCALING", "0");
+#endif
+
 		QApplication app(argc, argv);
 		app.setApplicationName(NAME);
 		app.setApplicationVersion(VERSION);
