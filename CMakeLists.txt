@@ -40,6 +40,7 @@ add_compile_definitions(
 set(STRATAGUS_VERSION ${CMAKE_PROJECT_VERSION})
 
 add_subdirectory(archimedes)
+add_subdirectory(src/third_party/lua-5.1.5)
 add_subdirectory(src/third_party/toluapp)
 add_subdirectory(src/third_party/zlib)
 
@@ -53,6 +54,7 @@ include_directories(
 	src/guichan/include/guichan
 	src/stratagus
 	src/third_party
+	src/third_party/lua-5.1.5/src
 	src/third_party/toluapp/include
 	src/third_party/xbrz/include
 	src/third_party/zlib
@@ -1365,7 +1367,6 @@ find_package(Qt6 6.5 COMPONENTS Location REQUIRED) #licensed under the GPL 2.0 (
 find_package(Qt6 6.5 COMPONENTS Qml REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
 find_package(Qt6 6.5 COMPONENTS Quick REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
 
-find_package(Lua51 REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_mixer REQUIRED)
 
@@ -1439,7 +1440,6 @@ endif()
 
 add_definitions(-DUSE_ZLIB -DPIXMAPS=\"${PIXMAPSDIRABS}\")
 include_directories(
-	${LUA_INCLUDE_DIR}
 	${SDL2_INCLUDE_DIR}
 	${SDL2_MIXER_INCLUDE_DIR}
 )
@@ -1455,9 +1455,9 @@ set(QT_LIBRARIES
 )
 
 set(wyrmgus_LIBS
-	${LUA_LIBRARIES}
 	${SDL2_LIBRARY}
 	${SDL2_MIXER_LIBRARY}
+	lua51_static
 	zlibstatic
 	toluapp_lib
 	${QT_LIBRARIES}
