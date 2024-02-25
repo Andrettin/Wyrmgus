@@ -533,13 +533,13 @@ QCoro::Task<void> stratagusMain(int argc, char **argv)
 
 void load_database(const bool initial_definition)
 {
-	database::get()->load(initial_definition).then([]() {
-		//do nothing
-	}, [](const std::exception &exception) {
+	try {
+		QCoro::waitFor(database::get()->load(initial_definition));
+	} catch (...) {
 		exception::report(std::current_exception());
 		log::log_error("Error loading database.");
 		std::terminate();
-	});
+	}
 }
 
 void load_defines()
