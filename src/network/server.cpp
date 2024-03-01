@@ -39,7 +39,6 @@
 #include "player/player_type.h"
 #include "settings.h"
 #include "util/assert_util.h"
-#include "util/event_loop.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/path_util.h"
@@ -425,7 +424,7 @@ QCoro::Task<void> server::init_game()
 			CHost host;
 
 			try {
-				co_await this->socket->Recv(buf, sizeof(buf), &host);
+				co_await this->socket->Recv(buf, &host);
 			} catch (...) {
 				exception::report(std::current_exception());
 				log::log_error("Receive ack failed.");
@@ -568,7 +567,7 @@ QCoro::Task<void> server::Send_GoodBye(const multiplayer_host &host)
 QCoro::Task<void> server::Update(unsigned long frameCounter)
 {
 	for (int i = 1; i < PlayerMax - 1; ++i) {
-		if (Hosts[i].PlyNr && Hosts[i].Host && Hosts[i].Port) {
+		if (Hosts[i].PlyNr && !Hosts[i].Host.isNull() && Hosts[i].Port) {
 			const unsigned long fcd = frameCounter - networkStates[i].LastFrame;
 			if (fcd >= CLIENT_LIVE_BEAT) {
 				if (fcd > CLIENT_IS_DEAD) {
@@ -685,8 +684,8 @@ QCoro::Task<int> server::Parse_Hello(int h, const CInitMessage_Hello &msg, const
 		}
 
 		if (h != -1) {
-			Hosts[h].Host = host.getIp();
-			Hosts[h].Port = host.getPort();
+			Hosts[h].Host = host.get_address();
+			Hosts[h].Port = host.get_port();
 			Hosts[h].PlyNr = h;
 			Hosts[h].SetName(msg.PlyName);
 #ifdef DEBUG

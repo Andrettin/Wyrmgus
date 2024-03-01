@@ -123,7 +123,7 @@ QCoro::Task<int> NetworkParseSetupEvent(const std::array<unsigned char, 1024> &b
 int FindHostIndexBy(const CHost &host)
 {
 	for (int i = 0; i != PlayerMax; ++i) {
-		if (Hosts[i].Host == host.getIp() && Hosts[i].Port == host.getPort()) {
+		if (Hosts[i].Host == host.get_address() && Hosts[i].Port == host.get_port()) {
 			return i;
 		}
 	}

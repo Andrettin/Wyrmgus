@@ -76,7 +76,7 @@ QCoro::Task<int> CMetaClient::Init()
 	CHost metaClientHost = co_await CHost::from_host_name_and_port(CNetworkParameter::Instance.localHost.c_str(), CNetworkParameter::Instance.localPort);
 
 	if (metaSocket.Open(metaClientHost) == false) {
-		fprintf(stderr, "METACLIENT: No free port %d available, aborting\n", metaServerHost.getPort());
+		fprintf(stderr, "METACLIENT: No free port %d available, aborting\n", metaServerHost.get_port());
 		co_return -1;
 	}
 
@@ -132,9 +132,11 @@ QCoro::Task<int> CMetaClient::Send(const std::string cmd)
 {
 	int ret = -1;
 	std::string mes(cmd);
-	mes.append("\n");
 
-	const size_t sent_bytes = co_await metaSocket.Send(mes.c_str(), mes.size());;
+	QByteArray byte_array(mes.c_str(), mes.size());
+	byte_array.append("\n");
+
+	const size_t sent_bytes = co_await metaSocket.Send(byte_array);
 
 	if (sent_bytes == 0) {
 		ret = -1;
@@ -156,22 +158,20 @@ QCoro::Task<int> CMetaClient::Recv()
 		co_return -1;
 	}
 
-	std::array<char, 1024> buf{};
+	const QByteArray read_data = co_await metaSocket.Recv();
 
-	const size_t n = co_await metaSocket.Recv(buf);
-
-	if (n == 0) {
+	if (read_data.isEmpty()) {
 		co_return -1;
 	}
 
 	// We know we now have the whole command.
 	// Convert to standard notation
-	std::string cmd(buf.data(), strlen(buf.data()));
+	std::string cmd(read_data.data(), strlen(read_data.data()));
 	cmd += '\n';
 	cmd += '\0';
 	auto log = std::make_unique<CClientLog>();
 	log->entry = cmd;
 	this->events.push_back(std::move(log));
-	lastRecvState = n;
-	co_return static_cast<int>(n);
+	lastRecvState = read_data.size();
+	co_return static_cast<int>(read_data.size());
 }

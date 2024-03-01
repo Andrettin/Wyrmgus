@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include <QHostAddress>
+
 /**
  * Number of bytes in the name of a network player,
  * including the terminating null character.
@@ -53,7 +55,7 @@ public:
 
 	void SetName(const char *name);
 
-	uint32_t Host = 0;         /// Host address
+	QHostAddress Host;
 	uint16_t Port = 0;         /// Port on host
 	uint16_t PlyNr = 0;        /// Player number
 	char PlyName[NetPlayerNameSize]{};  /// Name of player

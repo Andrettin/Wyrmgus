@@ -42,7 +42,6 @@
 #include "player/player_type.h"
 #include "settings.h"
 #include "util/exception_util.h"
-#include "util/event_loop.h"
 #include "util/path_util.h"
 #include "video/video.h"
 

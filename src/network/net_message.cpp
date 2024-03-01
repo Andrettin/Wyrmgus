@@ -36,6 +36,10 @@
 #include "util/util.h"
 #include "version.h"
 
+#ifdef USE_WIN32
+#include <winsock.h>
+#endif
+
 size_t serialize32(unsigned char *buf, uint32_t data)
 {
 	if (buf) {

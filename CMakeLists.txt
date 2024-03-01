@@ -1360,6 +1360,7 @@ find_package(Boost 1.69.0 REQUIRED)
 set(CMAKE_AUTOMOC ON)
 find_package(Qt6 6.5 COMPONENTS Core REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
 find_package(Qt6 6.5 COMPONENTS Gui REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
+find_package(Qt6 6.5 COMPONENTS Network REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
 find_package(Qt6 6.5 COMPONENTS Widgets REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
 find_package(Qt6 6.5 COMPONENTS Multimedia REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
 find_package(Qt6 6.5 COMPONENTS Location REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
@@ -1446,6 +1447,7 @@ include_directories(
 set(QT_LIBRARIES
 	Qt6::Core
 	Qt6::Gui
+	Qt6::Network
 	Qt6::Widgets
 	Qt6::Multimedia
 	Qt6::Location

@@ -36,7 +36,7 @@ size_t multiplayer_host::Serialize(unsigned char *buf) const
 {
 	unsigned char *p = buf;
 
-	p += serialize32(p, this->Host);
+	p += serialize32(p, this->Host.toIPv4Address());
 	p += serialize16(p, this->Port);
 	p += serialize16(p, this->PlyNr);
 	p += serialize(p, this->PlyName);
@@ -48,7 +48,10 @@ size_t multiplayer_host::Deserialize(const unsigned char *p)
 {
 	const unsigned char *buf = p;
 
-	p += deserialize32(p, &Host);
+	uint32_t ip_address = 0;
+	p += deserialize32(p, &ip_address);
+	Host = QHostAddress(ip_address);
+
 	p += deserialize16(p, &Port);
 	p += deserialize16(p, &PlyNr);
 	p += deserialize(p, this->PlyName);
@@ -57,7 +60,7 @@ size_t multiplayer_host::Deserialize(const unsigned char *p)
 
 void multiplayer_host::Clear()
 {
-	this->Host = 0;
+	this->Host.clear();
 	this->Port = 0;
 	this->PlyNr = 0;
 	memset(this->PlyName, 0, sizeof(this->PlyName));

@@ -26,21 +26,21 @@
 
 #pragma once
 
+#include <QHostAddress>
+
 class CHost final
 {
 public:
-	[[nodiscard]]
-	static QCoro::Task<void> from_host_name_and_port(CHost &host, const std::string_view &host_name, const uint16_t port);
+	static void from_host_name_and_port(CHost &host, const std::string_view &host_name, const uint16_t port);
 
-	[[nodiscard]]
-	static QCoro::Task<CHost> from_host_name_and_port(const std::string_view &host_name, const uint16_t port)
+	static CHost from_host_name_and_port(const std::string_view &host_name, const uint16_t port)
 	{
 		//create a host instance from a host name and a port in host byte order 
 		CHost host;
 		
-		co_await CHost::from_host_name_and_port(host, host_name, port);
+		CHost::from_host_name_and_port(host, host_name, port);
 
-		co_return host;
+		return host;
 	}
 
 	[[nodiscard]]
@@ -50,16 +50,16 @@ public:
 	{
 	}
 
-	explicit CHost(const uint32_t ip, const uint16_t port) : ip(ip), port(port)
+	explicit CHost(const QHostAddress &address, const uint16_t port) : address(address), port(port)
 	{
 	}
 
-	uint32_t getIp() const
+	const QHostAddress &get_address() const
 	{
-		return this->ip;
+		return this->address;
 	}
 
-	uint16_t getPort() const
+	uint16_t get_port() const
 	{
 		return this->port;
 	}
@@ -69,7 +69,7 @@ public:
 
 	bool operator ==(const CHost &rhs) const
 	{
-		return this->ip == rhs.ip && this->port == rhs.port;
+		return this->address == rhs.address && this->port == rhs.port;
 	}
 
 	bool operator !=(const CHost &rhs) const
@@ -78,7 +78,7 @@ public:
 	}
 
 private:
-	uint32_t ip = 0; //in network byte order
+	QHostAddress address;
 	uint16_t port = 0; //in network byte order
 };
 
@@ -100,9 +100,7 @@ public:
 	QCoro::Task<void> Send(const CHost &host, const void *buf, unsigned int len);
 
 	[[nodiscard]]
-	QCoro::Task<size_t> Recv(std::array<unsigned char, 1024> &buf, int len, CHost *hostFrom);
-
-	void SetNonBlocking();
+	QCoro::Task<size_t> Recv(std::array<unsigned char, 1024> &buf, CHost *hostFrom);
 
 	[[nodiscard]]
 	size_t HasDataToRead();
@@ -132,12 +130,10 @@ public:
 	QCoro::Task<void> Connect(const CHost &host);
 
 	[[nodiscard]]
-	QCoro::Task<size_t> Send(const void *buf, unsigned int len);
+	QCoro::Task<size_t> Send(const QByteArray &byte_array);
 
 	[[nodiscard]]
-	QCoro::Task<size_t> Recv(std::array<char, 1024> &buf);
-
-	void SetNonBlocking();
+	QCoro::Task<QByteArray> Recv();
 
 	[[nodiscard]]
 	QCoro::Task<size_t> WaitForDataToRead(const int timeout);

@@ -27,13 +27,13 @@
 #include "stratagus.h"
 
 #include "network/netsockets.h"
+#include "util/qunique_ptr.h"
 
-#include "util/event_loop.h"
+#include <QHostInfo>
+#include <QTcpSocket>
+#include <QUdpSocket>
 
-#include <boost/asio/ip/tcp.hpp>
-#include <boost/asio/ip/udp.hpp>
-#include <boost/asio/steady_timer.hpp>
-#include <boost/asio/use_awaitable.hpp>
+#include <qcoro/network/qcoroabstractsocket.h>
 
 #ifdef __MORPHOS__
 #undef socket
@@ -41,18 +41,14 @@
 
 // CHost
 
-QCoro::Task<void> CHost::from_host_name_and_port(CHost &host, const std::string_view &host_name, const uint16_t port)
+void CHost::from_host_name_and_port(CHost &host, const std::string_view &host_name, const uint16_t port)
 {
-	boost::asio::ip::tcp::resolver resolver(event_loop::get()->get_io_context());
-	boost::asio::ip::tcp::resolver::iterator it = resolver.resolve(host_name, std::to_string(port));
+	const QHostInfo host_info = QHostInfo::fromName(QString::fromStdString(std::string(host_name)));
 
-	boost::asio::ip::tcp::resolver::iterator it_end;
-	for (; it != it_end; ++it) {
-		boost::asio::ip::address address = it->endpoint().address();
-
-		if (address.is_v4()) {
-			host.ip = htonl(address.to_v4().to_ulong());
-			host.port = htons(port);
+	for (const QHostAddress &host_address : host_info.addresses()) {
+		if (host_address.protocol() == QHostAddress::IPv4Protocol) {
+			host.address = host_address;
+			host.port = port;
 			break;
 		}
 	}
@@ -66,20 +62,19 @@ CHost CHost::from_port(const uint16_t port)
 {
 	//create a host with IP as INADDR_ANY from a port in host byte order
 	CHost host;
-	host.ip = INADDR_ANY;
-	host.port = htons(port);
+	host.address = QHostAddress(QHostAddress::AnyIPv4);
+	host.port = port;
 	return host;
 }
 
 std::string CHost::toString() const
 {
-	const boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::address_v4(ntohl(this->ip)), ntohs(this->port));
-	return endpoint.address().to_string() + ":" + std::to_string(endpoint.port());
+	return this->get_address().toString().toStdString() + ":" + std::to_string(this->get_port());
 }
 
 bool CHost::isValid() const
 {
-	return this->ip != 0 && this->port != 0;
+	return !this->get_address().isNull() && this->port != 0;
 }
 
 // CUDPSocket_Impl
@@ -97,37 +92,37 @@ public:
 	[[nodiscard]]
 	bool Open(const CHost &host)
 	{
-		this->endpoint = boost::asio::ip::udp::endpoint(boost::asio::ip::address_v4(ntohl(host.getIp())), ntohs(host.getPort()));
-		this->socket = std::make_unique<boost::asio::ip::udp::socket>(event_loop::get()->get_io_context(), this->endpoint);
-		return this->socket->is_open();
+		this->socket = make_qunique<QUdpSocket>();
+		return this->socket->bind(host.get_address(), host.get_port());
 	}
 
 	void Close()
 	{
-		this->socket->close();
+		this->socket.reset();
 	}
 
 	[[nodiscard]]
 	QCoro::Task<void> Send(const CHost &host, const void *buf, unsigned int len)
 	{
-		boost::asio::ip::udp::endpoint receiver_endpoint(boost::asio::ip::address_v4(ntohl(host.getIp())), ntohs(host.getPort()));
-
 		try {
-			this->socket->send_to(boost::asio::buffer(buf, len), receiver_endpoint);
+			this->socket->writeDatagram(reinterpret_cast<const char *>(buf), static_cast<qint64>(len), host.get_address(), host.get_port());
 		} catch (...) {
-			std::throw_with_nested(std::runtime_error("Failed to send data through a UDP socket to endpoint: " + receiver_endpoint.address().to_string() + ":" + std::to_string(receiver_endpoint.port())));
+			std::throw_with_nested(std::runtime_error("Failed to send data through a UDP socket to endpoint: " + host.get_address().toString().toStdString() + ":" + std::to_string(host.get_port())));
 		}
+
+		co_return;
 	}
 
 	[[nodiscard]]
-	QCoro::Task<size_t> Recv(std::array<unsigned char, 1024> &buf, int len, CHost *hostFrom)
+	QCoro::Task<size_t> Recv(std::array<unsigned char, 1024> &buf, CHost *hostFrom)
 	{
 		try {
-			boost::asio::ip::udp::endpoint sender_endpoint;
+			QHostAddress sender_address;
+			uint16_t sender_port{};
 
-			const size_t size = this->socket->receive_from(boost::asio::buffer(buf.data(), buf.size()), sender_endpoint);
+			const size_t size = this->socket->readDatagram(reinterpret_cast<char *>(buf.data()), buf.size(), &sender_address, &sender_port);
 
-			*hostFrom = CHost(htonl(sender_endpoint.address().to_v4().to_ulong()), htons(sender_endpoint.port()));
+			*hostFrom = CHost(sender_address, sender_port);
 
 			co_return size;
 		} catch (...) {
@@ -135,42 +130,22 @@ public:
 		}
 	}
 
-	void SetNonBlocking()
-	{
-		this->socket->non_blocking(true);
-	}
-
 	[[nodiscard]]
 	size_t HasDataToRead()
 	{
-		return this->socket->available();
+		return this->socket->bytesAvailable();
 	}
 
 	[[nodiscard]]
 	QCoro::Task<size_t> WaitForDataToRead(const int timeout)
 	{
 		try {
-			boost::asio::steady_timer timer(event_loop::get()->get_io_context());
-			timer.expires_from_now(std::chrono::milliseconds(timeout));
+			const bool success = co_await qCoro(this->socket.get()).waitForReadyRead(timeout);
 
-			bool timed_out = false;
-
-			timer.async_wait([this, &timed_out](const boost::system::error_code &error_code) {
-				if (error_code) {
-					return;
-				}
-
-				this->socket->cancel();
-				timed_out = true;
-			});
-
-			this->socket->wait(boost::asio::ip::udp::socket::wait_read);
-			timer.cancel();
-
-			if (timed_out) {
-				co_return 0u;
+			if (success) {
+				co_return static_cast<size_t>(this->socket->bytesAvailable());
 			} else {
-				co_return this->socket->available();
+				co_return 0u;
 			}
 		} catch (...) {
 			std::throw_with_nested(std::runtime_error("Failed to wait for data to receive through a UDP socket."));
@@ -180,12 +155,11 @@ public:
 	[[nodiscard]]
 	bool IsValid() const
 	{
-		return this->socket != nullptr && this->socket->is_open();
+		return this->socket != nullptr;
 	}
 
 private:
-	boost::asio::ip::udp::endpoint endpoint;
-	std::unique_ptr<boost::asio::ip::udp::socket> socket;
+	qunique_ptr<QUdpSocket> socket;
 };
 
 // CUDPSocket
@@ -214,15 +188,10 @@ QCoro::Task<void> CUDPSocket::Send(const CHost &host, const void *buf, unsigned 
 	co_await m_impl->Send(host, buf, len);
 }
 
-QCoro::Task<size_t> CUDPSocket::Recv(std::array<unsigned char, 1024> &buf, int len, CHost *hostFrom)
+QCoro::Task<size_t> CUDPSocket::Recv(std::array<unsigned char, 1024> &buf, CHost *hostFrom)
 {
-	const size_t res = co_await m_impl->Recv(buf, len, hostFrom);
+	const size_t res = co_await m_impl->Recv(buf, hostFrom);
 	co_return res;
-}
-
-void CUDPSocket::SetNonBlocking()
-{
-	m_impl->SetNonBlocking();
 }
 
 size_t CUDPSocket::HasDataToRead()
@@ -255,9 +224,8 @@ public:
 	[[nodiscard]]
 	bool Open(const CHost &host)
 	{
-		this->endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(ntohl(host.getIp())), ntohs(host.getPort()));
-		this->socket = std::make_unique<boost::asio::ip::tcp::socket>(event_loop::get()->get_io_context(), this->endpoint);
-		return this->socket->is_open();
+		this->socket = make_qunique<QTcpSocket>();
+		return this->socket->bind(host.get_address(), host.get_port());
 	}
 
 	void Close()
@@ -268,16 +236,14 @@ public:
 	[[nodiscard]]
 	QCoro::Task<void> Connect(const CHost &host)
 	{
-		boost::asio::ip::tcp::endpoint connect_endpoint(boost::asio::ip::address_v4(ntohl(host.getIp())), ntohs(host.getPort()));
-
-		this->socket->connect(connect_endpoint);
+		co_await qCoro(this->socket.get()).connectToHost(host.get_address(), host.get_port());
 	}
 
 	[[nodiscard]]
-	QCoro::Task<size_t> Send(const void *buf, unsigned int len)
+	QCoro::Task<size_t> Send(const QByteArray &byte_array)
 	{
 		try {
-			const size_t size = this->socket->send(boost::asio::buffer(buf, len));
+			const size_t size = co_await qCoro(this->socket.get()).write(byte_array);
 
 			co_return size;
 		} catch (...) {
@@ -286,47 +252,27 @@ public:
 	}
 
 	[[nodiscard]]
-	QCoro::Task<size_t> Recv(std::array<char, 1024> &buf)
+	QCoro::Task<QByteArray> Recv()
 	{
 		try {
-			const size_t size = this->socket->receive(boost::asio::buffer(buf.data(), buf.size()));
+			const QByteArray byte_array = co_await qCoro(this->socket.get()).readAll();
 
-			co_return size;
+			co_return byte_array;
 		} catch (...) {
 			std::throw_with_nested(std::runtime_error("Failed to receive data through a TCP socket."));
 		}
-	}
-
-	void SetNonBlocking()
-	{
-		this->socket->non_blocking(true);
 	}
 
 	[[nodiscard]]
 	QCoro::Task<size_t> WaitForDataToRead(const int timeout)
 	{
 		try {
-			boost::asio::steady_timer timer(event_loop::get()->get_io_context());
-			timer.expires_from_now(std::chrono::milliseconds(timeout));
+			const bool success = co_await qCoro(this->socket.get()).waitForReadyRead(timeout);
 
-			bool timed_out = false;
-
-			timer.async_wait([this, &timed_out](const boost::system::error_code &error_code) {
-				if (error_code) {
-					return;
-				}
-
-				this->socket->cancel();
-				timed_out = true;
-			});
-
-			this->socket->wait(boost::asio::ip::tcp::socket::wait_read);
-			timer.cancel();
-
-			if (timed_out) {
-				co_return 0u;
+			if (success) {
+				co_return static_cast<size_t>(this->socket->bytesAvailable());
 			} else {
-				co_return this->socket->available();
+				co_return 0u;
 			}
 		} catch (...) {
 			std::throw_with_nested(std::runtime_error("Failed to wait for data to receive through a TCP socket."));
@@ -336,12 +282,11 @@ public:
 	[[nodiscard]]
 	bool IsValid() const
 	{
-		return this->socket != nullptr && this->socket->is_open();
+		return this->socket != nullptr;
 	}
 
 private:
-	boost::asio::ip::tcp::endpoint endpoint;
-	std::unique_ptr<boost::asio::ip::tcp::socket> socket;
+	qunique_ptr<QTcpSocket> socket;
 };
 
 // CTCPSocket
@@ -370,21 +315,16 @@ QCoro::Task<void> CTCPSocket::Connect(const CHost &host)
 	co_await m_impl->Connect(host);
 }
 
-QCoro::Task<size_t> CTCPSocket::Send(const void *buf, unsigned int len)
+QCoro::Task<size_t> CTCPSocket::Send(const QByteArray &byte_array)
 {
-	const size_t size = co_await m_impl->Send(buf, len);
+	const size_t size = co_await m_impl->Send(byte_array);
 	co_return size;
 }
 
-QCoro::Task<size_t> CTCPSocket::Recv(std::array<char, 1024> &buf)
+QCoro::Task<QByteArray> CTCPSocket::Recv()
 {
-	const size_t res = co_await m_impl->Recv(buf);
-	co_return res;
-}
-
-void CTCPSocket::SetNonBlocking()
-{
-	m_impl->SetNonBlocking();
+	QByteArray byte_array = co_await m_impl->Recv();
+	co_return byte_array;
 }
 
 QCoro::Task<size_t> CTCPSocket::WaitForDataToRead(const int timeout)

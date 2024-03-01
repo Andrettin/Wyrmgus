@@ -42,7 +42,6 @@
 #include "player/player.h"
 #include "settings.h"
 #include "util/assert_util.h"
-#include "util/event_loop.h"
 #include "util/log_util.h"
 #include "util/path_util.h"
 #include "util/util.h"
@@ -499,8 +498,8 @@ void client::SetConfig(const CInitMessage_Config &msg)
 	// server is last:
 	const bool name_changed = std::string_view(Hosts[HostsCount].PlyName) != std::string_view(msg.hosts[msg.hostsCount - 1].PlyName);
 
-	Hosts[HostsCount].Host = serverHost->getIp();
-	Hosts[HostsCount].Port = serverHost->getPort();
+	Hosts[HostsCount].Host = serverHost->get_address();
+	Hosts[HostsCount].Port = serverHost->get_port();
 	Hosts[HostsCount].PlyNr = msg.hosts[msg.hostsCount - 1].PlyNr;
 	Hosts[HostsCount].SetName(msg.hosts[msg.hostsCount - 1].PlyName);
 
@@ -639,8 +638,8 @@ void client::Parse_Welcome(const unsigned char *buf)
 	CNetworkParameter::Instance.NetworkLag = msg.Lag;
 	CNetworkParameter::Instance.gameCyclesPerUpdate = msg.gameCyclesPerUpdate;
 
-	Hosts[0].Host = serverHost->getIp();
-	Hosts[0].Port = serverHost->getPort();
+	Hosts[0].Host = serverHost->get_address();
+	Hosts[0].Port = serverHost->get_port();
 
 	if (server_player_name_changed) {
 		emit network_manager::get()->player_name_changed(0, Hosts[0].PlyName);
