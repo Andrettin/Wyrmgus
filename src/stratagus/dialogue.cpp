@@ -40,7 +40,6 @@
 #include "sound/sound_server.h"
 #include "unit/unit.h"
 #include "unit/unit_manager.h"
-#include "util/event_loop.h"
 
 namespace wyrmgus {
 

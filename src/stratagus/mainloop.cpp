@@ -83,7 +83,6 @@
 #include "util/container_util.h"
 #include "util/path_util.h"
 #include "util/string_util.h"
-#include "util/thread_pool.h"
 #include "video/font.h"
 #include "video/render_context.h"
 #include "video/video.h"

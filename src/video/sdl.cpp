@@ -62,7 +62,6 @@
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "util/assert_util.h"
-#include "util/event_loop.h"
 #include "util/queue_util.h"
 #include "video/font.h"
 #include "video/video.h"

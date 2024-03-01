@@ -122,7 +122,6 @@
 #include "upgrade/upgrade_modifier.h"
 #include "util/assert_util.h"
 #include "util/container_util.h"
-#include "util/event_loop.h"
 #include "util/gender.h"
 #include "util/log_util.h"
 #include "util/map_util.h"

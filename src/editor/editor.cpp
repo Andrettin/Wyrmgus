@@ -50,7 +50,6 @@
 #include "map/map.h"
 #include "map/map_info.h"
 #include "player/player.h"
-#include "util/event_loop.h"
 #include "util/path_util.h"
 #include "video/video.h"
 

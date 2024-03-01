@@ -116,14 +116,12 @@
 #include "upgrade/upgrade.h"
 #include "util/assert_util.h"
 #include "util/date_util.h"
-#include "util/event_loop.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/path_util.h"
 #include "util/random.h"
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
-#include "util/thread_pool.h"
 //Wyrmgus start
 #include "util/util.h"
 //Wyrmgus end

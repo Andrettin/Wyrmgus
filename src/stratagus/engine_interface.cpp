@@ -65,7 +65,6 @@
 #include "ui/interface.h"
 #include "unit/unit_type.h"
 #include "util/container_util.h"
-#include "util/event_loop.h"
 #include "util/exception_util.h"
 #include "util/image_util.h"
 #include "util/path_util.h"

@@ -67,11 +67,9 @@
 #include "upgrade/upgrade_structs.h"
 #include "util/assert_util.h"
 #include "util/empty_image_provider.h"
-#include "util/event_loop.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/path_util.h"
-#include "util/thread_pool.h"
 #include "version.h"
 #include "video/frame_buffer_object.h"
 
@@ -199,8 +197,6 @@ int main(int argc, char **argv)
 		engine.load(url);
 
 		const int result = app.exec();
-
-		thread_pool::get()->stop();
 
 		stratagus_on_exit_cleanup();
 

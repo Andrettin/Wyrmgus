@@ -50,7 +50,6 @@
 #include "ui/ui.h"
 #include "util/assert_util.h"
 #include "util/colorization_type.h"
-#include "util/event_loop.h"
 #include "video/font.h"
 #include "video/video.h"
 
