@@ -85,7 +85,7 @@ QCoro::Task<bool> network_manager::setup_server_address(const std::string server
 	auto host = std::make_unique<CHost>();
 
 	try {
-		co_await CHost::from_host_name_and_port(*host, server_address.c_str(), port);
+		CHost::from_host_name_and_port(*host, server_address.c_str(), port);
 
 		if (host->isValid() == false) {
 			//return false if an error occurred

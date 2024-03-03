@@ -70,10 +70,10 @@ QCoro::Task<int> CMetaClient::Init()
 	}
 
 	// Server socket
-	CHost metaServerHost = co_await CHost::from_host_name_and_port(metaHost.c_str(), metaPort);
+	CHost metaServerHost = CHost::from_host_name_and_port(metaHost.c_str(), metaPort);
 
 	// Client socket
-	CHost metaClientHost = co_await CHost::from_host_name_and_port(CNetworkParameter::Instance.localHost.c_str(), CNetworkParameter::Instance.localPort);
+	CHost metaClientHost = CHost::from_host_name_and_port(CNetworkParameter::Instance.localHost.c_str(), CNetworkParameter::Instance.localPort);
 
 	if (metaSocket.Open(metaClientHost) == false) {
 		fprintf(stderr, "METACLIENT: No free port %d available, aborting\n", metaServerHost.get_port());
