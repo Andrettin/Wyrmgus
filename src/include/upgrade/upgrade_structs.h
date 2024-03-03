@@ -122,7 +122,7 @@ public:
 	static CUpgrade *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
 		CUpgrade *upgrade = data_type::add(identifier, data_module);
-		upgrade->ID = CUpgrade::get_all().size() - 1;
+		upgrade->ID = static_cast<int>(CUpgrade::get_all().size()) - 1;
 		return upgrade;
 	}
 

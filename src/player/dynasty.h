@@ -58,7 +58,7 @@ public:
 	static dynasty *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
 		dynasty *dynasty = data_type::add(identifier, data_module);
-		dynasty->index = dynasty::get_all().size() - 1;
+		dynasty->index = static_cast<int>(dynasty::get_all().size()) - 1;
 		return dynasty;
 	}
 

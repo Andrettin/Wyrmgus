@@ -92,7 +92,7 @@ public:
 	static civilization *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
 		civilization *civilization = data_type::add(identifier, data_module);
-		civilization->ID = civilization::get_all().size() - 1;
+		civilization->ID = static_cast<int>(civilization::get_all().size()) - 1;
 		return civilization;
 	}
 

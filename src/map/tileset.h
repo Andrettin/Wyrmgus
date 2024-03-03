@@ -213,7 +213,7 @@ public:
 
 	unsigned int getTileCount() const
 	{
-		return this->tiles.size();
+		return static_cast<unsigned int>(this->tiles.size());
 	}
 
 	unsigned int getDefaultTileIndex() const;

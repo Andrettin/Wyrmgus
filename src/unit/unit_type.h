@@ -585,7 +585,7 @@ public:
 	static unit_type *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
 		unit_type *unit_type = data_type::add(identifier, data_module);
-		unit_type->Slot = unit_type::get_all().size() - 1;
+		unit_type->Slot = static_cast<int>(unit_type::get_all().size()) - 1;
 		return unit_type;
 	}
 

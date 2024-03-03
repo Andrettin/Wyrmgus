@@ -1920,7 +1920,7 @@ static bool EditorCallbackMouse_EditUnitArea(const PixelPos &screenPos)
 				CurrentButtons.push_back(std::make_unique<button>());
 			}
 			CurrentButtons[j]->Hint = CEditor::get()->ShownUnitTypes[i]->get_name();
-			CurrentButtons[j]->pos = j;
+			CurrentButtons[j]->pos = static_cast<int>(j);
 			CurrentButtons[j]->level = nullptr;
 			CurrentButtons[j]->Action = ButtonCmd::EditorUnit;
 			CurrentButtons[j]->ValueStr = CEditor::get()->ShownUnitTypes[i]->get_identifier();
@@ -2268,7 +2268,7 @@ QCoro::Task<void> CEditor::Init()
 			new_map_layer->moveToThread(QApplication::instance()->thread());
 		}
 
-		new_map_layer->ID = CMap::get()->MapLayers.size();
+		new_map_layer->ID = static_cast<int>(CMap::get()->MapLayers.size());
 		CMap::get()->Info->MapWidths.clear();
 		CMap::get()->Info->MapWidths.push_back(CMap::get()->Info->get_map_width());
 		CMap::get()->Info->MapHeights.clear();
