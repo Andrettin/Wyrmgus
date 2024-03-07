@@ -1992,9 +1992,8 @@ void CUnit::ApplyAuraEffect(const int aura_index)
 void CUnit::SetPrefix(const CUpgrade *prefix)
 {
 	if (Prefix != nullptr) {
-		for (const auto &modifier : Prefix->get_modifiers()) {
-			RemoveIndividualUpgradeModifier(*this, modifier.get());
-		}
+		IndividualUpgradeLost(*this, this->Prefix);
+
 		this->Variable[MAGICLEVEL_INDEX].Value -= Prefix->get_magic_level();
 		this->Variable[MAGICLEVEL_INDEX].Max -= Prefix->get_magic_level();
 	}
@@ -2004,10 +2003,10 @@ void CUnit::SetPrefix(const CUpgrade *prefix)
 		this->Container->get_character()->save();
 	}
 	Prefix = prefix;
+
 	if (Prefix != nullptr) {
-		for (const auto &modifier : Prefix->get_modifiers()) {
-			ApplyIndividualUpgradeModifier(*this, modifier.get());
-		}
+		IndividualUpgradeAcquire(*this, this->Prefix);
+
 		this->Variable[MAGICLEVEL_INDEX].Value += Prefix->get_magic_level();
 		this->Variable[MAGICLEVEL_INDEX].Max += Prefix->get_magic_level();
 	}
@@ -2018,9 +2017,8 @@ void CUnit::SetPrefix(const CUpgrade *prefix)
 void CUnit::SetSuffix(const CUpgrade *suffix)
 {
 	if (Suffix != nullptr) {
-		for (const auto &modifier : Suffix->get_modifiers()) {
-			RemoveIndividualUpgradeModifier(*this, modifier.get());
-		}
+		IndividualUpgradeLost(*this, this->Suffix);
+
 		this->Variable[MAGICLEVEL_INDEX].Value -= Suffix->get_magic_level();
 		this->Variable[MAGICLEVEL_INDEX].Max -= Suffix->get_magic_level();
 	}
@@ -2031,9 +2029,8 @@ void CUnit::SetSuffix(const CUpgrade *suffix)
 	}
 	Suffix = suffix;
 	if (Suffix != nullptr) {
-		for (const auto &modifier : Suffix->get_modifiers()) {
-			ApplyIndividualUpgradeModifier(*this, modifier.get());
-		}
+		IndividualUpgradeAcquire(*this, this->Suffix);
+
 		this->Variable[MAGICLEVEL_INDEX].Value += Suffix->get_magic_level();
 		this->Variable[MAGICLEVEL_INDEX].Max += Suffix->get_magic_level();
 	}
