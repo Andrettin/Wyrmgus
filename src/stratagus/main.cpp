@@ -78,6 +78,7 @@
 #include <QIcon>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QQuickWindow>
 #pragma warning(pop)
 
 static QCoro::Task<void> start_stratagus(const int argc, char **argv)
@@ -100,6 +101,8 @@ int main(int argc, char **argv)
 #ifdef Q_OS_WINDOWS
 		qputenv("QT_ENABLE_HIGHDPI_SCALING", "0");
 #endif
+
+		QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
 
 		QApplication app(argc, argv);
 		app.setApplicationName(NAME);
