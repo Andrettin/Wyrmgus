@@ -158,11 +158,11 @@ void dungeon_generator::generate_central_room() const
 	const int map_middle_x = (map_top_left.x() + map_bottom_right.x()) / 2;
 	const int map_middle_y = (map_top_left.y() + map_bottom_right.y()) / 2;
 
-	const int start_x = map_middle_x - random::get()->dice(3);
-	const int end_x = map_middle_x + random::get()->dice(3);
+	const int start_x = map_middle_x - random::get()->roll_dice(3);
+	const int end_x = map_middle_x + random::get()->roll_dice(3);
 
-	const int start_y = map_middle_y - random::get()->dice(3);
-	const int end_y = map_middle_y + random::get()->dice(3);
+	const int start_y = map_middle_y - random::get()->roll_dice(3);
+	const int end_y = map_middle_y + random::get()->roll_dice(3);
 
 	for (int x = start_x; x <= end_x; ++x) {
 		for (int y = start_y; y <= end_y; ++y) {
@@ -197,7 +197,7 @@ bool dungeon_generator::generate_chamber(const QPoint &edge_tile_pos, const QPoi
 	bool continued = false;
 	bool straight = false;
 
-	switch (random::get()->dice(4)) {
+	switch (random::get()->roll_dice(4)) {
 		case 1:
 		case 2:
 			continued = (this->generate_room(cp + 2 * dir_offset, dir_offset) || continued);
@@ -209,23 +209,23 @@ bool dungeon_generator::generate_chamber(const QPoint &edge_tile_pos, const QPoi
 			break;
 	}
 
-	if (continued && random::get()->dice(3) == 1) {
+	if (continued && random::get()->roll_dice(3) == 1) {
 		straight = true;
 	} else {
 		const QPoint inverted_dir_offset(dir_offset.y(), dir_offset.x());
 
-		if (random::get()->dice(3) == 1) {
+		if (random::get()->roll_dice(3) == 1) {
 			continued = (this->generate_chamber(cp + 2 * inverted_dir_offset, inverted_dir_offset) || continued);
 		}
 
-		if (random::get()->dice(3) == 1) {
+		if (random::get()->roll_dice(3) == 1) {
 			continued = (this->generate_chamber(cp - 2 * inverted_dir_offset, inverted_dir_offset * -1) || continued);
 		}
 	}
 
 	if (continued) {
 		if (straight) {
-			switch (random::get()->dice(2)) {
+			switch (random::get()->roll_dice(2)) {
 				case 1: {
 					//narrow passage
 					const QRect passage_wall_rect = dungeon_generator::create_rect(cp - QPoint(1, 1), cp + QPoint(1, 1));
@@ -241,7 +241,7 @@ bool dungeon_generator::generate_chamber(const QPoint &edge_tile_pos, const QPoi
 					break;
 			}
 		} else {
-			switch (random::get()->dice(8)) {
+			switch (random::get()->roll_dice(8)) {
 				case 1:
 					//trap and chest
 					this->generate_trap(cp - dir_offset);
@@ -263,7 +263,7 @@ bool dungeon_generator::generate_chamber(const QPoint &edge_tile_pos, const QPoi
 		}
 	} else {
 		//we have an ending chamber, so add something interesting
-		switch (random::get()->dice(30)) {
+		switch (random::get()->roll_dice(30)) {
 			case 1:
 				//trap and chest
 				this->generate_trap(cp);
@@ -293,7 +293,7 @@ bool dungeon_generator::generate_chamber(const QPoint &edge_tile_pos, const QPoi
 			case 6:
 				//gravestone(s) and NPC
 
-				if (random::get()->dice(3) == 1) {
+				if (random::get()->roll_dice(3) == 1) {
 					this->generate_guard(cp);
 				}
 				break;
@@ -301,7 +301,7 @@ bool dungeon_generator::generate_chamber(const QPoint &edge_tile_pos, const QPoi
 				this->generate_guard(cp);
 				this->generate_item(room_rect);
 				this->generate_item(room_rect);
-				if (random::get()->dice(2) == 1) {
+				if (random::get()->roll_dice(2) == 1) {
 					this->generate_item(room_rect);
 					this->generate_item(room_rect);
 				}
@@ -348,7 +348,7 @@ void dungeon_generator::generate_linking_corridor(const QPoint &edge_tile_pos, c
 	//make a corridor which links two areas
 	QPoint cp = edge_tile_pos;
 
-	for (int i = random::get()->dice(4, 10); i > 0; --i) {
+	for (int i = random::get()->roll_dice(4, 10); i > 0; --i) {
 		cp += dir_offset;
 
 		if (!this->is_tile_clear(cp)) {
@@ -364,8 +364,8 @@ void dungeon_generator::generate_linking_corridor(const QPoint &edge_tile_pos, c
 
 void dungeon_generator::generate_oval_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const
 {
-	const int width = random::get()->dice(2, 3);
-	const int height = random::get()->dice(2, 3);
+	const int width = random::get()->roll_dice(2, 3);
+	const int height = random::get()->roll_dice(2, 3);
 
 	const QPoint start_pos = edge_tile_pos + (dir_offset - QPoint(1, 1)) * QPoint(width, height);
 	const QPoint end_pos = edge_tile_pos + (dir_offset + QPoint(1, 1)) * QPoint(width, height);
@@ -392,10 +392,10 @@ void dungeon_generator::generate_oval_room(const QPoint &edge_tile_pos, const QP
 
 bool dungeon_generator::generate_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const
 {
-	const QPoint min_pos_offset(random::get()->dice(std::abs(dir_offset.x() - 1), 5), random::get()->dice(std::abs(dir_offset.y() - 1), 5));
+	const QPoint min_pos_offset(random::get()->roll_dice(std::abs(dir_offset.x() - 1), 5), random::get()->roll_dice(std::abs(dir_offset.y() - 1), 5));
 	const QPoint min_pos = edge_tile_pos - min_pos_offset;
 
-	const QPoint max_pos_offset(random::get()->dice(std::abs(dir_offset.x() + 1), 5), random::get()->dice(std::abs(dir_offset.y() + 1), 5));
+	const QPoint max_pos_offset(random::get()->roll_dice(std::abs(dir_offset.x() + 1), 5), random::get()->roll_dice(std::abs(dir_offset.y() + 1), 5));
 	const QPoint max_pos = edge_tile_pos + max_pos_offset;
 
 	const QRect room_rect = dungeon_generator::create_rect(min_pos, max_pos);
@@ -415,7 +415,7 @@ bool dungeon_generator::generate_room(const QPoint &edge_tile_pos, const QPoint 
 	//create a passage
 	this->set_tile_terrain(edge_tile_pos, this->get_floor_terrain());
 
-	if (random::get()->dice(2) == 1) {
+	if (random::get()->roll_dice(2) == 1) {
 		this->complete_area_terrain(room_rect, this->get_wall_terrain());
 		this->generate_ending_room_features(room_floor_rect);
 	} else {
@@ -462,7 +462,7 @@ void dungeon_generator::generate_square_room(const QPoint &edge_tile_pos, const 
 	bool continued = false;
 
 	//room ahead
-	switch (random::get()->dice(4)) {
+	switch (random::get()->roll_dice(4)) {
 		case 1:
 		case 2:
 			continued = (this->generate_room(cp + 3 * dir_offset, dir_offset) || continued);
@@ -477,16 +477,16 @@ void dungeon_generator::generate_square_room(const QPoint &edge_tile_pos, const 
 	//side rooms
 	const QPoint inverted_dir_offset(dir_offset.y(), dir_offset.x());
 
-	if (random::get()->dice(2) == 1) {
-		if (random::get()->dice(2) == 1) {
+	if (random::get()->roll_dice(2) == 1) {
+		if (random::get()->roll_dice(2) == 1) {
 			continued = (this->generate_chamber(cp + 3 * inverted_dir_offset, inverted_dir_offset) || continued);
 		} else {
 			continued = (this->generate_room(cp + 3 * inverted_dir_offset, inverted_dir_offset) || continued);
 		}
 	}
 
-	if (random::get()->dice(2) == 1) {
-		if (random::get()->dice(2) == 1) {
+	if (random::get()->roll_dice(2) == 1) {
+		if (random::get()->roll_dice(2) == 1) {
 			continued = (this->generate_chamber(cp - 3 * inverted_dir_offset, inverted_dir_offset * -1) || continued);
 		} else {
 			continued = (this->generate_room(cp - 3 * inverted_dir_offset, inverted_dir_offset * -1) || continued);
@@ -494,7 +494,7 @@ void dungeon_generator::generate_square_room(const QPoint &edge_tile_pos, const 
 	}
 
 	if (continued) {
-		switch (random::get()->dice(8)) {
+		switch (random::get()->roll_dice(8)) {
 			case 1:
 				//chest and trap
 				this->generate_item(cp);
@@ -533,7 +533,7 @@ void dungeon_generator::generate_square_room(const QPoint &edge_tile_pos, const 
 		}
 	} else {
 		//we have an ending chamber, so add something really interesting
-		switch (random::get()->dice(8)) {
+		switch (random::get()->roll_dice(8)) {
 			case 1:
 				//creature and chest
 				this->generate_guard(cp);
@@ -557,7 +557,7 @@ void dungeon_generator::generate_square_room(const QPoint &edge_tile_pos, const 
 
 void dungeon_generator::generate_corridor_to_room(const QPoint &edge_tile_pos, const QPoint &dir_offset) const
 {
-	const int corridor_length = random::get()->dice(2, 10);
+	const int corridor_length = random::get()->roll_dice(2, 10);
 
 	//ensure that the corridor is clear (3-tiles-wide)
 	const QPoint corridor_area_top_left(edge_tile_pos.x() - dir_offset.y(), edge_tile_pos.y() - dir_offset.x());
@@ -586,7 +586,7 @@ void dungeon_generator::generate_corridor_to_room(const QPoint &edge_tile_pos, c
 
 void dungeon_generator::generate_maze(const QPoint &edge_tile_pos, const QPoint &dir_offset) const
 {
-	const int s = random::get()->dice(7) + 1;
+	const int s = random::get()->roll_dice(7) + 1;
 
 	const QPoint start_pos = edge_tile_pos + dir_offset + (dir_offset - QPoint(1, 1)) * s;
 	const QPoint end_pos = edge_tile_pos + dir_offset + (dir_offset + QPoint(1, 1)) * s;
@@ -609,7 +609,7 @@ void dungeon_generator::generate_room_features(const QRect &room_floor_rect) con
 	const int width = room_floor_rect.width();
 	const int height = room_floor_rect.height();
 
-	switch (random::get()->dice(50)) {
+	switch (random::get()->roll_dice(50)) {
 		case 10:
 		case 11:
 			//central room
@@ -622,18 +622,18 @@ void dungeon_generator::generate_room_features(const QRect &room_floor_rect) con
 				
 				this->generate_room_features(innermost_rect);
 
-				switch (random::get()->dice(4)) {
+				switch (random::get()->roll_dice(4)) {
 					case 1:
-						this->set_tile_terrain(inner_rect.topLeft() + QPoint(0, random::get()->dice(height - 4)), this->get_floor_terrain());
+						this->set_tile_terrain(inner_rect.topLeft() + QPoint(0, random::get()->roll_dice(height - 4)), this->get_floor_terrain());
 						break;
 					case 2:
-						this->set_tile_terrain(inner_rect.topRight() + QPoint(0, random::get()->dice(height - 4)), this->get_floor_terrain());
+						this->set_tile_terrain(inner_rect.topRight() + QPoint(0, random::get()->roll_dice(height - 4)), this->get_floor_terrain());
 						break;
 					case 3:
-						this->set_tile_terrain(inner_rect.topLeft() + QPoint(random::get()->dice(width - 4), 0), this->get_floor_terrain());
+						this->set_tile_terrain(inner_rect.topLeft() + QPoint(random::get()->roll_dice(width - 4), 0), this->get_floor_terrain());
 						break;
 					case 4:
-						this->set_tile_terrain(inner_rect.bottomLeft() + QPoint(random::get()->dice(width - 4), 0), this->get_floor_terrain());
+						this->set_tile_terrain(inner_rect.bottomLeft() + QPoint(random::get()->roll_dice(width - 4), 0), this->get_floor_terrain());
 						break;
 				}
 			}
@@ -646,7 +646,7 @@ void dungeon_generator::generate_room_features(const QRect &room_floor_rect) con
 
 void dungeon_generator::generate_ending_room_features(const QRect &room_floor_rect) const
 {
-	switch (random::get()->dice(50)) {
+	switch (random::get()->roll_dice(50)) {
 		case 1:
 			//dungeon shop
 			break;
@@ -665,12 +665,12 @@ void dungeon_generator::generate_internal_room_features(const QRect &room_floor_
 	const int width = room_floor_rect.width();
 	const int height = room_floor_rect.height();
 
-	switch (random::get()->dice(50)) {
+	switch (random::get()->roll_dice(50)) {
 		case 1:
 		case 2:
 			if ((width * height) < 66) {
 				rect::for_each_point(room_floor_rect, [&](const QPoint &tile_pos) {
-					if (random::get()->dice(5) == 1) {
+					if (random::get()->roll_dice(5) == 1) {
 						this->generate_guard(tile_pos);
 					}
 				});
@@ -710,7 +710,7 @@ void dungeon_generator::generate_internal_room_features(const QRect &room_floor_
 		case 12:
 			//room with runetraps
 			rect::for_each_point(room_floor_rect, [&](const QPoint &tile_pos) {
-				if (random::get()->dice(4) == 1) {
+				if (random::get()->roll_dice(4) == 1) {
 					this->generate_trap(tile_pos);
 				}
 			});
@@ -725,7 +725,7 @@ void dungeon_generator::generate_internal_room_features(const QRect &room_floor_
 		case 16:
 			//vertically partitioned room
 			if (width > 3) {
-				const int x = room_floor_rect.left() + random::get()->dice(width - 2);
+				const int x = room_floor_rect.left() + random::get()->roll_dice(width - 2);
 
 				if (this->is_tile_clear(QPoint(x, room_floor_rect.top() - 1)) && this->is_tile_clear(QPoint(x, room_floor_rect.bottom() + 1))) {
 					this->set_area_terrain(QRect(QPoint(x, room_floor_rect.top()), QPoint(x, room_floor_rect.bottom())), this->get_wall_terrain());
@@ -744,7 +744,7 @@ void dungeon_generator::generate_internal_room_features(const QRect &room_floor_
 		case 19:
 			//horizontally partitioned room
 			if (height > 3) {
-				const int y = room_floor_rect.top() + random::get()->dice(height - 2);
+				const int y = room_floor_rect.top() + random::get()->roll_dice(height - 2);
 
 				if (this->is_tile_clear(QPoint(room_floor_rect.left() - 1, y)) && this->is_tile_clear(QPoint(room_floor_rect.right() + 1, y))) {
 					this->set_area_terrain(QRect(QPoint(room_floor_rect.left(), y), QPoint(room_floor_rect.right(), y)), this->get_wall_terrain());
@@ -774,7 +774,7 @@ void dungeon_generator::generate_internal_room_features(const QRect &room_floor_
 		case 24:
 			//traps and bones
 			rect::for_each_point(room_floor_rect, [&](const QPoint &tile_pos) {
-				if (random::get()->dice(4) == 1) {
+				if (random::get()->roll_dice(4) == 1) {
 					this->generate_trap(tile_pos);
 				}
 			});
@@ -811,7 +811,7 @@ void dungeon_generator::generate_inner_maze(const QRect &room_rect) const
 			continue;
 		}
 
-		const int dx = (random::get()->dice(2) == 1) ? (random::get()->generate(2) * 2 - 1) : 0;
+		const int dx = (random::get()->roll_dice(2) == 1) ? (random::get()->generate(2) * 2 - 1) : 0;
 		const int dy = (dx == 0) ? (random::get()->generate(2) * 2 - 1) : 0;
 		const QPoint dp(dx, dy);
 
@@ -990,7 +990,7 @@ void dungeon_generator::generate_creep() const
 
 	CreateUnit(tile_pos, *unit_type, CPlayer::get_neutral_player(), this->z);
 
-	if (random::get()->dice(10) == 1) {
+	if (random::get()->roll_dice(10) == 1) {
 		this->generate_item(tile_pos);
 	}
 }

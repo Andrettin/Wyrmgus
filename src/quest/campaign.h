@@ -66,7 +66,7 @@ class campaign final : public detailed_data_entry, public data_type<campaign>, p
 
 	Q_PROPERTY(wyrmgus::icon* icon MEMBER icon NOTIFY changed)
 	Q_PROPERTY(wyrmgus::player_color* player_color MEMBER player_color NOTIFY changed)
-	Q_PROPERTY(QDateTime start_date MEMBER start_date READ get_start_date NOTIFY changed)
+	Q_PROPERTY(QDate start_date MEMBER start_date READ get_start_date NOTIFY changed)
 	Q_PROPERTY(archimedes::calendar* start_date_calendar MEMBER start_date_calendar)
 	Q_PROPERTY(archimedes::timeline* timeline MEMBER timeline NOTIFY changed)
 	Q_PROPERTY(wyrmgus::faction* faction MEMBER faction NOTIFY changed)
@@ -108,7 +108,7 @@ public:
 	virtual void ProcessConfigData(const CConfigData *config_data) override;
 	virtual void initialize() override;
 	
-	const QDateTime &get_start_date() const
+	const QDate &get_start_date() const
 	{
 		return this->start_date;
 	}
@@ -193,7 +193,7 @@ signals:
 private:
 	wyrmgus::icon *icon = nullptr;
 	wyrmgus::player_color *player_color = nullptr; //the player color used for the campaign's icon
-	QDateTime start_date; //the starting date for the campaign
+	QDate start_date; //the starting date for the campaign
 	calendar *start_date_calendar = nullptr; //the calendar for the start date
 	archimedes::timeline *timeline = nullptr; //the timeline in which the campaign is set
 	bool hidden = false; //whether the campaign is hidden

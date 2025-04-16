@@ -55,6 +55,14 @@ public:
 		this->Hour = date_time.time().hour();
 	}
 
+	CDate(const QDate &date)
+	{
+		this->Year = date.year();
+		this->Month = date.month();
+		this->Day = date.day();
+		this->Hour = 12;
+	}
+
 	operator QDateTime() const
 	{
 		return QDateTime(QDate(this->Year, this->Month, this->Day), QTime(this->Hour, 0));

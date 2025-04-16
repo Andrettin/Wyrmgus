@@ -47,6 +47,7 @@ add_subdirectory(src/third_party/zlib)
 
 include_directories(
 	archimedes/src
+	archimedes/src/third_party/magic_enum/include
 	src
 	src/include
 	src/guichan/include
@@ -1358,14 +1359,14 @@ find_package(Boost 1.69.0 REQUIRED)
 #Qt6 modules
 #different modules have different licenses, make sure all modules used here are compatible with the GPL 2.0
 set(CMAKE_AUTOMOC ON)
-find_package(Qt6 6.5 COMPONENTS Core REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
-find_package(Qt6 6.5 COMPONENTS Gui REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
-find_package(Qt6 6.5 COMPONENTS Network REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
-find_package(Qt6 6.5 COMPONENTS Widgets REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
-find_package(Qt6 6.5 COMPONENTS Multimedia REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
-find_package(Qt6 6.5 COMPONENTS Location REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
-find_package(Qt6 6.5 COMPONENTS Qml REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
-find_package(Qt6 6.5 COMPONENTS Quick REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
+find_package(Qt6 6.8 COMPONENTS Core REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
+find_package(Qt6 6.8 COMPONENTS Gui REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
+find_package(Qt6 6.8 COMPONENTS Network REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
+find_package(Qt6 6.8 COMPONENTS Widgets REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
+find_package(Qt6 6.8 COMPONENTS Multimedia REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
+find_package(Qt6 6.8 COMPONENTS Location REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
+find_package(Qt6 6.8 COMPONENTS Qml REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
+find_package(Qt6 6.8 COMPONENTS Quick REQUIRED) #licensed under the GPL 2.0 (as well as the LGPL 3.0)
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_mixer REQUIRED)

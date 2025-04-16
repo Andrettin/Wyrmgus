@@ -147,6 +147,8 @@ class defines final : public defines_base, public singleton<defines>
 	Q_PROPERTY(QStringList tips READ get_tips_qstring_list NOTIFY changed)
 
 public:
+	using singleton<defines>::get;
+
 	virtual void process_gsml_property(const gsml_property &property) override;
 	virtual void process_gsml_scope(const gsml_data &scope) override;
 	virtual void initialize() override;
