@@ -346,7 +346,7 @@ int CclDefineCampaign(lua_State *l)
 		} else if (!strcmp(value, "Hidden")) {
 			campaign->hidden = LuaToBoolean(l, -1);
 		} else if (!strcmp(value, "StartYear")) {
-			campaign->start_date.setDate(QDate(LuaToNumber(l, -1), 0, 0));
+			campaign->start_date = QDate(LuaToNumber(l, -1), 0, 0);
 		} else if (!strcmp(value, "StartDate")) {
 			CDate start_date;
 			CclGetDate(l, &start_date);
@@ -435,10 +435,10 @@ static int CclGetCampaignData(lua_State *l)
 		lua_pushstring(l, campaign->get_description().c_str());
 		return 1;
 	} else if (!strcmp(data, "StartYear")) {
-		lua_pushnumber(l, campaign->get_start_date().date().year());
+		lua_pushnumber(l, campaign->get_start_date().year());
 		return 1;
 	} else if (!strcmp(data, "StartYearString")) {
-		lua_pushstring(l, wyrmgus::date::year_to_string(campaign->get_start_date().date().year()).c_str());
+		lua_pushstring(l, wyrmgus::date::year_to_string(campaign->get_start_date().year()).c_str());
 		return 1;
 	} else if (!strcmp(data, "Faction")) {
 		if (campaign->get_faction() != nullptr) {

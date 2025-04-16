@@ -46,8 +46,6 @@ add_subdirectory(src/third_party/zlib)
 # Stratagus sources
 
 include_directories(
-	archimedes/src
-	archimedes/src/third_party/magic_enum/include
 	src
 	src/include
 	src/guichan/include
@@ -58,6 +56,8 @@ include_directories(
 	src/third_party/lua-5.1.5/toluapp-simple
 	src/third_party/xbrz/include
 	src/third_party/zlib
+	archimedes/src
+	archimedes/src/third_party/magic_enum/include
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -1808,6 +1808,16 @@ target_link_libraries(wyrmgus ${wyrmgus_LIBS})
 target_precompile_headers(wyrmgus_main REUSE_FROM wyrmgus)
 if(WITH_TEST)
 	target_precompile_headers(wyrmgus_test REUSE_FROM wyrmgus)
+endif()
+
+if(WIN32)
+	set_target_properties(wyrmgus_main 
+		PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=%PATH%;${Qt6_DIR}/../../../bin;"
+	)
+	
+	set_target_properties(wyrmgus_main 
+		PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "$(ProjectDir).."
+	)
 endif()
 
 set_target_properties(wyrmgus_main PROPERTIES OUTPUT_NAME ${BINARY_NAME})

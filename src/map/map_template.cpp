@@ -4816,7 +4816,7 @@ void map_template::create_terrain_image_from_geodata(QImage &image, const terrai
 		}
 
 		for (const auto &geoshape : kv_pair.second) {
-			geoshape::write_to_image(*geoshape, image, color, georectangle, this->get_map_projection(), image_checkpoint_save_filename);
+			geoshape::write_to_image(*geoshape, image, color, georectangle, this->get_map_projection());
 		}
 	}
 }

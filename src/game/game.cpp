@@ -1412,7 +1412,7 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 	
 	const campaign *current_campaign = game::get()->get_current_campaign();
 
-	QDateTime start_date;
+	QDate start_date;
 
 	if (current_campaign != nullptr) {
 		start_date = current_campaign->get_start_date();
@@ -1420,16 +1420,14 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 		const int year = 1;
 		const int month = random::get()->generate(date::months_per_year) + 1;
 		const int day = random::get()->generate(date::get_days_in_month(month, year)) + 1;
-		const int hour = random::get()->generate(date::hours_per_day);
 		const QDate date(year, month, day);
-		start_date = QDateTime(date, QTime(hour, 0));
+		start_date = date;
 	}
 
-	game::get()->set_current_year(start_date.date().year());
+	game::get()->set_current_year(start_date.year());
 
-	uint64_t total_hours = static_cast<uint64_t>(std::abs(game::base_date.date().year() - start_date.date().year())) * DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY;
-	total_hours += QDate(1, 1, 1).daysTo(QDate(1, start_date.date().month(), start_date.date().day())) * DEFAULT_HOURS_PER_DAY;
-	total_hours += start_date.time().hour();
+	uint64_t total_hours = static_cast<uint64_t>(std::abs(game::base_date.date().year() - start_date.year())) * DEFAULT_DAYS_PER_YEAR * DEFAULT_HOURS_PER_DAY;
+	total_hours += QDate(1, 1, 1).daysTo(QDate(1, start_date.month(), start_date.day())) * DEFAULT_HOURS_PER_DAY;
 
 	game::get()->set_current_total_hours(total_hours);
 	//Wyrmgus end

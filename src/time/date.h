@@ -68,6 +68,11 @@ public:
 		return QDateTime(QDate(this->Year, this->Month, this->Day), QTime(this->Hour, 0));
 	}
 	
+	operator QDate() const
+	{
+		return QDate(this->Year, this->Month, this->Day);
+	}
+	
 	bool ContainsDate(const CDate &date) const;	/// whether this date "contains" another (i.e. if it is subsequent to another, and in an appropriate timeline)
 	CDate ToBaseCalendar(calendar *current_calendar) const;
 	std::string ToString() const;
