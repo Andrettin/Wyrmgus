@@ -382,7 +382,7 @@ std::string PlayerRace::TranslateName(const std::string &name, const archimedes:
 	// try to translate the entire name, as a particular translation for it may exist
 	const auto find_iterator = language->NameTranslations.find(name);
 	if (find_iterator != language->NameTranslations.end()) {
-		return find_iterator->second[SyncRand(find_iterator->second.size())];
+		return find_iterator->second[random::get()->generate(find_iterator->second.size())];
 	}
 	
 	//if adapting the entire name failed, try to match prefixes and suffixes
@@ -397,8 +397,8 @@ std::string PlayerRace::TranslateName(const std::string &name, const archimedes:
 				const auto prefix_find_iterator = language->NameTranslations.find(name_prefix);
 				const auto suffix_find_iterator = language->NameTranslations.find(name_suffix);
 				if (prefix_find_iterator != language->NameTranslations.end() && suffix_find_iterator != language->NameTranslations.end()) { // if both a prefix and suffix have been matched
-					name_prefix = prefix_find_iterator->second[SyncRand(prefix_find_iterator->second.size())];
-					name_suffix = suffix_find_iterator->second[SyncRand(suffix_find_iterator->second.size())];
+					name_prefix = prefix_find_iterator->second[random::get()->generate(prefix_find_iterator->second.size())];
+					name_suffix = suffix_find_iterator->second[random::get()->generate(suffix_find_iterator->second.size())];
 					name_suffix = DecapitalizeString(name_suffix);
 					if (name_prefix.substr(name_prefix.size() - 2, 2) == "gs" && name_suffix.substr(0, 1) == "g") { //if the last two characters of the prefix are "gs", and the first character of the suffix is "g", then remove the final "s" from the prefix (as in "Königgrätz")
 						name_prefix = FindAndReplaceStringEnding(name_prefix, "gs", "g");
@@ -1591,7 +1591,7 @@ void CPlayer::set_faction(const wyrmgus::faction *faction)
 		}
 
 		if (!available_colors.empty()) {
-			player_color = available_colors[SyncRand(available_colors.size())];
+			player_color = available_colors[random::get()->generate(available_colors.size())];
 		}
 	}
 
@@ -3116,9 +3116,9 @@ void CPlayer::PerformResourceTrade()
 */
 bool CPlayer::HasMarketUnit() const
 {
-	const int n_m = AiHelpers.SellMarkets[0].size();
+	const size_t n_m = AiHelpers.SellMarkets[0].size();
 
-	for (int i = 0; i < n_m; ++i) {
+	for (size_t i = 0; i < n_m; ++i) {
 		const wyrmgus::unit_type &market_type = *AiHelpers.SellMarkets[0][i];
 
 		if (this->GetUnitTypeCount(&market_type)) {
@@ -3138,16 +3138,16 @@ CUnit *CPlayer::GetMarketUnit() const
 {
 	CUnit *market_unit = nullptr;
 	
-	const int n_m = AiHelpers.SellMarkets[0].size();
+	const size_t n_m = AiHelpers.SellMarkets[0].size();
 
-	for (int i = 0; i < n_m; ++i) {
+	for (size_t i = 0; i < n_m; ++i) {
 		const wyrmgus::unit_type &market_type = *AiHelpers.SellMarkets[0][i];
 
 		if (this->GetUnitTypeCount(&market_type)) {
 			std::vector<CUnit *> market_table;
 			FindPlayerUnitsByType(*this, market_type, market_table);
 			if (market_table.size() > 0) {
-				market_unit = market_table[SyncRand(market_table.size())];
+				market_unit = market_table[random::get()->generate(market_table.size())];
 				break;
 			}
 		}
@@ -3195,7 +3195,7 @@ void CPlayer::update_current_quests()
 		objective->update_counter();
 	}
 	
-	for (int i = (this->current_quests.size()  - 1); i >= 0; --i) {
+	for (int i = (static_cast<int>(this->current_quests.size())  - 1); i >= 0; --i) {
 		wyrmgus::quest *quest = this->current_quests[i];
 		const std::pair<bool, std::string> failure_result = this->check_quest_failure(quest);
 		if (failure_result.first) {
@@ -3314,7 +3314,7 @@ void CPlayer::remove_current_quest(wyrmgus::quest *quest)
 {
 	vector::remove(this->current_quests, quest);
 	
-	for (int i = (this->quest_objectives.size()  - 1); i >= 0; --i) {
+	for (int i = (static_cast<int>(this->quest_objectives.size())  - 1); i >= 0; --i) {
 		if (this->quest_objectives[i]->get_quest_objective()->get_quest() == quest) {
 			vector::remove(this->quest_objectives, this->quest_objectives[i]);
 		}

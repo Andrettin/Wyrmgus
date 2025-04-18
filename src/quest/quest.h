@@ -77,7 +77,7 @@ public:
 	static quest *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
 		quest *quest = data_type::add(identifier, data_module);
-		quest->index = quest::get_all().size() - 1;
+		quest->index = static_cast<int>(quest::get_all().size()) - 1;
 		return quest;
 	}
 

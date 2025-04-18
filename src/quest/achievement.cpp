@@ -285,7 +285,7 @@ int achievement::get_progress_max() const
 	}
 
 	int progress_max = 0;
-	progress_max += this->required_quests.size();
+	progress_max += static_cast<int>(this->required_quests.size());
 	progress_max += this->character_level;
 
 	return progress_max;

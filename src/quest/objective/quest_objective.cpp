@@ -111,7 +111,7 @@ std::unique_ptr<quest_objective> quest_objective::from_gsml_scope(const gsml_dat
 }
 
 quest_objective::quest_objective(const wyrmgus::quest *quest)
-	: quest(quest), index(quest->get_objectives().size())
+	: quest(quest), index(static_cast<int>(quest->get_objectives().size()))
 {
 }
 
