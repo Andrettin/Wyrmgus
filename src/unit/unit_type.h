@@ -1430,7 +1430,7 @@ public:
 		{
 			DataKey k{};
 			k.key = key;
-			k.keylen = strlen(key);
+			k.keylen = static_cast<unsigned int>(strlen(key));
 			const auto it = std::lower_bound(buildin.begin(), buildin.end(), k, DataKey::key_pred);
 			if (it != buildin.end() && it->keylen == k.keylen && 0 == strcmp(it->key, key)) {
 				return it->offset;

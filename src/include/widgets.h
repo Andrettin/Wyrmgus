@@ -295,7 +295,7 @@ public:
 
 	virtual int getNumberOfElements() override
 	{
-		return list.size();
+		return static_cast<int>(list.size());
 	}
 
 	virtual std::string getElementAt(int i) override

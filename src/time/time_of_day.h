@@ -53,7 +53,7 @@ public:
 	static time_of_day *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
 		time_of_day *time_of_day = data_type::add(identifier, data_module);
-		time_of_day->ID = time_of_day::get_all().size() - 1;
+		time_of_day->ID = static_cast<int>(time_of_day::get_all().size()) - 1;
 		return time_of_day;
 	}
 

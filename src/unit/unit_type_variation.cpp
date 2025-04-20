@@ -50,7 +50,7 @@ unit_type_variation::unit_type_variation(const std::string &identifier, const wy
 	if (image_layer == -1) {
 		this->index = static_cast<int>(unit_type->get_variations().size());
 	} else {
-		this->index = unit_type->LayerVariations[image_layer].size();
+		this->index = static_cast<int>(unit_type->LayerVariations[image_layer].size());
 	}
 }
 

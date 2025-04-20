@@ -63,7 +63,7 @@ public:
 	static upgrade_class *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
 		upgrade_class *upgrade_class = data_type::add(identifier, data_module);
-		upgrade_class->index = upgrade_class::get_all().size() - 1;
+		upgrade_class->index = static_cast<int>(upgrade_class::get_all().size()) - 1;
 		return upgrade_class;
 	}
 

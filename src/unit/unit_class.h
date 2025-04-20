@@ -69,7 +69,7 @@ public:
 	static unit_class *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
 		unit_class *unit_class = data_type::add(identifier, data_module);
-		unit_class->index = unit_class::get_all().size() - 1;
+		unit_class->index = static_cast<int>(unit_class::get_all().size()) - 1;
 		return unit_class;
 	}
 

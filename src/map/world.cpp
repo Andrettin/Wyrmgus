@@ -48,7 +48,7 @@ namespace wyrmgus {
 world *world::add(const std::string &identifier, const wyrmgus::data_module *data_module)
 {
 	world *world = data_type::add(identifier, data_module);
-	world->ID = world::get_all().size() - 1;
+	world->ID = static_cast<int>(world::get_all().size()) - 1;
 	UI.WorldButtons.resize(world::get_all().size());
 	UI.WorldButtons[world->ID].X = -1;
 	UI.WorldButtons[world->ID].Y = -1;

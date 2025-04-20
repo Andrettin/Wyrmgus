@@ -127,26 +127,26 @@ int CclDefineQuest(lua_State *l)
 			quest->FailEffects = std::make_unique<LuaCallback>(l, -1);
 		} else if (!strcmp(value, "ObjectiveStrings")) {
 			quest->objective_strings.clear();
-			const int args = lua_rawlen(l, -1);
+			const int args = static_cast<int>(lua_rawlen(l, -1));
 			for (int j = 0; j < args; ++j) {
 				quest->objective_strings.push_back(LuaToString(l, -1, j + 1));
 			}
 		} else if (!strcmp(value, "BriefingSounds")) {
 			quest->BriefingSounds.clear();
-			const int args = lua_rawlen(l, -1);
+			const int args = static_cast<int>(lua_rawlen(l, -1));
 			for (int j = 0; j < args; ++j) {
 				quest->BriefingSounds.push_back(LuaToString(l, -1, j + 1));
 			}
 		// objective types
 		} else if (!strcmp(value, "Objectives")) {
-			const int args = lua_rawlen(l, -1);
+			const int args = static_cast<int>(lua_rawlen(l, -1));
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
 				wyrmgus::quest_objective *objective = nullptr;
 				if (!lua_istable(l, -1)) {
 					LuaError(l, "incorrect argument (expected table for quest objectives)");
 				}
-				const int subargs = lua_rawlen(l, -1);
+				const int subargs = static_cast<int>(lua_rawlen(l, -1));
 				for (int k = 0; k < subargs; ++k) {
 					value = LuaToString(l, -1, k + 1);
 					++k;
@@ -181,7 +181,7 @@ int CclDefineQuest(lua_State *l)
 			}
 		} else if (!strcmp(value, "HeroesMustSurvive")) {
 			quest->HeroesMustSurvive.clear();
-			const int args = lua_rawlen(l, -1);
+			const int args = static_cast<int>(lua_rawlen(l, -1));
 			for (int j = 0; j < args; ++j) {
 				wyrmgus::character *hero = wyrmgus::character::get(LuaToString(l, -1, j + 1));
 				quest->HeroesMustSurvive.push_back(hero);
@@ -196,11 +196,11 @@ int CclDefineQuest(lua_State *l)
 
 static int CclGetQuests(lua_State *l)
 {
-	lua_createtable(l, wyrmgus::quest::get_all().size(), 0);
-	for (size_t i = 1; i <= wyrmgus::quest::get_all().size(); ++i)
+	lua_createtable(l, static_cast<int>(quest::get_all().size()), 0);
+	for (size_t i = 1; i <= quest::get_all().size(); ++i)
 	{
-		lua_pushstring(l, wyrmgus::quest::get_all()[i-1]->get_identifier().c_str());
-		lua_rawseti(l, -2, i);
+		lua_pushstring(l, quest::get_all()[i-1]->get_identifier().c_str());
+		lua_rawseti(l, -2, static_cast<int>(i));
 	}
 	return 1;
 }
@@ -296,19 +296,19 @@ static int CclGetQuestData(lua_State *l)
 		}
 		return 1;
 	} else if (!strcmp(data, "Objectives")) {
-		lua_createtable(l, quest->get_objective_strings().size(), 0);
+		lua_createtable(l, static_cast<int>(quest->get_objective_strings().size()), 0);
 		for (size_t i = 1; i <= quest->get_objective_strings().size(); ++i)
 		{
 			lua_pushstring(l, quest->get_objective_strings()[i-1].c_str());
-			lua_rawseti(l, -2, i);
+			lua_rawseti(l, -2, static_cast<int>(i));
 		}
 		return 1;
 	} else if (!strcmp(data, "BriefingSounds")) {
-		lua_createtable(l, quest->BriefingSounds.size(), 0);
+		lua_createtable(l, static_cast<int>(quest->BriefingSounds.size()), 0);
 		for (size_t i = 1; i <= quest->BriefingSounds.size(); ++i)
 		{
 			lua_pushstring(l, quest->BriefingSounds[i-1].c_str());
-			lua_rawseti(l, -2, i);
+			lua_rawseti(l, -2, static_cast<int>(i));
 		}
 		return 1;
 	} else {
@@ -353,7 +353,7 @@ int CclDefineCampaign(lua_State *l)
 			campaign->start_date = start_date;
 		} else if (!strcmp(value, "RequiredQuests")) {
 			campaign->required_quests.clear();
-			const int args = lua_rawlen(l, -1);
+			const int args = static_cast<int>(lua_rawlen(l, -1));
 			for (int j = 0; j < args; ++j) {
 				std::string quest_ident = LuaToString(l, -1, j + 1);
 				wyrmgus::quest *required_quest = wyrmgus::quest::get(quest_ident);
@@ -363,7 +363,7 @@ int CclDefineCampaign(lua_State *l)
 			campaign->map_templates.clear();
 			campaign->MapSizes.clear();
 			campaign->MapTemplateStartPos.clear();
-			const int args = lua_rawlen(l, -1);
+			const int args = static_cast<int>(lua_rawlen(l, -1));
 			for (int j = 0; j < args; ++j) {
 				std::string map_template_ident = LuaToString(l, -1, j + 1);
 				wyrmgus::map_template *map_template = wyrmgus::map_template::get_or_add(map_template_ident, nullptr);
@@ -405,11 +405,11 @@ int CclDefineCampaign(lua_State *l)
 
 static int CclGetCampaigns(lua_State *l)
 {
-	lua_createtable(l, wyrmgus::campaign::get_all().size(), 0);
-	for (size_t i = 1; i <= wyrmgus::campaign::get_all().size(); ++i)
+	lua_createtable(l, static_cast<int>(campaign::get_all().size()), 0);
+	for (size_t i = 1; i <= campaign::get_all().size(); ++i)
 	{
-		lua_pushstring(l, wyrmgus::campaign::get_all()[i - 1]->get_identifier().c_str());
-		lua_rawseti(l, -2, i);
+		lua_pushstring(l, campaign::get_all()[i - 1]->get_identifier().c_str());
+		lua_rawseti(l, -2, static_cast<int>(i));
 	}
 	return 1;
 }
@@ -451,11 +451,11 @@ static int CclGetCampaignData(lua_State *l)
 		lua_pushboolean(l, campaign->is_hidden());
 		return 1;
 	} else if (!strcmp(data, "RequiredQuests")) {
-		lua_createtable(l, campaign->get_required_quests().size(), 0);
+		lua_createtable(l, static_cast<int>(campaign->get_required_quests().size()), 0);
 		for (size_t i = 1; i <= campaign->get_required_quests().size(); ++i)
 		{
 			lua_pushstring(l, campaign->get_required_quests()[i-1]->get_identifier().c_str());
-			lua_rawseti(l, -2, i);
+			lua_rawseti(l, -2, static_cast<int>(i));
 		}
 		return 1;
 	} else if (!strcmp(data, "MapTemplate")) {
@@ -546,7 +546,7 @@ int CclDefineAchievement(lua_State *l)
 			achievement->character_type = unit_type;
 		} else if (!strcmp(value, "RequiredQuests")) {
 			achievement->required_quests.clear();
-			const int args = lua_rawlen(l, -1);
+			const int args = static_cast<int>(lua_rawlen(l, -1));
 			for (int j = 0; j < args; ++j) {
 				std::string quest_ident = LuaToString(l, -1, j + 1);
 				wyrmgus::quest *required_quest = wyrmgus::quest::get(quest_ident);
@@ -562,11 +562,11 @@ int CclDefineAchievement(lua_State *l)
 
 static int CclGetAchievements(lua_State *l)
 {
-	lua_createtable(l, wyrmgus::achievement::get_all().size(), 0);
-	for (size_t i = 1; i <= wyrmgus::achievement::get_all().size(); ++i)
+	lua_createtable(l, static_cast<int>(achievement::get_all().size()), 0);
+	for (size_t i = 1; i <= achievement::get_all().size(); ++i)
 	{
-		lua_pushstring(l, wyrmgus::achievement::get_all()[i-1]->get_identifier().c_str());
-		lua_rawseti(l, -2, i);
+		lua_pushstring(l, achievement::get_all()[i-1]->get_identifier().c_str());
+		lua_rawseti(l, -2, static_cast<int>(i));
 	}
 	return 1;
 }
@@ -643,7 +643,7 @@ int CclDefineDialogue(lua_State *l)
 		const char *value = LuaToString(l, -2);
 		
 		if (!strcmp(value, "Nodes")) {
-			const int args = lua_rawlen(l, -1);
+			const int args = static_cast<int>(lua_rawlen(l, -1));
 			for (int j = 0; j < args; ++j) {
 				lua_rawgeti(l, -1, j + 1);
 				auto node = std::make_unique<wyrmgus::dialogue_node>(dialogue, static_cast<int>(dialogue->nodes.size()));
@@ -652,7 +652,7 @@ int CclDefineDialogue(lua_State *l)
 					LuaError(l, "incorrect argument (expected table for dialogue nodes)");
 				}
 
-				const int subargs = lua_rawlen(l, -1);
+				const int subargs = static_cast<int>(lua_rawlen(l, -1));
 				for (int k = 0; k < subargs; ++k) {
 					value = LuaToString(l, -1, k + 1);
 					++k;
@@ -681,7 +681,7 @@ int CclDefineDialogue(lua_State *l)
 						lua_pop(l, 1);
 					} else if (!strcmp(value, "options")) {
 						lua_rawgeti(l, -1, k + 1);
-						const int subsubargs = lua_rawlen(l, -1);
+						const int subsubargs = static_cast<int>(lua_rawlen(l, -1));
 						for (int n = 0; n < subsubargs; ++n) {
 							if (n >= static_cast<int>(node->options.size())) {
 								auto option = std::make_unique<wyrmgus::dialogue_option>(node.get());
@@ -692,7 +692,7 @@ int CclDefineDialogue(lua_State *l)
 						lua_pop(l, 1);
 					} else if (!strcmp(value, "option-effects")) {
 						lua_rawgeti(l, -1, k + 1);
-						const int subsubargs = lua_rawlen(l, -1);
+						const int subsubargs = static_cast<int>(lua_rawlen(l, -1));
 						for (int n = 0; n < subsubargs; ++n) {
 							lua_rawgeti(l, -1, n + 1);
 							if (n >= static_cast<int>(node->options.size())) {
@@ -705,7 +705,7 @@ int CclDefineDialogue(lua_State *l)
 						lua_pop(l, 1);
 					} else if (!strcmp(value, "option-tooltips")) {
 						lua_rawgeti(l, -1, k + 1);
-						const int subsubargs = lua_rawlen(l, -1);
+						const int subsubargs = static_cast<int>(lua_rawlen(l, -1));
 						for (int n = 0; n < subsubargs; ++n) {
 							if (n >= static_cast<int>(node->options.size())) {
 								auto option = std::make_unique<wyrmgus::dialogue_option>(node.get());

@@ -176,7 +176,7 @@ int CFile::printf(const char *format, ...)
 			return -1;
 		}
 	}
-	size = strlen(p.get());
+	size = static_cast<int>(strlen(p.get()));
 	int ret = pimpl->write(p.get(), size);
 	return ret;
 }
@@ -318,11 +318,11 @@ int CFile::PImpl::read(void *buf, size_t len)
 
 	if (cl_type != CLF_TYPE_INVALID) {
 		if (cl_type == CLF_TYPE_PLAIN) {
-			ret = fread(buf, 1, len, cl_plain);
+			ret = static_cast<int>(fread(buf, 1, len, cl_plain));
 		}
 #ifdef USE_ZLIB
 		if (cl_type == CLF_TYPE_GZIP) {
-			ret = gzread(cl_gz, buf, len);
+			ret = gzread(cl_gz, buf, static_cast<unsigned int>(len));
 		}
 #endif // USE_ZLIB
 	} else {
@@ -354,11 +354,11 @@ int CFile::PImpl::write(const void *buf, size_t size)
 
 	if (tp != CLF_TYPE_INVALID) {
 		if (tp == CLF_TYPE_PLAIN) {
-			ret = fwrite(buf, size, 1, cl_plain);
+			ret = static_cast<int>(fwrite(buf, size, 1, cl_plain));
 		}
 #ifdef USE_ZLIB
 		if (tp == CLF_TYPE_GZIP) {
-			ret = gzwrite(cl_gz, buf, size);
+			ret = gzwrite(cl_gz, buf, static_cast<unsigned int>(size));
 		}
 #endif // USE_ZLIB
 	} else {
@@ -644,7 +644,7 @@ void FileWriter::printf(const char *format, ...)
 	buf[sizeof(buf) - 1] = '\0';
 	vsnprintf(buf.data(), sizeof(buf) - 1, format, ap);
 	va_end(ap);
-	write(buf.data(), strlen(buf.data()));
+	write(buf.data(), static_cast<unsigned int>(strlen(buf.data())));
 }
 
 
@@ -669,7 +669,7 @@ public:
 
 	virtual int write(const char *data, unsigned int size)
 	{
-		return fwrite(data, size, 1, file);
+		return static_cast<int>(fwrite(data, size, 1, file));
 	}
 };
 

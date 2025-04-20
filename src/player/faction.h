@@ -112,7 +112,7 @@ public:
 	static faction *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
 		faction *faction = data_type::add(identifier, data_module);
-		faction->ID = faction::get_all().size() - 1;
+		faction->ID = static_cast<int>(faction::get_all().size()) - 1;
 		return faction;
 	}
 

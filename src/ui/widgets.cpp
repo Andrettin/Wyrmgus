@@ -1102,7 +1102,7 @@ void MultiLineLabel::adjustSize()
 		}
 	}
 	this->setWidth(width);
-	this->setHeight(this->getFont()->getHeight() * this->mTextRows.size());
+	this->setHeight(this->getFont()->getHeight() * static_cast<int>(this->mTextRows.size()));
 }
 
 /**
@@ -1411,7 +1411,7 @@ void LuaListModel::setList(lua_State *lua, lua_Object *lo)
 {
 	list.clear();
 
-	const int args = lua_rawlen(lua, *lo);
+	const int args = static_cast<int>(lua_rawlen(lua, *lo));
 	for (int j = 0; j < args; ++j) {
 		list.push_back(std::string(LuaToString(lua, *lo, j + 1)));
 	}

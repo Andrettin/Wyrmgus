@@ -234,7 +234,7 @@ public:
 	static terrain_type *add(const std::string &identifier, const wyrmgus::data_module *data_module)
 	{
 		terrain_type *terrain_type = data_type::add(identifier, data_module);
-		terrain_type->ID = terrain_type::get_all().size() - 1;
+		terrain_type->ID = static_cast<int>(terrain_type::get_all().size()) - 1;
 		return terrain_type;
 	}
 
