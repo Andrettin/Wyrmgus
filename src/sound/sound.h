@@ -29,13 +29,16 @@
 
 #include "database/data_entry.h"
 #include "database/data_type.h"
-#include "sound/unitsound.h"
 #include "stratagus.h"
 
 class CConfigData;
 class CUnit;
 class LuaActionListener;
 class Missile;
+
+namespace wyrmgus {
+	class sound;
+}
 
 extern wyrmgus::sound *RegisterTwoGroups(const std::string &identifier, wyrmgus::sound *first, wyrmgus::sound *second);
 extern void SetSoundRange(wyrmgus::sound *sound, unsigned char range);

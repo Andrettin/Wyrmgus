@@ -30,6 +30,7 @@
 
 #include "spell/spell.h"
 
+#include "economy/resource.h"
 #include "luacallback.h"
 #include "player/civilization.h"
 #include "player/faction.h"
@@ -69,7 +70,7 @@ static std::unique_ptr<wyrmgus::spell_action> CclSpellAction(lua_State *l)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	const int args = lua_rawlen(l, -1);
+	const int args = static_cast<int>(lua_rawlen(l, -1));
 
 	const char *value = LuaToString(l, -1, 1);
 
@@ -145,7 +146,7 @@ static void CclSpellCondition(lua_State *l, ConditionInfo *condition)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	const int args = lua_rawlen(l, -1);
+	const int args = static_cast<int>(lua_rawlen(l, -1));
 	for (int j = 0; j < args; ++j) {
 		const char *value = LuaToString(l, -1, j + 1);
 		++j;
@@ -227,7 +228,7 @@ void CclSpellAutocast(lua_State *l, AutoCastInfo *autocast)
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	const int args = lua_rawlen(l, -1);
+	const int args = static_cast<int>(lua_rawlen(l, -1));
 	for (int j = 0; j < args; ++j) {
 		const char *value = LuaToString(l, -1, j + 1);
 		++j;
@@ -305,7 +306,7 @@ int CclDefineSpell(lua_State *l)
 			if (!lua_istable(l, -1)) {
 				LuaError(l, "incorrect argument");
 			}
-			const int len = lua_rawlen(l, -1);
+			const int len = static_cast<int>(lua_rawlen(l, -1));
 			for (int j = 0; j < len; ++j) {
 				const resource *resource = resource::get(LuaToString(l, -1, j + 1));
 				++j;
@@ -338,7 +339,7 @@ int CclDefineSpell(lua_State *l)
 			if (!lua_istable(l, i + 1)) {
 				LuaError(l, "incorrect argument");
 			}
-			const int subargs = lua_rawlen(l, i + 1);
+			const int subargs = static_cast<int>(lua_rawlen(l, i + 1));
 			for (int k = 0; k < subargs; ++k) {
 				lua_rawgeti(l, i + 1, k + 1);
 				spell->actions.push_back(CclSpellAction(l));

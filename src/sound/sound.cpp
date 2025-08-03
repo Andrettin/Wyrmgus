@@ -38,6 +38,7 @@
 #include "sound/sample.h"
 #include "sound/sound_server.h"
 #include "sound/unit_sound_type.h"
+#include "sound/unitsound.h"
 #include "spell/status_effect.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
@@ -513,7 +514,7 @@ void sound::initialize()
 {
 	const size_t file_count = this->get_files().size();
 	if (file_count > 1) { // sound group
-		this->Number = file_count;
+		this->Number = static_cast<unsigned>(file_count);
 	} else if (file_count == 1) { // unique sound
 		this->Number = ONE_SOUND;
 	} else if (this->get_first_sound() != nullptr && this->get_second_sound() != nullptr) {

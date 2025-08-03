@@ -40,6 +40,7 @@
 #include "actions.h"
 #include "character.h"
 #include "commands.h"
+#include "economy/resource.h"
 #include "magic_domain.h"
 #include "map/map.h"
 #include "map/map_info.h"
@@ -51,6 +52,7 @@
 #include "player/player.h"
 #include "script.h"
 #include "sound/sound.h"
+#include "sound/unitsound.h"
 #include "spell/spell_action.h"
 #include "spell/spell_action_adjust_variable.h"
 #include "spell/spell_action_spawn_missile.h"
@@ -275,7 +277,7 @@ namespace wyrmgus {
 spell *spell::add(const std::string &identifier, const wyrmgus::data_module *data_module)
 {
 	spell *spell = data_type::add(identifier, data_module);
-	spell->Slot = spell::get_all().size() - 1;
+	spell->Slot = static_cast<int>(spell::get_all().size()) - 1;
 
 	return spell;
 }

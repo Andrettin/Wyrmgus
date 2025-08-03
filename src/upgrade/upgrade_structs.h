@@ -31,8 +31,6 @@
 #include "database/detailed_data_entry.h"
 #include "data_type.h"
 #include "economy/resource_container.h"
-#include "item/item_class.h"
-#include "stratagus.h"
 #include "unit/unit_type_container.h"
 
 Q_MOC_INCLUDE("player/civilization.h")

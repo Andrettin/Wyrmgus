@@ -27,8 +27,9 @@
 #pragma once
 
 #include "map/map_template_container.h"
-#include "map/tile_transition.h"
 #include "vec2i.h"
+
+Q_MOC_INCLUDE("map/tile_transition.h")
 
 class CUnit;
 struct lua_State;

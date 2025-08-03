@@ -110,7 +110,7 @@ static int CclMakeSound(lua_State *l)
 		id = MakeSound(c_name, files);
 	} else if (lua_istable(l, 2)) {
 		// several files
-		const int args = lua_rawlen(l, 2);
+		const int args = static_cast<int>(lua_rawlen(l, 2));
 		files.reserve(args);
 		for (int j = 0; j < args; ++j) {
 			files.push_back(LuaToString(l, 2, j + 1));
@@ -258,7 +258,7 @@ static int CclSetSoundVolumePercent(lua_State *l)
 */
 static int CclGetSounds(lua_State *l)
 {
-	lua_createtable(l, wyrmgus::sound::get_all().size(), 0);
+	lua_createtable(l, static_cast<int>(wyrmgus::sound::get_all().size()), 0);
 	int j = 1;
 	for (auto it = wyrmgus::sound::get_all().begin(); it != wyrmgus::sound::get_all().end(); ++it) {
 		lua_pushstring(l, (*it)->get_identifier().c_str());

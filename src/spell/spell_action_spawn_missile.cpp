@@ -71,7 +71,7 @@ static void CclSpellMissileLocation(lua_State *l, wyrmgus::spell_action_spawn_mi
 	if (!lua_istable(l, -1)) {
 		LuaError(l, "incorrect argument");
 	}
-	const int args = lua_rawlen(l, -1);
+	const int args = static_cast<int>(lua_rawlen(l, -1));
 	for (int j = 0; j < args; ++j) {
 		const char *value = LuaToString(l, -1, j + 1);
 		++j;

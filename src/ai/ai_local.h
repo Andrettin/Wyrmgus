@@ -31,7 +31,6 @@
 #include "economy/resource_container.h"
 #include "map/landmass_container.h"
 #include "map/site_container.h"
-#include "unit/unit_cache.h"
 #include "unit/unit_class_container.h"
 #include "unit/unit_type_container.h"
 #include "vec2i.h"
