@@ -65,6 +65,7 @@
 #include "unit/unit_manager.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
+#include "upgrade/upgrade_structs.h"
 #include "util/assert_util.h"
 #include "util/exception_util.h"
 #include "util/log_util.h"

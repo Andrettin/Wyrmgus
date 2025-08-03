@@ -171,6 +171,7 @@
 #include "unit/unit_ref.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
+#include "upgrade/upgrade_structs.h"
 #include "util/assert_util.h"
 #include "util/container_util.h"
 #include "util/enum_util.h"

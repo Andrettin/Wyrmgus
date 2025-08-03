@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name video.h - The video headerfile. */
-//
-//      (c) Copyright 1999-2022 by Lutz Sammer, Nehal Mistry, Jimmy Salmon,
+//      (c) Copyright 1999-2025 by Lutz Sammer, Nehal Mistry, Jimmy Salmon,
 //                                 Pali Rohár and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify

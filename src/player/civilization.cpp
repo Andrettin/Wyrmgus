@@ -51,6 +51,7 @@
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade_class.h"
+#include "upgrade/upgrade_structs.h"
 #include "util/container_util.h"
 #include "util/gender.h"
 #include "util/path_util.h"
