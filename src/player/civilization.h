@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2018-2022 by Andrettin
+//      (c) Copyright 2018-2025 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@
 #include "database/data_type.h"
 #include "player/civilization_base.h"
 #include "time/date.h"
-#include "ui/ui.h"
+#include "ui/filler.h"
 
 Q_MOC_INCLUDE("language/language.h")
 Q_MOC_INCLUDE("ui/interface_style.h")

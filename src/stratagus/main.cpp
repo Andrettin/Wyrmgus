@@ -29,6 +29,7 @@
 #include "database/database.h"
 #include "database/defines.h"
 #include "database/preferences.h"
+#include "economy/resource.h"
 #include "editor.h"
 #include "engine_interface.h"
 #include "game/game.h"

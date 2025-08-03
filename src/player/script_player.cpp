@@ -73,6 +73,7 @@
 #include "time/calendar.h"
 #include "ui/button.h"
 #include "ui/button_cmd.h"
+#include "ui/icon.h"
 #include "ui/interface_style.h"
 #include "ui/ui.h"
 #include "unit/unit.h"

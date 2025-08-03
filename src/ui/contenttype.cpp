@@ -36,6 +36,7 @@
 #include "database/preferences.h"
 #include "script.h"
 #include "translator.h"
+#include "ui/icon.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
 #include "util/assert_util.h"

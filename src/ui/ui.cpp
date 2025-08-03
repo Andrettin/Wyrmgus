@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ui.cpp - The user interface globals. */
-//
-//      (c) Copyright 1999-2022 by Lutz Sammer, Andreas Arens,
+//      (c) Copyright 1999-2025 by Lutz Sammer, Andreas Arens,
 //                                 Jimmy Salmon, Pali Rohár and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -31,6 +29,7 @@
 
 #include "ui/ui.h"
 
+#include "database/database.h"
 #include "database/defines.h"
 #include "database/preferences.h"
 #include "engine_interface.h"

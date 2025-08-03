@@ -71,6 +71,7 @@
 //Wyrmgus end
 #include "unit/unit.h"
 #include "unit/unit_find.h"
+#include "ui/icon.h"
 //Wyrmgus start
 #include "ui/interface.h"
 #include "ui/ui.h"

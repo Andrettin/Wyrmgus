@@ -46,6 +46,7 @@
 #include "quest/objective/quest_objective.h"
 #include "quest/objective_type.h"
 #include "script.h"
+#include "ui/icon.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"

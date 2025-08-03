@@ -76,6 +76,7 @@
 #include "ui/button_level.h"
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"
+#include "ui/icon.h"
 #include "ui/interface.h"
 #include "ui/popup.h"
 #include "ui/resource_icon.h"

@@ -64,6 +64,7 @@
 #include "ui/cursor_type.h"
 #include "ui/hotkey_setup.h"
 #include "ui/interface.h"
+#include "ui/ui.h"
 #include "unit/unit_type.h"
 #include "util/container_util.h"
 #include "util/exception_util.h"

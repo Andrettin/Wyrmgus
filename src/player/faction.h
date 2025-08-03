@@ -29,9 +29,10 @@
 #include "database/data_type.h"
 #include "database/detailed_data_entry.h"
 #include "time/date.h"
-#include "ui/icon.h"
-#include "ui/ui.h"
+#include "ui/filler.h"
 #include "unit/unit_class_container.h"
+
+Q_MOC_INCLUDE("ui/icon.h")
 
 class CAiBuildingTemplate;
 class CCurrency;

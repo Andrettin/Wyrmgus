@@ -498,6 +498,7 @@ set(ui_SRCS
 	src/ui/contenttype.cpp
 	src/ui/cursor.cpp
 	src/ui/cursor_type.cpp
+	src/ui/filler.cpp
 	src/ui/hotkey_setup.cpp
 	src/ui/icon.cpp
 	src/ui/icon_base.cpp
@@ -1099,6 +1100,7 @@ set(wyrmgus_ui_HDRS
 	src/ui/contenttype.h
 	src/ui/cursor.h
 	src/ui/cursor_type.h
+	src/ui/filler.h
 	src/ui/hotkey_setup.h
 	src/ui/icon.h
 	src/ui/icon_base.h

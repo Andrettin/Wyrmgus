@@ -8,9 +8,8 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name commands.cpp - Global command handler - network support. */
-//
-//      (c) Copyright 2000-2007 by Lutz Sammer, Andreas Arens, and Jimmy Salmon.
+//      (c) Copyright 2000-2025 by Lutz Sammer, Andreas Arens, Jimmy Salmon
+//      and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -31,6 +30,7 @@
 #include "commands.h"
 
 #include "actions.h"
+#include "economy/resource.h"
 //Wyrmgus start
 #include "map/map.h" //it contains map width and height
 //Wyrmgus end

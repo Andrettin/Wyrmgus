@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name ui.h - The user interface header file. */
-//
-//      (c) Copyright 1999-2022 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1999-2025 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -33,6 +31,7 @@
 
 #include "color.h"
 #include "economy/resource.h"
+#include "ui/filler.h"
 #include "ui/interface.h"
 #include "ui/statusline.h"
 #include "util/singleton.h"
@@ -178,43 +177,6 @@ public:
 	std::vector<std::unique_ptr<CContentType>> Contents; /// Array of contents to display.
 
 	std::unique_ptr<ConditionPanel> Condition; /// Condition to show the panel; if null, no condition.
-};
-
-class CFiller final
-{
-public:
-	CFiller() {}
-
-	CFiller(const CFiller &filler)
-	{
-		*this = filler;
-	}
-
-	CFiller(CFiller &&filler)
-	{
-		this->G = filler.G;
-		this->X = filler.X;
-		this->Y = filler.Y;
-		this->loaded = filler.loaded;
-
-		filler.G = nullptr;
-	}
-
-	CFiller &operator =(const CFiller &other_filler);
-
-	bool is_loaded() const
-	{
-		return this->loaded;
-	}
-
-	void Load();
-	bool OnGraphic(int x, int y) const;
-
-	std::shared_ptr<CGraphic> G; /// Graphic
-	int X = 0;               /// X coordinate
-	int Y = 0;               /// Y coordinate
-private:
-	bool loaded = false;
 };
 
 class CButtonPanel final

@@ -57,6 +57,7 @@
 #include "spell/spell.h"
 #include "text_processor.h"
 #include "time/calendar.h"
+#include "ui/icon.h"
 #include "unit/unit.h"
 #include "unit/unit_class.h"
 #include "unit/unit_type_variation.h"
