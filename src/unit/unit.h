@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 1998-2022 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2025 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -27,27 +27,34 @@
 #pragma once
 
 #include "item/item_slot.h"
+#include "missileconfig.h"
 #include "player/player_container.h"
 #include "spell/spell_container.h"
+#include "unit/group_selection_mode.h"
+#include "unit/image_layer.h"
 #include "unit/unit_class_container.h"
-#include "unit/unit_type.h"
 #include "unit/unit_type_container.h"
 #include "unit/unit_variable.h"
 #include "vec2i.h"
 
 class CAnimation;
 class CFile;
+class CGraphic;
 class CMapLayer;
 class COrder;
 class CPlayer;
+class CPlayerColorGraphic;
 class CUnit;
 class CUpgrade;
 class CViewport;
 class Missile;
 class PathFinderData;
+enum class ButtonCmd;
 enum class UnitAction : char;
 enum class VariableAttribute;
 struct lua_State;
+
+typedef uint32_t IntColor;
 
 extern int CclUnit(lua_State *l);
 
@@ -58,16 +65,20 @@ namespace archimedes {
 namespace wyrmgus {
 	class animation_set;
 	class character;
+	class civilization;
 	class civilization_base;
 	class construction;
 	class construction_frame;
 	class epithet;
+	class icon;
 	class landmass;
 	class map_template;
 	class on_top_build_restriction;
 	class player_color;
 	class renderer;
+	class resource;
 	class site;
+	class species;
 	class spell;
 	class tile;
 	class time_of_day;
@@ -81,6 +92,7 @@ namespace wyrmgus {
 	enum class item_class;
 	enum class item_slot;
 	enum class status_effect;
+	enum class tile_flag : uint32_t;
 }
 
 /*
@@ -406,31 +418,7 @@ public:
 	**
 	**  @return        True if visible, false otherwise.
 	*/
-	bool IsVisibleAsGoal(const CPlayer &player) const
-	{
-		// Invisibility
-		if (this->is_invisible(player)) {
-			return false;
-		}
-		// Don't attack revealers
-		if (this->Type->BoolFlag[REVEALER_INDEX].value) {
-			return false;
-		}
-		//Wyrmgus start
-//		if ((player.get_type() == player_type::computer && !this->Type->BoolFlag[PERMANENTCLOAK_INDEX].value)
-		if (
-		//Wyrmgus end
-			//Wyrmgus start
-//			|| IsVisible(player) || IsVisibleOnRadar(player)) {
-			IsVisible(player) || IsVisibleOnRadar(player)) {
-			//Wyrmgus end
-			return IsAliveOnMap();
-		} else {
-			return Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value
-				   && this->is_seen_by_player(&player)
-				   && !this->is_seen_destroyed_by_player(&player);
-		}
-	}
+	bool IsVisibleAsGoal(const CPlayer &player) const;
 
 	/**
 	**  Returns true, if unit is visible for this player on the map.
@@ -487,10 +475,7 @@ public:
 	**
 	**  @return true if unit can move.
 	*/
-	bool CanMove() const
-	{
-		return this->Type->CanMove();
-	}
+	bool CanMove() const;
 
 	int GetDrawLevel() const;
 
@@ -1089,7 +1074,7 @@ private:
 	std::vector<const CUpgrade *> traits;
 public:
 	int Variation;      /// Which of the variations of its unit type this unit has
-	int LayerVariation[MaxImageLayers];	/// Which layer variations this unit has
+	int LayerVariation[static_cast<int>(image_layer::count)]; /// Which layer variations this unit has
 	const CUpgrade *Prefix = nullptr;	/// Item unit's prefix
 	const CUpgrade *Suffix = nullptr;	/// Item unit's suffix
 	const wyrmgus::spell *Spell = nullptr; /// Item unit's spell

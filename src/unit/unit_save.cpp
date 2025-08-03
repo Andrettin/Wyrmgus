@@ -49,6 +49,8 @@
 #include "unit/unit_type.h"
 #include "util/assert_util.h"
 
+#include <magic_enum/magic_enum.hpp>
+
 /**
 **  Generate a unit reference, a printable unique string for unit.
 */
@@ -421,9 +423,9 @@ void SaveUnit(const CUnit &unit, CFile &file)
 
 	//Wyrmgus start
 	file.printf(",\n  \"variation\", %d", unit.Variation);
-	for (int i = 0; i < MaxImageLayers; ++i) {
+	for (int i = 0; i < static_cast<int>(image_layer::count); ++i) {
 		if (unit.LayerVariation[i] != -1) {
-			file.printf(",\n  \"layer-variation\", \"%s\", %d", GetImageLayerNameById(i).c_str(), unit.LayerVariation[i]);
+			file.printf(",\n  \"layer-variation\", \"%s\", %d", magic_enum::enum_name(static_cast<image_layer>(i)).data(), unit.LayerVariation[i]);
 		}
 	}
 

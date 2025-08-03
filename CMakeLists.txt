@@ -1116,8 +1116,10 @@ set(wyrmgus_ui_HDRS
 set(wyrmgus_unit_HDRS
 	src/unit/can_target_flag.h
 	src/unit/construction.h
+	src/unit/group_selection_mode.h
 	src/unit/historical_unit.h
 	src/unit/historical_unit_history.h
+	src/unit/image_layer.h
 	src/unit/unit.h
 	src/unit/unit_cache.h
 	src/unit/unit_class.h

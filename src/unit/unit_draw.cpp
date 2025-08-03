@@ -1139,11 +1139,11 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 	const time_of_day *time_of_day = this->get_center_tile_time_of_day();
 	
 	//Wyrmgus start
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(MountImageLayer), player_index, frame, screenPos, time_of_day, render_commands); // draw the mount just before the body
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::mount)), player_index, frame, screenPos, time_of_day, render_commands); // draw the mount just before the body
 	
 	//draw the backpack before everything but the shadow if facing south (or the still frame, since that also faces south), southeast or southwest
 	if (this->Direction == LookingS || frame == type->StillFrame || this->Direction == LookingSE || this->Direction == LookingSW) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::backpack)), player_index, frame, screenPos, time_of_day, render_commands);
 	}
 	
 	//draw the left arm before the body if not facing south (or the still frame, since that also faces south); if the position of the arms in the southeast frame is inverted, don't draw the left arm yet either
@@ -1161,9 +1161,9 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 		)
 	) {
 		//draw the shield before the left arm if not facing south
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShieldImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::shield)), player_index, frame, screenPos, time_of_day, render_commands);
 
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::left_arm)), player_index, frame, screenPos, time_of_day, render_commands);
 	}
 	
 	//draw the right arm before the body if facing north, or if facing southeast/southwest and the arms are inverted for that direction
@@ -1179,9 +1179,9 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitAction::Die))
 		)
 	) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::weapon)), player_index, frame, screenPos, time_of_day, render_commands);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::right_arm)), player_index, frame, screenPos, time_of_day, render_commands);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::right_hand)), player_index, frame, screenPos, time_of_day, render_commands);
 	}
 	//Wyrmgus end
 
@@ -1243,7 +1243,7 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 	//Wyrmgus start
 	//draw the left arm and right arm clothing after the body, even if the arms were drawn before
 	if ((this->Direction != LookingS || this->CurrentAction() == UnitAction::Die) && frame != type->StillFrame) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingLeftArmImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::clothing_left_arm)), player_index, frame, screenPos, time_of_day, render_commands);
 	}
 
 	if (
@@ -1258,20 +1258,20 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitAction::Die))
 		)
 	) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::clothing_right_arm)), player_index, frame, screenPos, time_of_day, render_commands);
 	}
 
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(PantsImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::pants)), player_index, frame, screenPos, time_of_day, render_commands);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::clothing)), player_index, frame, screenPos, time_of_day, render_commands);
 	
 	//draw the backpack after the clothing if facing east or west, if isn't dying (dying animations for east and west use northeast frames)
 	if ((this->Direction == LookingE || this->Direction == LookingW) && this->CurrentAction() != UnitAction::Die) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::backpack)), player_index, frame, screenPos, time_of_day, render_commands);
 	}
 	
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HairImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(HelmetImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
-	DrawPlayerColorOverlay(*type, this->GetLayerSprite(BootsImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::hair)), player_index, frame, screenPos, time_of_day, render_commands);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::helmet)), player_index, frame, screenPos, time_of_day, render_commands);
+	DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::boots)), player_index, frame, screenPos, time_of_day, render_commands);
 	
 	//draw the left arm just after the body if facing south
 	if (
@@ -1287,9 +1287,9 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitAction::Die))
 		)
 	) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(LeftArmImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingLeftArmImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(ShieldImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::left_arm)), player_index, frame, screenPos, time_of_day, render_commands);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::clothing_left_arm)), player_index, frame, screenPos, time_of_day, render_commands);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::shield)), player_index, frame, screenPos, time_of_day, render_commands);
 	}
 
 	//draw the right arm just after the body if not facing north
@@ -1305,16 +1305,16 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 			&& (this->Direction == LookingSE || this->Direction == LookingSW || (this->Direction == LookingS && this->CurrentAction() == UnitAction::Die))
 		)
 	) {
-		if ((this->Direction == LookingS || this->Direction == LookingSE || this->Direction == LookingSW) && this->CurrentAction() != UnitAction::Die && this->GetLayerSprite(RightHandImageLayer) != nullptr) { // if the unit has a right hand sprite, draw the weapon after the right arm, but before the hand
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
+		if ((this->Direction == LookingS || this->Direction == LookingSE || this->Direction == LookingSW) && this->CurrentAction() != UnitAction::Die && this->GetLayerSprite(static_cast<int>(image_layer::right_hand)) != nullptr) { // if the unit has a right hand sprite, draw the weapon after the right arm, but before the hand
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::right_arm)), player_index, frame, screenPos, time_of_day, render_commands);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::clothing_right_arm)), player_index, frame, screenPos, time_of_day, render_commands);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::weapon)), player_index, frame, screenPos, time_of_day, render_commands);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::right_hand)), player_index, frame, screenPos, time_of_day, render_commands);
 		} else {
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(WeaponImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightArmImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(RightHandImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
-			DrawPlayerColorOverlay(*type, this->GetLayerSprite(ClothingRightArmImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::weapon)), player_index, frame, screenPos, time_of_day, render_commands);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::right_arm)), player_index, frame, screenPos, time_of_day, render_commands);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::right_hand)), player_index, frame, screenPos, time_of_day, render_commands);
+			DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::clothing_right_arm)), player_index, frame, screenPos, time_of_day, render_commands);
 		}
 	}
 
@@ -1327,7 +1327,7 @@ void CUnit::Draw(const CViewport &vp, std::vector<std::function<void(renderer *)
 			(this->Direction == LookingE || this->Direction == LookingW) && this->CurrentAction() == UnitAction::Die
 		)
 	) {
-		DrawPlayerColorOverlay(*type, this->GetLayerSprite(BackpackImageLayer), player_index, frame, screenPos, time_of_day, render_commands);
+		DrawPlayerColorOverlay(*type, this->GetLayerSprite(static_cast<int>(image_layer::backpack)), player_index, frame, screenPos, time_of_day, render_commands);
 	}
 
 	if (variation && variation->LightSprite) {

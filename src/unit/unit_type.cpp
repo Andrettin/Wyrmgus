@@ -986,7 +986,7 @@ void unit_type::process_gsml_scope(const gsml_data &scope)
 			this->variations.clear();
 
 			//remove previously defined layer variations, if any
-			for (int i = 0; i < MaxImageLayers; ++i) {
+			for (int i = 0; i < static_cast<int>(image_layer::count); ++i) {
 				this->LayerVariations[i].clear();
 			}
 		}
@@ -1671,7 +1671,7 @@ void unit_type::set_parent(const unit_type *parent_type)
 		this->variations.push_back(parent_variation->duplicate(this));
 	}
 	
-	for (int i = 0; i < MaxImageLayers; ++i) {
+	for (int i = 0; i < static_cast<int>(image_layer::count); ++i) {
 		this->LayerFiles[i] = parent_type->LayerFiles[i];
 		
 		//inherit layer variations
@@ -2494,17 +2494,17 @@ void unit_type::pack_image_layers(const QString &image_filepath) const
 		painter.drawImage(packed_image.rect(), shadow_image, shadow_image.rect());
 	}
 
-	std::array<QImage, MaxImageLayers> layer_images{};
+	std::array<QImage, static_cast<int>(image_layer::count)> layer_images{};
 
-	for (int i = 0; i < MaxImageLayers; ++i) {
+	for (int i = 0; i < static_cast<int>(image_layer::count); ++i) {
 		const std::string &layer_file = this->LayerFiles[i];
 		if (!layer_file.empty()) {
 			layer_images[i] = QImage(QString::fromStdString(LibraryFileName(layer_file.c_str())));
 		}
 	}
 
-	if (!layer_images[MountImageLayer].isNull()) {
-		painter.drawImage(packed_image.rect(), layer_images[MountImageLayer], packed_image.rect());
+	if (!layer_images[static_cast<int>(image_layer::mount)].isNull()) {
+		painter.drawImage(packed_image.rect(), layer_images[static_cast<int>(image_layer::mount)], packed_image.rect());
 	}
 
 	assert_throw(packed_image.width() % 5 == 0);
@@ -2525,10 +2525,10 @@ void unit_type::pack_image_layers(const QString &image_filepath) const
 		{ LookingSE, QRect(QPoint(direction_rect_width * 3, direction_rect_size.height()), QSize(direction_rect_width * 2, direction_dying_rect_height)) }
 	};
 
-	if (!layer_images[BackpackImageLayer].isNull()) {
+	if (!layer_images[static_cast<int>(image_layer::backpack)].isNull()) {
 		for (const auto &[direction, direction_rect] : direction_rects) {
 			if (direction == LookingS || direction == LookingSE) {
-				painter.drawImage(direction_rect, layer_images[BackpackImageLayer], direction_rect);
+				painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::backpack)], direction_rect);
 			}
 		}
 	}
@@ -2539,12 +2539,12 @@ void unit_type::pack_image_layers(const QString &image_filepath) const
 			&& !(this->BoolFlag[INVERTEDEASTARMS_INDEX].value && direction == LookingE)
 			&& !(this->BoolFlag[INVERTEDSOUTHEASTARMS_INDEX].value && direction == LookingSE)
 		) {
-			if (!layer_images[ShieldImageLayer].isNull()) {
-				painter.drawImage(direction_rect, layer_images[ShieldImageLayer], direction_rect);
+			if (!layer_images[static_cast<int>(image_layer::shield)].isNull()) {
+				painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::shield)], direction_rect);
 			}
 
-			if (!layer_images[LeftArmImageLayer].isNull()) {
-				painter.drawImage(direction_rect, layer_images[LeftArmImageLayer], direction_rect);
+			if (!layer_images[static_cast<int>(image_layer::left_arm)].isNull()) {
+				painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::left_arm)], direction_rect);
 			}
 		}
 	}
@@ -2555,68 +2555,68 @@ void unit_type::pack_image_layers(const QString &image_filepath) const
 			|| (this->BoolFlag[INVERTEDEASTARMS_INDEX].value && direction == LookingE)
 			|| (this->BoolFlag[INVERTEDSOUTHEASTARMS_INDEX].value && direction == LookingSE)
 		) {
-			if (!layer_images[WeaponImageLayer].isNull()) {
-				painter.drawImage(direction_rect, layer_images[WeaponImageLayer], direction_rect);
+			if (!layer_images[static_cast<int>(image_layer::weapon)].isNull()) {
+				painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::weapon)], direction_rect);
 			}
 
-			if (!layer_images[RightArmImageLayer].isNull()) {
-				painter.drawImage(direction_rect, layer_images[RightArmImageLayer], direction_rect);
+			if (!layer_images[static_cast<int>(image_layer::right_arm)].isNull()) {
+				painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::right_arm)], direction_rect);
 			}
 
-			if (!layer_images[RightHandImageLayer].isNull()) {
-				painter.drawImage(direction_rect, layer_images[RightHandImageLayer], direction_rect);
+			if (!layer_images[static_cast<int>(image_layer::right_hand)].isNull()) {
+				painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::right_hand)], direction_rect);
 			}
 		}
 	}
 
 	painter.drawImage(packed_image.rect(), main_image, main_image.rect());
 
-	if (!layer_images[ClothingLeftArmImageLayer].isNull()) {
+	if (!layer_images[static_cast<int>(image_layer::clothing_left_arm)].isNull()) {
 		for (const auto &[direction, direction_rect] : direction_rects) {
 			if (direction != LookingS) {
-				painter.drawImage(direction_rect, layer_images[ClothingLeftArmImageLayer], direction_rect);
+				painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::clothing_left_arm)], direction_rect);
 			}
 		}
 	}
 
-	if (!layer_images[ClothingRightArmImageLayer].isNull()) {
+	if (!layer_images[static_cast<int>(image_layer::clothing_right_arm)].isNull()) {
 		for (const auto &[direction, direction_rect] : direction_rects) {
 			if (
 				direction == LookingN
 				|| (this->BoolFlag[INVERTEDEASTARMS_INDEX].value && direction == LookingE)
 				|| (this->BoolFlag[INVERTEDSOUTHEASTARMS_INDEX].value && direction == LookingSE)
 			) {
-				painter.drawImage(direction_rect, layer_images[ClothingRightArmImageLayer], direction_rect);
+				painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::clothing_right_arm)], direction_rect);
 			}
 		}
 	}
 
-	if (!layer_images[PantsImageLayer].isNull()) {
-		painter.drawImage(packed_image.rect(), layer_images[PantsImageLayer], packed_image.rect());
+	if (!layer_images[static_cast<int>(image_layer::pants)].isNull()) {
+		painter.drawImage(packed_image.rect(), layer_images[static_cast<int>(image_layer::pants)], packed_image.rect());
 	}
 
-	if (!layer_images[ClothingImageLayer].isNull()) {
-		painter.drawImage(packed_image.rect(), layer_images[ClothingImageLayer], packed_image.rect());
+	if (!layer_images[static_cast<int>(image_layer::clothing)].isNull()) {
+		painter.drawImage(packed_image.rect(), layer_images[static_cast<int>(image_layer::clothing)], packed_image.rect());
 	}
 
-	if (!layer_images[BackpackImageLayer].isNull()) {
+	if (!layer_images[static_cast<int>(image_layer::backpack)].isNull()) {
 		for (const auto &[direction, direction_rect] : direction_rects) {
 			if (direction == LookingE) {
-				painter.drawImage(direction_rect, layer_images[BackpackImageLayer], direction_rect);
+				painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::backpack)], direction_rect);
 			}
 		}
 	}
 
-	if (!layer_images[HairImageLayer].isNull()) {
-		painter.drawImage(packed_image.rect(), layer_images[HairImageLayer], packed_image.rect());
+	if (!layer_images[static_cast<int>(image_layer::hair)].isNull()) {
+		painter.drawImage(packed_image.rect(), layer_images[static_cast<int>(image_layer::hair)], packed_image.rect());
 	}
 
-	if (!layer_images[HelmetImageLayer].isNull()) {
-		painter.drawImage(packed_image.rect(), layer_images[HelmetImageLayer], packed_image.rect());
+	if (!layer_images[static_cast<int>(image_layer::helmet)].isNull()) {
+		painter.drawImage(packed_image.rect(), layer_images[static_cast<int>(image_layer::helmet)], packed_image.rect());
 	}
 
-	if (!layer_images[BootsImageLayer].isNull()) {
-		painter.drawImage(packed_image.rect(), layer_images[BootsImageLayer], packed_image.rect());
+	if (!layer_images[static_cast<int>(image_layer::boots)].isNull()) {
+		painter.drawImage(packed_image.rect(), layer_images[static_cast<int>(image_layer::boots)], packed_image.rect());
 	}
 
 	for (const auto &[direction, direction_rect] : direction_rects) {
@@ -2625,16 +2625,16 @@ void unit_type::pack_image_layers(const QString &image_filepath) const
 			|| (this->BoolFlag[INVERTEDEASTARMS_INDEX].value && direction == LookingE)
 			|| (this->BoolFlag[INVERTEDSOUTHEASTARMS_INDEX].value && direction == LookingSE)
 		) {
-			if (!layer_images[LeftArmImageLayer].isNull()) {
-				painter.drawImage(direction_rect, layer_images[LeftArmImageLayer], direction_rect);
+			if (!layer_images[static_cast<int>(image_layer::left_arm)].isNull()) {
+				painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::left_arm)], direction_rect);
 			}
 
-			if (!layer_images[ClothingLeftArmImageLayer].isNull()) {
-				painter.drawImage(direction_rect, layer_images[ClothingLeftArmImageLayer], direction_rect);
+			if (!layer_images[static_cast<int>(image_layer::clothing_left_arm)].isNull()) {
+				painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::clothing_left_arm)], direction_rect);
 			}
 
-			if (!layer_images[ShieldImageLayer].isNull()) {
-				painter.drawImage(direction_rect, layer_images[ShieldImageLayer], direction_rect);
+			if (!layer_images[static_cast<int>(image_layer::shield)].isNull()) {
+				painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::shield)], direction_rect);
 			}
 		}
 	}
@@ -2645,46 +2645,46 @@ void unit_type::pack_image_layers(const QString &image_filepath) const
 			&& !(this->BoolFlag[INVERTEDEASTARMS_INDEX].value && direction == LookingE)
 			&& !(this->BoolFlag[INVERTEDSOUTHEASTARMS_INDEX].value && direction == LookingSE)
 		) {
-			if ((direction == LookingS || direction == LookingSE) && !layer_images[RightHandImageLayer].isNull()) {
-				if (!layer_images[RightArmImageLayer].isNull()) {
-					painter.drawImage(direction_rect, layer_images[RightArmImageLayer], direction_rect);
+			if ((direction == LookingS || direction == LookingSE) && !layer_images[static_cast<int>(image_layer::right_hand)].isNull()) {
+				if (!layer_images[static_cast<int>(image_layer::right_arm)].isNull()) {
+					painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::right_arm)], direction_rect);
 				}
 
-				if (!layer_images[ClothingRightArmImageLayer].isNull()) {
-					painter.drawImage(direction_rect, layer_images[ClothingRightArmImageLayer], direction_rect);
+				if (!layer_images[static_cast<int>(image_layer::clothing_right_arm)].isNull()) {
+					painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::clothing_right_arm)], direction_rect);
 				}
 
-				if (!layer_images[WeaponImageLayer].isNull()) {
-					painter.drawImage(direction_rect, layer_images[WeaponImageLayer], direction_rect);
+				if (!layer_images[static_cast<int>(image_layer::weapon)].isNull()) {
+					painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::weapon)], direction_rect);
 				}
 
-				if (!layer_images[RightHandImageLayer].isNull()) {
-					painter.drawImage(direction_rect, layer_images[RightHandImageLayer], direction_rect);
+				if (!layer_images[static_cast<int>(image_layer::right_hand)].isNull()) {
+					painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::right_hand)], direction_rect);
 				}
 			} else {
-				if (!layer_images[WeaponImageLayer].isNull()) {
-					painter.drawImage(direction_rect, layer_images[WeaponImageLayer], direction_rect);
+				if (!layer_images[static_cast<int>(image_layer::weapon)].isNull()) {
+					painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::weapon)], direction_rect);
 				}
 
-				if (!layer_images[RightArmImageLayer].isNull()) {
-					painter.drawImage(direction_rect, layer_images[RightArmImageLayer], direction_rect);
+				if (!layer_images[static_cast<int>(image_layer::right_arm)].isNull()) {
+					painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::right_arm)], direction_rect);
 				}
 
-				if (!layer_images[RightHandImageLayer].isNull()) {
-					painter.drawImage(direction_rect, layer_images[RightHandImageLayer], direction_rect);
+				if (!layer_images[static_cast<int>(image_layer::right_hand)].isNull()) {
+					painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::right_hand)], direction_rect);
 				}
 
-				if (!layer_images[ClothingRightArmImageLayer].isNull()) {
-					painter.drawImage(direction_rect, layer_images[ClothingRightArmImageLayer], direction_rect);
+				if (!layer_images[static_cast<int>(image_layer::clothing_right_arm)].isNull()) {
+					painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::clothing_right_arm)], direction_rect);
 				}
 			}
 		}
 	}
 
-	if (!layer_images[BackpackImageLayer].isNull()) {
+	if (!layer_images[static_cast<int>(image_layer::backpack)].isNull()) {
 		for (const auto &[direction, direction_rect] : direction_rects) {
 			if (direction == LookingN || direction == LookingNE) {
-				painter.drawImage(direction_rect, layer_images[BackpackImageLayer], direction_rect);
+				painter.drawImage(direction_rect, layer_images[static_cast<int>(image_layer::backpack)], direction_rect);
 			}
 		}
 	}
@@ -3035,7 +3035,7 @@ void LoadUnitTypeSprite(unit_type &type)
 		type.LightSprite = CGraphic::New(type.LightFile, type.get_frame_size());
 		type.LightSprite->Load(preferences::get()->get_scale_factor());
 	}
-	for (int i = 0; i < MaxImageLayers; ++i) {
+	for (int i = 0; i < static_cast<int>(image_layer::count); ++i) {
 		if (!type.LayerFiles[i].empty()) {
 			type.LayerSprites[i] = CPlayerColorGraphic::New(type.LayerFiles[i], type.get_frame_size(), type.get_conversible_player_color());
 			type.LayerSprites[i]->Load(preferences::get()->get_scale_factor());
@@ -3059,7 +3059,7 @@ void LoadUnitTypeSprite(unit_type &type)
 			variation->LightSprite = CGraphic::New(variation->LightFile, frame_size);
 			variation->LightSprite->Load(preferences::get()->get_scale_factor());
 		}
-		for (int j = 0; j < MaxImageLayers; ++j) {
+		for (int j = 0; j < static_cast<int>(image_layer::count); ++j) {
 			if (!variation->LayerFiles[j].empty()) {
 				variation->LayerSprites[j] = CPlayerColorGraphic::New(variation->LayerFiles[j], frame_size, type.get_conversible_player_color());
 				variation->LayerSprites[j]->Load(preferences::get()->get_scale_factor());
@@ -3078,7 +3078,7 @@ void LoadUnitTypeSprite(unit_type &type)
 		}
 	}
 	
-	for (int i = 0; i < MaxImageLayers; ++i) {
+	for (int i = 0; i < static_cast<int>(image_layer::count); ++i) {
 		for (const auto &layer_variation : type.LayerVariations[i]) {
 			if (!layer_variation->get_image_file().empty()) {
 				layer_variation->Sprite = CPlayerColorGraphic::New(layer_variation->get_image_file().string(), type.get_frame_size(), type.get_conversible_player_color());
@@ -3283,76 +3283,6 @@ std::string GetUnitTypeStatsString(const std::string &unit_type_ident)
 	}
 	
 	return "";
-}
-
-std::string GetImageLayerNameById(int image_layer)
-{
-	if (image_layer == LeftArmImageLayer) {
-		return "left-arm";
-	} else if (image_layer == RightArmImageLayer) {
-		return "right-arm";
-	} else if (image_layer == RightHandImageLayer) {
-		return "right-hand";
-	} else if (image_layer == HairImageLayer) {
-		return "hair";
-	} else if (image_layer == ClothingImageLayer) {
-		return "clothing";
-	} else if (image_layer == ClothingLeftArmImageLayer) {
-		return "clothing-left-arm";
-	} else if (image_layer == ClothingRightArmImageLayer) {
-		return "clothing-right-arm";
-	} else if (image_layer == PantsImageLayer) {
-		return "pants";
-	} else if (image_layer == BootsImageLayer) {
-		return "boots";
-	} else if (image_layer == WeaponImageLayer) {
-		return "weapon";
-	} else if (image_layer == ShieldImageLayer) {
-		return "shield";
-	} else if (image_layer == HelmetImageLayer) {
-		return "helmet";
-	} else if (image_layer == BackpackImageLayer) {
-		return "backpack";
-	} else if (image_layer == MountImageLayer) {
-		return "mount";
-	}
-
-	return "";
-}
-
-int GetImageLayerIdByName(const std::string &image_layer)
-{
-	if (image_layer == "left-arm") {
-		return LeftArmImageLayer;
-	} else if (image_layer == "right-arm") {
-		return RightArmImageLayer;
-	} else if (image_layer == "right-hand") {
-		return RightHandImageLayer;
-	} else if (image_layer == "hair") {
-		return HairImageLayer;
-	} else if (image_layer == "clothing") {
-		return ClothingImageLayer;
-	} else if (image_layer == "clothing-left-arm") {
-		return ClothingLeftArmImageLayer;
-	} else if (image_layer == "clothing-right-arm") {
-		return ClothingRightArmImageLayer;
-	} else if (image_layer == "pants") {
-		return PantsImageLayer;
-	} else if (image_layer == "boots") {
-		return BootsImageLayer;
-	} else if (image_layer == "weapon") {
-		return WeaponImageLayer;
-	} else if (image_layer == "shield") {
-		return ShieldImageLayer;
-	} else if (image_layer == "helmet") {
-		return HelmetImageLayer;
-	} else if (image_layer == "backpack") {
-		return BackpackImageLayer;
-	} else if (image_layer == "mount") {
-		return MountImageLayer;
-	}
-
-	return -1;
 }
 //Wyrmgus end
 

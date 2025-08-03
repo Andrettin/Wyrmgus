@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2022 by Andrettin
+//      (c) Copyright 1998-2025 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -26,44 +26,8 @@
 
 #pragma once
 
-#include "script/condition/scope_condition_base.h"
-#include "unit/unit.h"
-#include "unit/unit_type.h"
-
-namespace wyrmgus {
-
-class any_settlement_center_unit_condition final : public scope_condition_base<CPlayer, CUnit>
-{
-public:
-	explicit any_settlement_center_unit_condition(const gsml_operator condition_operator)
-		: scope_condition_base(condition_operator)
-	{
-	}
-
-	virtual const std::string &get_class_identifier() const override
-	{
-		static const std::string class_identifier = "any_settlement_center_unit";
-		return class_identifier;
-	}
-
-	virtual bool check_assignment(const CPlayer *player, const read_only_context &ctx) const override
-	{
-		std::vector<CUnit *> settlement_centers = player->get_town_hall_units();
-		vector::merge(settlement_centers, player->get_type_units(settlement_site_unit_type));
-
-		for (const CUnit *town_hall : settlement_centers) {
-			if (this->check_scope(town_hall, ctx)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	virtual std::string get_scope_name() const override
-	{
-		return "Any settlement center";
-	}
+enum class GroupSelectionMode {
+	SELECTABLE_BY_RECTANGLE_ONLY = 0,
+	NON_SELECTABLE_BY_RECTANGLE_ONLY,
+	SELECT_ALL
 };
-
-}

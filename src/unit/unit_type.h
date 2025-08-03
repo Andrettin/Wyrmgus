@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 1998-2022 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2025 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -33,6 +33,8 @@
 #include "economy/resource_container.h"
 #include "missileconfig.h"
 #include "ui/icon.h"
+#include "unit/group_selection_mode.h"
+#include "unit/image_layer.h"
 #include "unit/unit_stats.h"
 #include "util/color_container.h"
 #include "vec2i.h"
@@ -103,33 +105,6 @@ namespace wyrmgus {
 
 constexpr int UnitSides = 8;
 constexpr int MaxAttackPos = 5;
-
-enum class GroupSelectionMode {
-	SELECTABLE_BY_RECTANGLE_ONLY = 0,
-	NON_SELECTABLE_BY_RECTANGLE_ONLY,
-	SELECT_ALL
-};
-
-//Wyrmgus start
-enum ImageLayers {
-	LeftArmImageLayer,
-	RightArmImageLayer,
-	RightHandImageLayer,
-	HairImageLayer,
-	ClothingImageLayer,
-	ClothingLeftArmImageLayer,
-	ClothingRightArmImageLayer,
-	PantsImageLayer,
-	BootsImageLayer,
-	WeaponImageLayer,
-	ShieldImageLayer,
-	HelmetImageLayer,
-	BackpackImageLayer,
-	MountImageLayer,
-	
-	MaxImageLayers
-};
-//Wyrmgus end
 
 namespace wyrmgus {
 
@@ -1177,7 +1152,7 @@ public:
 	std::string ShadowFile;         /// Shadow file
 	//Wyrmgus start
 	std::string LightFile;			/// Light file
-	std::string LayerFiles[MaxImageLayers];	/// Layer files
+	std::string LayerFiles[static_cast<int>(image_layer::count)];	/// Layer files
 	std::map<ButtonCmd, IconConfig> ButtonIcons;		//icons for button actions
 	std::map<item_slot, unit_type *> DefaultEquipment; //default equipment for the unit type, mapped to item slots
 	//Wyrmgus end
@@ -1331,7 +1306,7 @@ private:
 	std::vector<qunique_ptr<unit_type_variation>> variations;
 public:
 	//Wyrmgus start
-	std::vector<qunique_ptr<unit_type_variation>> LayerVariations[MaxImageLayers];	/// Layer variation information
+	std::vector<qunique_ptr<unit_type_variation>> LayerVariations[static_cast<int>(image_layer::count)];	/// Layer variation information
 	//Wyrmgus end
 private:
 	std::unique_ptr<and_build_restriction> build_restrictions;
@@ -1357,7 +1332,7 @@ public:
 	std::shared_ptr<CGraphic> ShadowSprite;          /// Shadow sprite image
 	//Wyrmgus start
 	std::shared_ptr<CGraphic> LightSprite;						/// Light sprite image
-	std::array<std::shared_ptr<CPlayerColorGraphic>, MaxImageLayers> LayerSprites{};	/// Layer sprite images
+	std::array<std::shared_ptr<CPlayerColorGraphic>, static_cast<int>(image_layer::count)> LayerSprites{};	/// Layer sprite images
 	//Wyrmgus end
 
 private:
@@ -1532,10 +1507,5 @@ extern void DefineVariableField(lua_State *l, wyrmgus::unit_variable &var, int l
 
 /// Update custom Variables with other variable (like Hp, ...)
 extern void UpdateUnitVariables(CUnit &unit);
-
-//Wyrmgus start
-extern std::string GetImageLayerNameById(int image_layer);
-extern int GetImageLayerIdByName(const std::string &image_layer);
-//Wyrmgus end
 
 extern std::string GetItemEffectsString(const std::string &item_ident);

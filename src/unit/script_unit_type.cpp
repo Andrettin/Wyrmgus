@@ -85,8 +85,11 @@
 //Wyrmgus end
 #include "util/assert_util.h"
 #include "util/gender.h"
+#include "util/string_util.h"
 #include "video/font.h"
 #include "video/video.h"
+
+#include <magic_enum/magic_enum.hpp>
 
 CUnitTypeVar UnitTypeVar;    /// Variables for UnitType and unit.
 
@@ -562,7 +565,7 @@ int CclDefineUnitType(lua_State *l)
 			//remove previously defined variations, if any
 			type->variations.clear();
 			//remove previously defined layer variations, if any
-			for (int i = 0; i < MaxImageLayers; ++i) {
+			for (int i = 0; i < static_cast<int>(image_layer::count); ++i) {
 				type->LayerVariations[i].clear();
 			}
 			const int args = lua_rawlen(l, -1);
@@ -579,7 +582,8 @@ int CclDefineUnitType(lua_State *l)
 					++k;
 					if (!strcmp(value, "layer")) {
 						std::string image_layer_name = LuaToString(l, -1, k + 1);
-						image_layer = GetImageLayerIdByName(image_layer_name);
+						string::replace(image_layer_name, "-", "_");
+						image_layer = static_cast<int>(magic_enum::enum_cast<wyrmgus::image_layer>(image_layer_name).value());
 					} else if (!strcmp(value, "variation-id")) {
 						const std::string variation_identifier = LuaToString(l, -1, k + 1);
 						variation = make_qunique<unit_type_variation>(variation_identifier, type, image_layer);
@@ -605,7 +609,9 @@ int CclDefineUnitType(lua_State *l)
 					} else if (!strcmp(value, "light-file")) {
 						variation->LightFile = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "layer-file")) {
-						const int layer_file_image_layer = GetImageLayerIdByName(LuaToString(l, -1, k + 1));
+						std::string layer_file_layer_name = LuaToString(l, -1, k + 1);
+						string::replace(layer_file_layer_name, "-", "_");
+						const int layer_file_image_layer = static_cast<int>(magic_enum::enum_cast<wyrmgus::image_layer>(layer_file_layer_name).value());
 						++k;
 						variation->LayerFiles[layer_file_image_layer] = LuaToString(l, -1, k + 1);
 					} else if (!strcmp(value, "frame-size")) {
@@ -787,7 +793,9 @@ int CclDefineUnitType(lua_State *l)
 					++k;
 
 					if (!strcmp(value, "layer")) {
-						image_layer = GetImageLayerIdByName(LuaToString(l, -1, k + 1));
+						std::string layer_file_layer_name = LuaToString(l, -1, k + 1);
+						string::replace(layer_file_layer_name, "-", "_");
+						const int layer_file_image_layer = static_cast<int>(magic_enum::enum_cast<wyrmgus::image_layer>(layer_file_layer_name).value());
 					} else if (!strcmp(value, "file")) {
 						type->LayerFiles[image_layer] = LuaToString(l, -1, k + 1);
 					} else {
@@ -2268,8 +2276,9 @@ static int CclGetUnitTypeData(lua_State *l)
 		return 1;
 	} else if (!strcmp(data, "LayerVariations")) {
 		LuaCheckArgs(l, 3);
-		const std::string image_layer_name = LuaToString(l, 3);
-		const int image_layer = GetImageLayerIdByName(image_layer_name);
+		std::string image_layer_name = LuaToString(l, 3);
+		string::replace(image_layer_name, "-", "_");
+		const int image_layer = static_cast<int>(magic_enum::enum_cast<wyrmgus::image_layer>(image_layer_name).value());
 		
 		std::vector<std::string> variation_idents;
 		for (const auto &layer_variation : type->LayerVariations[image_layer]) {

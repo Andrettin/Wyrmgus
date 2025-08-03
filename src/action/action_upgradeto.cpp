@@ -271,7 +271,7 @@ int TransformUnitIntoType(CUnit &unit, const wyrmgus::unit_type &newtype)
 	//Wyrmgus start
 	//change variation if upgrading (new unit type may have different variations)
 	unit.ChooseVariation(&newtype);
-	for (int i = 0; i < MaxImageLayers; ++i) {
+	for (int i = 0; i < static_cast<int>(image_layer::count); ++i) {
 		unit.ChooseVariation(&newtype, false, i);
 	}
 	//Wyrmgus end

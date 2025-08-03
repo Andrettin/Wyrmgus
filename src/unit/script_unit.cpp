@@ -70,7 +70,10 @@
 #include "util/exception_util.h"
 #include "util/log_util.h"
 #include "util/point_util.h"
+#include "util/string_util.h"
 #include "util/util.h"
+
+#include <magic_enum/magic_enum.hpp>
 
 /// Get resource by name
 extern unsigned CclGetResourceByName(lua_State *l);
@@ -691,7 +694,8 @@ int CclUnit(lua_State *l)
 			unit->Variation = LuaToNumber(l, 2, j + 1);
 		} else if (!strcmp(value, "layer-variation")) {
 			std::string image_layer_name = LuaToString(l, 2, j + 1);
-			int image_layer = GetImageLayerIdByName(image_layer_name);
+			string::replace(image_layer_name, "-", "_");
+			int image_layer = static_cast<int>(magic_enum::enum_cast<wyrmgus::image_layer>(image_layer_name).value());
 			if (image_layer != -1) {
 				++j;
 				unit->LayerVariation[image_layer] = LuaToNumber(l, 2, j + 1);
@@ -1952,7 +1956,8 @@ static int CclSetUnitVariable(lua_State *l)
 	} else if (!strcmp(name, "LayerVariation")) {
 		LuaCheckArgs(l, 4);
 		std::string image_layer_name = LuaToString(l, 3);
-		int image_layer = GetImageLayerIdByName(image_layer_name);
+		string::replace(image_layer_name, "-", "_");
+		int image_layer = static_cast<int>(magic_enum::enum_cast<wyrmgus::image_layer>(image_layer_name).value());
 		if (image_layer != -1) {
 			size_t variation_index = LuaToNumber(l, 4);
 			if (variation_index >= 0 && variation_index < unit->Type->LayerVariations[image_layer].size()) {

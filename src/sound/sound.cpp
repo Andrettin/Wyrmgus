@@ -30,6 +30,7 @@
 #include "sound/sound.h"
 
 #include "character.h"
+#include "database/database.h"
 #include "database/defines.h"
 #include "iolib.h"
 #include "missile.h"
@@ -40,6 +41,7 @@
 #include "spell/status_effect.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
+#include "unit/unit_type.h"
 #include "util/container_util.h"
 #include "util/log_util.h"
 #include "util/vector_util.h"

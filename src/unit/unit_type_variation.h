@@ -28,7 +28,7 @@
 
 #include "economy/resource.h"
 #include "ui/icon.h"
-#include "unit/unit_type.h" //for the image layers enum
+#include "unit/image_layer.h"
 #include "upgrade/upgrade_structs.h" //for the costs enum
 
 class CGraphic;
@@ -91,7 +91,7 @@ public:
 		variation->ItemsEquipped = this->ItemsEquipped;
 		variation->ItemsNotEquipped = this->ItemsNotEquipped;
 		variation->Terrains = this->Terrains;
-		for (int i = 0; i < MaxImageLayers; ++i) {
+		for (int i = 0; i < static_cast<int>(image_layer::count); ++i) {
 			variation->LayerFiles[i] = this->LayerFiles[i];
 		}
 		variation->ButtonIcons = this->ButtonIcons;
@@ -245,10 +245,10 @@ public:
 	std::vector<const season *> Seasons;
 	std::vector<const season *> ForbiddenSeasons;
 
-	std::string LayerFiles[MaxImageLayers];	/// Variation's layer graphics.
+	std::string LayerFiles[static_cast<int>(image_layer::count)];	/// Variation's layer graphics.
 	std::filesystem::path FileWhenLoaded[MaxCosts];     /// Change the graphic when the unit is loaded.
 	std::filesystem::path FileWhenEmpty[MaxCosts];      /// Change the graphic when the unit is empty.
-	std::array<std::shared_ptr<CPlayerColorGraphic>, MaxImageLayers> LayerSprites{};	/// The graphics corresponding to LayerFiles.
+	std::array<std::shared_ptr<CPlayerColorGraphic>, static_cast<int>(image_layer::count)> LayerSprites{};	/// The graphics corresponding to LayerFiles.
 	std::array<std::shared_ptr<CPlayerColorGraphic>, MaxCosts> SpriteWhenLoaded{}; /// The graphic corresponding to FileWhenLoaded.
 	std::array<std::shared_ptr<CPlayerColorGraphic>, MaxCosts> SpriteWhenEmpty{};  /// The graphic corresponding to FileWhenEmpty
 	

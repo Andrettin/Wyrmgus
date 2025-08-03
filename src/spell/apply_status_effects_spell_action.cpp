@@ -34,6 +34,7 @@
 //Wyrmgus end
 #include "spell/status_effect.h"
 #include "unit/unit.h"
+#include "unit/unit_type.h"
 #include "util/string_conversion_util.h"
 #include "util/string_util.h"
 

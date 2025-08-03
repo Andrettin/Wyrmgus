@@ -29,6 +29,7 @@
 #include "unit/unit_type_variation.h"
 
 #include "animation/animation_set.h"
+#include "database/database.h"
 #include "include/config.h"
 #include "item/item_class.h"
 #include "map/terrain_type.h"
@@ -38,9 +39,12 @@
 #include "ui/button.h"
 #include "ui/button_cmd.h"
 #include "unit/construction.h"
+#include "unit/unit_type.h"
 #include "unit/variation_tag.h"
 #include "util/util.h"
 #include "video/video.h"
+
+#include <magic_enum/magic_enum.hpp>
 
 namespace wyrmgus {
 
@@ -254,8 +258,7 @@ void unit_type_variation::ProcessConfigData(const CConfigData *config_data)
 				if (key == "file") {
 					file = CMod::GetCurrentModPath() + value;
 				} else if (key == "image_layer") {
-					value = FindAndReplaceString(value, "_", "-");
-					image_layer = GetImageLayerIdByName(value);
+					image_layer = static_cast<int>(magic_enum::enum_cast<wyrmgus::image_layer>(value).value());
 				} else {
 					fprintf(stderr, "Invalid unit type variation layer file property: \"%s\".\n", key.c_str());
 				}

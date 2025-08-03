@@ -518,7 +518,7 @@ void upgrade_modifier::apply_to_player(CPlayer *player, const int multiplier) co
 					unit->ChooseVariation();
 				}
 			}
-			for (int i = 0; i < MaxImageLayers; ++i) {
+			for (int i = 0; i < static_cast<int>(image_layer::count); ++i) {
 				const unit_type_variation *current_layer_variation = unit->GetLayerVariation(i);
 				if (current_layer_variation != nullptr) {
 					if (!unit->can_have_variation(current_layer_variation)) {

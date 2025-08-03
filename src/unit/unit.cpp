@@ -1021,7 +1021,7 @@ void CUnit::set_character(wyrmgus::character *character)
 	}
 
 	this->ChooseVariation(); //choose a new variation now
-	for (int i = 0; i < MaxImageLayers; ++i) {
+	for (int i = 0; i < static_cast<int>(image_layer::count); ++i) {
 		ChooseVariation(nullptr, false, i);
 	}
 	this->UpdateButtonIcons();
@@ -1362,7 +1362,7 @@ void CUnit::ChooseVariation(const wyrmgus::unit_type *new_type, const bool ignor
 			current_tags = &this->GetVariation()->get_tags();
 		}
 	} else {
-		if (image_layer == HairImageLayer && this->get_character() != nullptr && !this->get_character()->get_variation_tags().empty()) {
+		if (image_layer == static_cast<int>(image_layer::hair) && this->get_character() != nullptr && !this->get_character()->get_variation_tags().empty()) {
 			current_tags = &this->get_character()->get_variation_tags();
 		} else if (this->GetLayerVariation(image_layer)) {
 			current_tags = &this->GetLayerVariation(image_layer)->get_tags();
@@ -1492,7 +1492,7 @@ void CUnit::ChooseButtonIcon(const ButtonCmd button_action)
 		this->ButtonIcons[button_action] = variation->ButtonIcons.find(button_action)->second.Icon;
 		return;
 	}
-	for (int i = 0; i < MaxImageLayers; ++i) {
+	for (int i = 0; i < static_cast<int>(image_layer::count); ++i) {
 		const wyrmgus::unit_type_variation *layer_variation = this->GetLayerVariation(i);
 		if (layer_variation && layer_variation->ButtonIcons.find(button_action) != layer_variation->ButtonIcons.end()) {
 			this->ButtonIcons[button_action] = layer_variation->ButtonIcons.find(button_action)->second.Icon;
@@ -1674,7 +1674,7 @@ void CUnit::EquipItem(CUnit &item, bool affect_character)
 	if (variation != nullptr && !this->can_have_variation(variation)) {
 		this->ChooseVariation(); //choose a new variation now
 	}
-	for (int i = 0; i < MaxImageLayers; ++i) {
+	for (int i = 0; i < static_cast<int>(image_layer::count); ++i) {
 		const wyrmgus::unit_type_variation *layer_variation = this->GetLayerVariation(i);
 		if (
 			layer_variation
@@ -1856,7 +1856,7 @@ void CUnit::DeequipItem(CUnit &item, bool affect_character)
 	if (variation != nullptr && !this->can_have_variation(variation)) {
 		this->ChooseVariation(); //choose a new variation now
 	}
-	for (int i = 0; i < MaxImageLayers; ++i) {
+	for (int i = 0; i < static_cast<int>(image_layer::count); ++i) {
 		const wyrmgus::unit_type_variation *layer_variation = this->GetLayerVariation(i);
 
 		if (
@@ -3223,6 +3223,37 @@ bool CUnit::IsAlive() const
 	return !Destroyed && CurrentAction() != UnitAction::Die;
 }
 
+bool CUnit::IsVisibleAsGoal(const CPlayer &player) const
+{
+	// Invisibility
+	if (this->is_invisible(player)) {
+		return false;
+	}
+	// Don't attack revealers
+	if (this->Type->BoolFlag[REVEALER_INDEX].value) {
+		return false;
+	}
+	//Wyrmgus start
+//		if ((player.get_type() == player_type::computer && !this->Type->BoolFlag[PERMANENTCLOAK_INDEX].value)
+	if (
+		//Wyrmgus end
+			//Wyrmgus start
+//			|| IsVisible(player) || IsVisibleOnRadar(player)) {
+IsVisible(player) || IsVisibleOnRadar(player)) {
+		//Wyrmgus end
+		return IsAliveOnMap();
+	} else {
+		return Type->BoolFlag[VISIBLEUNDERFOG_INDEX].value
+			&& this->is_seen_by_player(&player)
+			&& !this->is_seen_destroyed_by_player(&player);
+	}
+}
+
+bool CUnit::CanMove() const
+{
+	return this->Type->CanMove();
+}
+
 int CUnit::GetDrawLevel() const
 {
 	return ((Type->get_corpse_type() != nullptr && CurrentAction() == UnitAction::Die) ?
@@ -3537,7 +3568,7 @@ CUnit *MakeUnit(const wyrmgus::unit_type &type, CPlayer *player)
 
 		//Wyrmgus start
 		unit->ChooseVariation(nullptr, true);
-		for (int i = 0; i < MaxImageLayers; ++i) {
+		for (int i = 0; i < static_cast<int>(image_layer::count); ++i) {
 			unit->ChooseVariation(nullptr, true, i);
 		}
 		unit->UpdateButtonIcons();
