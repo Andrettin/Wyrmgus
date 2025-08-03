@@ -34,6 +34,7 @@
 #include "age.h"
 #include "ai.h"
 #include "ai/ai_local.h" //for using AiHelpers
+#include "character.h"
 #include "character_title.h"
 #include "commands.h" //for faction setting
 #include "currency.h"
@@ -47,7 +48,6 @@
 //Wyrmgus end
 #include "game/difficulty.h"
 //Wyrmgus start
-#include "grand_strategy.h"
 #include "iocompat.h"
 //Wyrmgus end
 #include "iolib.h"
@@ -78,7 +78,9 @@
 #include "player/dynasty.h"
 #include "player/faction.h"
 #include "player/faction_history.h"
+#include "player/faction_tier.h"
 #include "player/faction_type.h"
+#include "player/government_type.h"
 #include "player/player_color.h"
 #include "player/player_flag.h"
 #include "player/player_type.h"

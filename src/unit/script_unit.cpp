@@ -35,11 +35,9 @@
 #include "ai/ai_local.h"
 //Wyrmgus end
 #include "animation/animation_set.h"
+#include "character.h"
 #include "commands.h"
 #include "epithet.h"
-//Wyrmgus start
-#include "grand_strategy.h"
-//Wyrmgus end
 #include "item/unique_item.h"
 #include "map/map.h"
 #include "map/map_info.h"

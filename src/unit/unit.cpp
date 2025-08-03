@@ -47,9 +47,6 @@
 #include "epithet.h"
 #include "game/game.h"
 #include "editor.h"
-//Wyrmgus start
-#include "grand_strategy.h"
-//Wyrmgus end
 #include "item/item_slot.h"
 #include "item/persistent_item.h"
 #include "item/unique_item.h"

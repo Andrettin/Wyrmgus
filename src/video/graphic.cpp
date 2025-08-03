@@ -31,9 +31,6 @@
 
 #include "database/defines.h"
 #include "database/preferences.h"
-//Wyrmgus start
-#include "grand_strategy.h"
-//Wyrmgus end
 #include "intern_video.h"
 #include "iocompat.h"
 #include "iolib.h"

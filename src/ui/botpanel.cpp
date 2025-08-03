@@ -44,9 +44,6 @@
 #include "economy/resource.h"
 #include "engine_interface.h"
 #include "game/game.h"
-//Wyrmgus start
-#include "grand_strategy.h"
-//Wyrmgus end
 #include "guichan/key.h"
 #include "guichan/sdl/sdlinput.h"
 #include "item/unique_item.h"

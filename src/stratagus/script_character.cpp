@@ -33,7 +33,6 @@
 #include "ai/ai_local.h" //for using AiHelpers
 #include "character_title.h"
 #include "epithet.h"
-#include "grand_strategy.h"
 #include "item/persistent_item.h"
 #include "item/unique_item.h"
 #include "map/historical_location.h"
@@ -47,6 +46,7 @@
 #include "script.h"
 #include "spell/spell.h"
 #include "time/timeline.h"
+#include "ui/icon.h"
 #include "unit/unit_type.h"
 #include "unit/variation_tag.h"
 #include "upgrade/upgrade.h"
@@ -877,17 +877,6 @@ static int CclGetCustomHeroes(lua_State *l)
 	return 1;
 }
 
-static int CclGetGrandStrategyHeroes(lua_State *l)
-{
-	lua_createtable(l, GrandStrategyGame.Heroes.size(), 0);
-	for (size_t i = 1; i <= GrandStrategyGame.Heroes.size(); ++i)
-	{
-		lua_pushstring(l, GrandStrategyGame.Heroes[i-1]->get_full_name().c_str());
-		lua_rawseti(l, -2, i);
-	}
-	return 1;
-}
-
 /**
 **  Parse character temporary data
 **
@@ -936,6 +925,5 @@ void CharacterCclRegister()
 	lua_register(Lua, "GetCustomHeroData", CclGetCustomHeroData);
 	lua_register(Lua, "GetCharacters", CclGetCharacters);
 	lua_register(Lua, "GetCustomHeroes", CclGetCustomHeroes);
-	lua_register(Lua, "GetGrandStrategyHeroes", CclGetGrandStrategyHeroes);
 	lua_register(Lua, "Character", CclCharacter);
 }

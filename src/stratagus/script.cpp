@@ -36,14 +36,12 @@
 #include "actions.h"
 //Wyrmgus end
 #include "config.h"
+#include "database/database.h"
 #include "economy/resource_storage_type.h"
 //Wyrmgus start
 #include "editor.h"
 //Wyrmgus end
 #include "game/game.h"
-//Wyrmgus start
-#include "grand_strategy.h"
-//Wyrmgus end
 #include "iocompat.h"
 #include "iolib.h"
 #include "item/unique_item.h"
@@ -72,6 +70,7 @@
 #include "unit/unit_manager.h" //for checking units of a custom unit type and deleting them if the unit type has been removed
 #include "unit/unit_type.h"
 //Wyrmgus end
+#include "upgrade/upgrade_structs.h"
 #include "util/assert_util.h"
 #include "util/log_util.h"
 #include "util/number_util.h"

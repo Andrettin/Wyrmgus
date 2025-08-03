@@ -35,7 +35,6 @@
 #include "engine_interface.h"
 //Wyrmgus start
 #include "game/game.h"
-#include "grand_strategy.h"
 //Wyrmgus end
 #include "iolib.h"
 #include "map/map.h"

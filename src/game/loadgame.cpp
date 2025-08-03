@@ -28,6 +28,7 @@
 
 #include "actions.h"
 #include "ai.h"
+#include "character.h"
 #include "commands.h"
 #include "currency.h"
 #include "database/database.h"

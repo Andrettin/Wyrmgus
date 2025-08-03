@@ -132,11 +132,11 @@
 #include "action/action_attack.h"
 #include "commands.h"
 #include "database/defines.h"
+#include "economy/resource.h"
 //Wyrmgus start
 #include "editor.h"
 //Wyrmgus end
 #include "game/game.h"
-#include "grand_strategy.h"
 #include "iolib.h"
 //Wyrmgus start
 #include "luacallback.h"

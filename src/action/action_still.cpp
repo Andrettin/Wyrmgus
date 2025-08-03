@@ -36,9 +36,6 @@
 #include "commands.h"
 #include "database/defines.h"
 #include "database/preferences.h"
-//Wyrmgus start
-#include "grand_strategy.h"
-//Wyrmgus end
 #include "iolib.h"
 #include "map/map.h"
 #include "map/map_layer.h"

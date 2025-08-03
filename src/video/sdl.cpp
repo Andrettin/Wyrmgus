@@ -47,9 +47,6 @@
 #include "editor.h"
 #include "engine_interface.h"
 #include "game/game.h"
-//Wyrmgus start
-#include "grand_strategy.h"
-//Wyrmgus end
 #include "map/minimap.h"
 #include "network/network.h"
 #include "network/network_manager.h"

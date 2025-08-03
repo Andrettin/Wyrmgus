@@ -31,6 +31,7 @@
 #include "actions.h"
 #include "character.h"
 #include "commands.h"
+#include "database/database.h"
 #include "database/defines.h"
 #include "database/preferences.h"
 #include "dialogue.h"
@@ -38,7 +39,6 @@
 #include "engine_interface.h"
 #include "game/game.h"
 //Wyrmgus start
-#include "grand_strategy.h"
 #include "luacallback.h"
 //Wyrmgus end
 #include "map/map.h"
@@ -50,6 +50,7 @@
 #include "particle.h"
 #include "player/civilization.h"
 #include "player/faction.h"
+#include "player/government_type.h"
 #include "player/player.h"
 #include "quest/campaign.h"
 //Wyrmgus start
@@ -72,6 +73,7 @@
 #include "translator.h"
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"
+#include "ui/icon.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit.h"
