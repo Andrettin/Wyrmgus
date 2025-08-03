@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 1998-2022 by Lutz Sammer, Jimmy Salmon and Andrettin
+//      (c) Copyright 1998-2025 by Lutz Sammer, Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -220,27 +220,4 @@ void icon::DrawUnitIcon(const ButtonStyle &style, const unsigned flags, const Pi
 	}
 }
 
-}
-
-/**
-**  Load the Icon
-*/
-bool IconConfig::LoadNoLog()
-{
-	assert_throw(!this->Name.empty());
-
-	Icon = wyrmgus::icon::try_get(this->Name);
-	return Icon != nullptr;
-}
-
-/**
-**  Load the Icon
-*/
-bool IconConfig::Load()
-{
-	const bool res = LoadNoLog();
-	if (!res) {
-		throw std::runtime_error("Can't find icon \"" + this->Name + "\".");
-	}
-	return res;
 }

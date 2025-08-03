@@ -32,7 +32,7 @@
 #include "database/data_type.h"
 #include "economy/resource_container.h"
 #include "missileconfig.h"
-#include "ui/icon.h"
+#include "ui/icon_config.h"
 #include "unit/group_selection_mode.h"
 #include "unit/image_layer.h"
 #include "unit/unit_stats.h"
@@ -44,6 +44,7 @@
 #endif
 
 class CFile;
+class CGraphic;
 class CPlayer;
 class CPlayerColorGraphic;
 class CUnit;

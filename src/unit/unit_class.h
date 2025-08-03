@@ -30,6 +30,8 @@
 #include "database/named_data_entry.h"
 #include "unit/unit_class_container.h"
 
+Q_MOC_INCLUDE("upgrade/upgrade_class.h")
+
 class CPlayer;
 
 namespace archimedes {

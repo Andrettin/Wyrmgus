@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 1998-2022 by Lutz Sammer and Andrettin
+//      (c) Copyright 1998-2025 by Lutz Sammer and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -30,24 +30,6 @@
 #include "ui/icon_base.h"
 #include "util/color_container.h"
 #include "vec2i.h"
-
-/**
-**  @class IconConfig icon.h
-**
-**  \#include "icon.h"
-**
-**  This structure contains all configuration information about an icon.
-**
-**  IconConfig::Name
-**
-**    Unique identifier of the icon, used to reference icons in config
-**    files and during startup.  The name is resolved during game
-**    start and the pointer placed in the next field.
-**
-**  IconConfig::Icon
-**
-**    Pointer to an icon. This pointer is resolved during game start.
-*/
 
 constexpr int IconActive = 1; //cursor on icon
 constexpr int IconClicked = 2; //mouse button down on icon
@@ -144,14 +126,3 @@ private:
 };
 
 }
-
-/// Icon reference (used in config tables)
-class IconConfig final
-{
-public:
-	bool LoadNoLog();
-	bool Load();
-public:
-	std::string Name; //config icon name
-	wyrmgus::icon *Icon = nullptr; //icon pointer to use to run time
-};

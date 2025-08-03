@@ -59,6 +59,7 @@
 //Wyrmgus start
 #include "translator.h"
 //Wyrmgus end
+#include "ui/icon.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/unit_class.h"

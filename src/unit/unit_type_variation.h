@@ -27,7 +27,7 @@
 #pragma once
 
 #include "economy/resource.h"
-#include "ui/icon.h"
+#include "ui/icon_config.h"
 #include "unit/image_layer.h"
 #include "upgrade/upgrade_structs.h" //for the costs enum
 

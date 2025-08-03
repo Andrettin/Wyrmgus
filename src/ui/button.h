@@ -29,7 +29,7 @@
 #include "database/data_entry.h"
 #include "database/data_type.h"
 #include "sound/unitsound.h"
-#include "ui/icon.h"
+#include "ui/icon_config.h"
 
 class CConfigData;
 class CUnit;

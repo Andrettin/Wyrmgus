@@ -32,6 +32,7 @@
 #include "player/player.h"
 #include "script.h"
 #include "spell/spell.h"
+#include "ui/icon.h"
 #include "unit/unit_type.h"
 #include "upgrade/upgrade.h"
 #include "util/log_util.h"

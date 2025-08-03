@@ -8,7 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-//      (c) Copyright 2018-2022 by Andrettin
+//      (c) Copyright 2018-2025 by Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
 //      it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@
 #include "religion/pantheon.h"
 #include "religion/religion.h"
 #include "upgrade/upgrade.h"
+#include "upgrade/upgrade_structs.h"
 #include "util/container_util.h"
 #include "util/gender.h"
 #include "util/string_util.h"

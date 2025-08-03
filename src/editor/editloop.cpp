@@ -64,6 +64,7 @@
 #include "ui/button_cmd.h"
 #include "ui/cursor.h"
 #include "ui/cursor_type.h"
+#include "ui/icon.h"
 #include "ui/interface.h"
 #include "ui/ui.h"
 #include "unit/build_restriction/on_top_build_restriction.h"

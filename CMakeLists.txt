@@ -501,6 +501,7 @@ set(ui_SRCS
 	src/ui/hotkey_setup.cpp
 	src/ui/icon.cpp
 	src/ui/icon_base.cpp
+	src/ui/icon_config.cpp
 	src/ui/icon_image_provider.cpp
 	src/ui/interface.cpp
 	src/ui/interface_image_provider.cpp
@@ -1101,6 +1102,7 @@ set(wyrmgus_ui_HDRS
 	src/ui/hotkey_setup.h
 	src/ui/icon.h
 	src/ui/icon_base.h
+	src/ui/icon_config.h
 	src/ui/icon_image_provider.h
 	src/ui/interface.h
 	src/ui/interface_element_type.h
@@ -1151,13 +1153,15 @@ set(wyrmgus_unit_build_restriction_HDRS
 )
 
 set(wyrmgus_upgrade_HDRS
-	src/include/upgrade/upgrade.h
+	src/upgrade/allow.h
+	src/upgrade/upgrade.h
 	src/upgrade/upgrade_category.h
 	src/upgrade/upgrade_category_rank.h
 	src/upgrade/upgrade_class.h
 	src/upgrade/upgrade_container.h
-	src/include/upgrade/upgrade_modifier.h
-	src/include/upgrade/upgrade_structs.h
+	src/upgrade/upgrade_modifier.h
+	src/upgrade/upgrade_structs.h
+	src/upgrade/upgrade_timers.h
 )
 
 set(wyrmgus_util_HDRS

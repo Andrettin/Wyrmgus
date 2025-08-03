@@ -29,6 +29,10 @@
 #include "database/data_type.h"
 #include "database/named_data_entry.h"
 
+Q_MOC_INCLUDE("age.h")
+Q_MOC_INCLUDE("upgrade/upgrade_category.h")
+Q_MOC_INCLUDE("unit/unit_class.h")
+
 class CPlayer;
 class CUpgrade;
 

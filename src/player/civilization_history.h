@@ -28,6 +28,8 @@
 
 #include "database/data_entry_history.h"
 
+Q_MOC_INCLUDE("upgrade/upgrade_class.h")
+
 class CUpgrade;
 
 namespace wyrmgus {

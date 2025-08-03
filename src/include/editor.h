@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include "ui/icon.h"
+#include "ui/icon_config.h"
 #include "util/singleton.h"
 #include "vec2i.h"
 

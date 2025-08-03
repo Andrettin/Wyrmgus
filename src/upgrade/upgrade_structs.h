@@ -8,9 +8,7 @@
 //                        T H E   W A R   B E G I N S
 //         Stratagus - A free fantasy real time strategy game engine
 //
-/**@name upgrade_structs.h - The upgrade/allow header file. */
-//
-//      (c) Copyright 1999-2022 by Vladi Belperchinov-Shabanski,
+//      (c) Copyright 1999-2025 by Vladi Belperchinov-Shabanski,
 //		Jimmy Salmon and Andrettin
 //
 //      This program is free software; you can redistribute it and/or modify
@@ -554,58 +552,3 @@ private:
 };
 
 Q_DECLARE_METATYPE(std::vector<const CUpgrade *>)
-
-/**
-**  Allow what a player can do. Every #CPlayer has an own allow struct.
-**
-**  This could allow/disallow units, actions or upgrades.
-**
-**  Values are:
-**    @li `A' -- allowed,
-**    @li `F' -- forbidden,
-**    @li `R' -- acquired, perhaps other values
-**    @li `Q' -- acquired but forbidden (does it make sense?:))
-**    @li `E' -- enabled, allowed by level but currently forbidden
-**    @li `X' -- fixed, acquired can't be disabled
-*/
-class CAllow final
-{
-public:
-	CAllow()
-	{
-		this->Clear();
-	}
-
-	void Clear()
-	{
-		memset(Units, 0, sizeof(Units));
-		memset(Upgrades, 0, sizeof(Upgrades));
-	}
-
-	int  Units[UnitTypeMax];        /// maximum amount of units allowed
-	char Upgrades[UpgradeMax];      /// upgrades allowed/disallowed
-};
-
-/**
-**  Upgrade timer used in the player structure.
-**  Every player has an own UpgradeTimers struct.
-*/
-class CUpgradeTimers final
-{
-public:
-	CUpgradeTimers()
-	{
-		this->Clear();
-	}
-
-	void Clear()
-	{
-		memset(Upgrades, 0, sizeof(Upgrades));
-	}
-
-	/**
-	**  all 0 at the beginning, all upgrade actions do increment values in
-	**  this struct.
-	*/
-	int Upgrades[UpgradeMax];       /// counter for each upgrade
-};
