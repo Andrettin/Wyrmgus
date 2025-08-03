@@ -48,7 +48,7 @@ void cheat::process_gsml_scope(const gsml_data &scope)
 
 	if (tag == "effects") {
 		this->effects = std::make_unique<effect_list<CPlayer>>();
-		database::process_gsml_data(this->effects, scope);
+		scope.process(this->effects.get());
 	} else {
 		data_entry::process_gsml_scope(scope);
 	}

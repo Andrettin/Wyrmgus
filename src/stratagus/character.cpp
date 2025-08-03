@@ -32,6 +32,7 @@
 #include "character_history.h"
 #include "character_title.h"
 #include "config.h"
+#include "database/database.h"
 #include "engine_interface.h"
 #include "epithet.h"
 #include "game/game.h"
@@ -251,7 +252,7 @@ void character::process_gsml_scope(const gsml_data &scope)
 		}
 	} else if (tag == "conditions") {
 		auto conditions = std::make_unique<and_condition<CPlayer>>();
-		database::process_gsml_data(conditions, scope);
+		scope.process(conditions.get());
 		this->conditions = std::move(conditions);
 	} else if (tag == "deities") {
 		for (const std::string &value : values) {
@@ -286,7 +287,7 @@ void character::process_gsml_scope(const gsml_data &scope)
 			const wyrmgus::unit_type *unit_type = unit_type::get(child_scope.get_tag());
 
 			auto item = std::make_unique<persistent_item>(unit_type, this);
-			database::process_gsml_data(item, child_scope);
+			child_scope.process(item.get());
 			this->default_items.push_back(std::move(item));
 		});
 	} else if (tag == "items") {
@@ -298,7 +299,7 @@ void character::process_gsml_scope(const gsml_data &scope)
 			}
 
 			auto item = std::make_unique<persistent_item>(unit_type, this);
-			database::process_gsml_data(item, child_scope);
+			child_scope.process(item.get());
 			this->add_item(std::move(item));
 		});
 	} else if (tag == "sounds") {
@@ -306,7 +307,7 @@ void character::process_gsml_scope(const gsml_data &scope)
 			this->sound_set = std::make_unique<unit_sound_set>();
 		}
 
-		database::process_gsml_data(this->sound_set, scope);
+		scope.process(this->sound_set.get());
 	} else {
 		data_entry::process_gsml_scope(scope);
 	}

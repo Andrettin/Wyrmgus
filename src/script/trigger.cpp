@@ -867,13 +867,13 @@ void trigger::process_gsml_scope(const gsml_data &scope)
 
 	if (tag == "random_weight_factor") {
 		this->random_weight_factor = std::make_unique<factor<CPlayer>>();
-		database::process_gsml_data(this->random_weight_factor, scope);
+		scope.process(this->random_weight_factor.get());
 	} else if (tag == "effects") {
 		this->effects = std::make_unique<effect_list<CPlayer>>();
-		database::process_gsml_data(this->effects, scope);
+		scope.process(this->effects.get());
 	} else if (tag == "conditions") {
 		this->conditions = std::make_unique<and_condition<CPlayer>>();
-		database::process_gsml_data(this->conditions, scope);
+		scope.process(this->conditions.get());
 	} else {
 		data_entry::process_gsml_scope(scope);
 	}

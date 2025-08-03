@@ -129,9 +129,9 @@ void spell_action_spawn_missile::process_gsml_scope(const gsml_data &scope)
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "start_point") {
-		database::process_gsml_data(this->StartPoint, scope);
+		scope.process(&this->StartPoint);
 	} else if (tag == "end_point") {
-		database::process_gsml_data(this->EndPoint, scope);
+		scope.process(&this->EndPoint);
 	} else {
 		throw std::runtime_error("Invalid spawn missile spell action scope: \"" + tag + "\".");
 	}

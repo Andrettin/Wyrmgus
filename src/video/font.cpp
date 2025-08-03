@@ -29,6 +29,7 @@
 
 #include "video/font.h"
 
+#include "database/database.h"
 #include "database/defines.h"
 #include "database/preferences.h"
 #include "intern_video.h"

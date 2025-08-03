@@ -37,7 +37,7 @@
 #include "unit/unit_domain.h"
 #include "unit/unit_type.h"
 #include "util/assert_util.h"
-#include "util/fractional_int.h"
+#include "util/decimillesimal_int.h"
 
 class CPlayer;
 class CUnit;

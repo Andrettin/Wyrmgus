@@ -79,7 +79,7 @@ void defines::process_gsml_scope(const gsml_data &scope)
 	const std::vector<std::string> &values = scope.get_values();
 
 	if (tag == "game_sound_set") {
-		database::process_gsml_data(game_sound_set::get(), scope);
+		scope.process(game_sound_set::get());
 	} else if (tag == "border_transition_tiles") {
 		scope.for_each_child([&](const gsml_data &child_scope) {
 			std::string transition_type_str = child_scope.get_tag();

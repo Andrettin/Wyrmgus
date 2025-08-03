@@ -48,9 +48,9 @@
 #include "unit/unit.h" //for using CPreference
 //Wyrmgus end
 #include "util/assert_util.h"
+#include "util/centesimal_int.h"
 #include "util/colorization_type.h"
 #include "util/container_util.h"
-#include "util/fractional_int.h"
 #include "util/image_util.h"
 #include "util/log_util.h"
 #include "util/point_util.h"

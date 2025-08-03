@@ -31,6 +31,7 @@
 #include "editor.h"
 
 #include "commands.h"
+#include "database/database.h"
 #include "database/defines.h"
 #include "database/preferences.h"
 #include "engine_interface.h"

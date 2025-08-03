@@ -363,19 +363,19 @@ void game::process_gsml_scope(const gsml_data &scope)
 	if (tag == "player_delayed_effects") {
 		scope.for_each_child([&](const gsml_data &delayed_effect_data) {
 			auto delayed_effect = std::make_unique<delayed_effect_instance<CPlayer>>();
-			database::process_gsml_data(delayed_effect, delayed_effect_data);
+			delayed_effect_data.process(delayed_effect.get());
 			this->add_delayed_effect(std::move(delayed_effect));
 		});
 	} else if (tag == "unit_delayed_effects") {
 		scope.for_each_child([&](const gsml_data &delayed_effect_data) {
 			auto delayed_effect = std::make_unique<delayed_effect_instance<CUnit>>();
-			database::process_gsml_data(delayed_effect, delayed_effect_data);
+			delayed_effect_data.process(delayed_effect.get());
 			this->add_delayed_effect(std::move(delayed_effect));
 		});
 	} else if (tag == "site_data") {
 		scope.for_each_child([&](const gsml_data &child_scope) {
 			const site *site = site::get(child_scope.get_tag());
-			database::process_gsml_data(site->get_game_data(), child_scope);
+			child_scope.process(site->get_game_data());
 		});
 	} else {
 		throw std::runtime_error("Invalid game data scope: \"" + scope.get_tag() + "\".");
@@ -769,7 +769,7 @@ void game::clear_results()
 void load_game_data(const std::string &gsml_string)
 {
 	gsml_parser parser;
-	database::process_gsml_data(game::get(), parser.parse(gsml_string));
+	parser.parse(gsml_string).process(game::get());
 }
 
 /**
@@ -1439,7 +1439,7 @@ void CreateGame(const std::filesystem::path &filepath, CMap *map)
 			LuaLoadFile(path);
 		} else if (filepath.extension() == ".wmp") {
 			gsml_parser parser;
-			database::process_gsml_data(CMap::get()->get_info(), parser.parse(path::from_string(path)));
+			parser.parse(path::from_string(path)).process(CMap::get()->get_info());
 		}
 	}
 

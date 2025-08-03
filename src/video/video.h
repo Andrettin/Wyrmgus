@@ -32,7 +32,7 @@
 #include "color.h"
 #include "guichan.h"
 #include "vec2i.h"
-#include "util/fractional_int.h"
+#include "util/centesimal_int.h"
 #include "video/color_modification.h"
 
 #pragma warning(push, 0)

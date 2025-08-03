@@ -28,6 +28,7 @@
 
 #include "unit/construction.h"
 
+#include "database/database.h"
 #include "database/preferences.h"
 #include "script.h"
 #include "translator.h"
@@ -81,7 +82,7 @@ void construction::process_gsml_scope(const gsml_data &scope)
 	if (tag == "frames") {
 		scope.for_each_child([&](const gsml_data &child_scope) {
 			auto cframe = std::make_unique<construction_frame>();
-			database::process_gsml_data(cframe, child_scope);
+			child_scope.process(cframe.get());
 			if (!this->frames.empty()) {
 				this->frames.back()->next = cframe.get();
 			}

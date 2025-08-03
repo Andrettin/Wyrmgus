@@ -85,7 +85,7 @@ void civilization_base::process_gsml_scope(const gsml_data &scope)
 			this->unit_sound_set = std::make_unique<wyrmgus::unit_sound_set>();
 		}
 
-		database::process_gsml_data(this->unit_sound_set, scope);
+		scope.process(this->unit_sound_set.get());
 	} else if (tag == "not_enough_resource_sounds") {
 		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();

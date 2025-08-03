@@ -204,7 +204,7 @@ void animation_set::process_gsml_scope(const gsml_data &scope)
 		|| tag.starts_with("harvest")
 	) {
 		animation_sequence *animation_sequence = animation_sequence::add(this->get_identifier() + "_" + tag, this->get_module());
-		database::process_gsml_data(animation_sequence, scope);
+		animation_sequence->process_gsml_data(scope);
 
 		this->set_animations(tag, animation_sequence);
 	} else {

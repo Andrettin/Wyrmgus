@@ -29,6 +29,7 @@
 #include "economy/resource.h"
 
 #include "database/defines.h"
+#include "util/number_util.h"
 #include "util/util.h"
 #include "video/video.h"
 

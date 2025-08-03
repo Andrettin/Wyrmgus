@@ -62,9 +62,9 @@ public:
 		const std::string &tag = scope.get_tag();
 
 		if (tag == "success") {
-			database::process_gsml_data(this->success_effects, scope);
+			scope.process(&this->success_effects);
 		} else if (tag == "failure") {
-			database::process_gsml_data(this->failure_effects, scope);
+			scope.process(&this->failure_effects);
 		} else {
 			effect<CUnit>::process_gsml_scope(scope);
 		}

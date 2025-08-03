@@ -186,7 +186,7 @@ std::unique_ptr<effect<scope_type>> effect<scope_type>::from_gsml_scope(const gs
 		throw std::runtime_error("Invalid scope effect: \"" + effect_identifier + "\".");
 	}
 
-	database::process_gsml_data(effect, scope);
+	scope.process(effect.get());
 
 	return effect;
 }

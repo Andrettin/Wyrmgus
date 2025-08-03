@@ -48,6 +48,7 @@
 //Wyrmgus end
 #include "unit/unit_manager.h"
 #include "util/assert_util.h"
+#include "util/number_util.h"
 #include "util/util.h"
 #include "video/intern_video.h"
 #include "video/renderer.h"

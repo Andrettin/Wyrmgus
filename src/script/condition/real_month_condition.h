@@ -31,6 +31,8 @@
 #include "time/month.h"
 #include "util/locale_util.h"
 
+#include <magic_enum/magic_enum.hpp>
+
 namespace wyrmgus {
 
 template <typename scope_type>
@@ -40,7 +42,7 @@ public:
 	explicit real_month_condition(const std::string &value, const gsml_operator condition_operator)
 		: condition<scope_type>(condition_operator)
 	{
-		this->month = string_to_month(value);
+		this->month = magic_enum::enum_cast<archimedes::month>(value).value();
 	}
 
 	virtual const std::string &get_class_identifier() const override

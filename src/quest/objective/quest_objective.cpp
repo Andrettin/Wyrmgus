@@ -105,7 +105,7 @@ std::unique_ptr<quest_objective> quest_objective::from_gsml_scope(const gsml_dat
 		throw std::runtime_error("Invalid quest objective scope: \"" + tag + "\".");
 	}
 
-	database::process_gsml_data(objective, scope);
+	scope.process(objective.get());
 
 	return objective;
 }

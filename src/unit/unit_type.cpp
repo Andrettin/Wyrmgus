@@ -33,6 +33,7 @@
 #include "animation/animation_exactframe.h"
 #include "animation/animation_frame.h"
 #include "animation/animation_set.h"
+#include "database/database.h"
 #include "database/defines.h"
 #include "database/preferences.h"
 #include "editor.h" //for personal name generation
@@ -812,7 +813,7 @@ void unit_type::process_gsml_scope(const gsml_data &scope)
 	} else if (tag == "conditional_requirements_strings") {
 		scope.for_each_child([&](const gsml_data &child_scope) {
 			auto conditional_string = std::make_unique<wyrmgus::conditional_string<CPlayer>>();
-			database::process_gsml_data(conditional_string, child_scope);
+			child_scope.process(conditional_string.get());
 			this->conditional_requirements_strings.push_back(std::move(conditional_string));
 		});
 	} else if (tag == "hue_ignored_colors") {
@@ -935,7 +936,7 @@ void unit_type::process_gsml_scope(const gsml_data &scope)
 			}
 
 			resource_info *res_info_ptr = this->resource_infos[resource].get();
-			database::process_gsml_data(res_info_ptr, child_scope);
+			child_scope.process(res_info_ptr);
 		});
 	} else if (tag == "unit_stocks") {
 		scope.for_each_property([&](const gsml_property &property) {
@@ -998,7 +999,7 @@ void unit_type::process_gsml_scope(const gsml_data &scope)
 			auto variation = make_qunique<unit_type_variation>(tag, this);
 			variation->moveToThread(QApplication::instance()->thread());
 
-			database::process_gsml_data(variation, child_scope);
+			child_scope.process(variation.get());
 
 			this->variations.push_back(std::move(variation));
 		});
@@ -1025,13 +1026,13 @@ void unit_type::process_gsml_scope(const gsml_data &scope)
 			this->sound_set = std::make_unique<unit_sound_set>();
 		}
 
-		database::process_gsml_data(this->sound_set, scope);
+		scope.process(this->sound_set.get());
 	} else if (tag == "preconditions") {
 		this->preconditions = std::make_unique<and_condition<CPlayer>>();
-		database::process_gsml_data(this->preconditions, scope);
+		scope.process(this->preconditions.get());
 	} else if (tag == "conditions") {
 		this->conditions = std::make_unique<and_condition<CPlayer>>();
-		database::process_gsml_data(this->conditions, scope);
+		scope.process(this->conditions.get());
 	} else if (tag == "0_ad_template_names") {
 		for (const std::string &value : values) {
 			this->map_to_0_ad_template_name(value);

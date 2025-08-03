@@ -101,12 +101,12 @@ void unit_type_variation::process_gsml_scope(const gsml_data &scope)
 		});
 	} else if (tag == "player_conditions") {
 		auto conditions = std::make_unique<and_condition<CPlayer>>();
-		database::process_gsml_data(conditions, scope);
+		scope.process(conditions.get());
 		this->player_conditions = std::move(conditions);
 		this->player_conditions_ptr = this->player_conditions.get();
 	} else if (tag == "conditions" || tag == "unit_conditions") {
 		auto conditions = std::make_unique<and_condition<CUnit>>();
-		database::process_gsml_data(conditions, scope);
+		scope.process(conditions.get());
 		this->unit_conditions = std::move(conditions);
 		this->unit_conditions_ptr = this->unit_conditions.get();
 	} else if (tag == "tags") {

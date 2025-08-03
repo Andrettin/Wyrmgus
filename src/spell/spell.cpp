@@ -331,17 +331,17 @@ void spell::process_gsml_scope(const gsml_data &scope)
 		if (!this->cast_conditions) {
 			this->cast_conditions = std::make_unique<ConditionInfo>();
 		}
-		database::process_gsml_data(this->cast_conditions, scope);
+		scope.process(this->cast_conditions.get());
 	} else if (tag == "autocast") {
 		if (!this->autocast) {
 			this->autocast = std::make_unique<AutoCastInfo>();
 		}
-		database::process_gsml_data(this->autocast, scope);
+		scope.process(this->autocast.get());
 	} else if (tag == "ai_cast") {
 		if (!this->ai_cast) {
 			this->ai_cast = std::make_unique<AutoCastInfo>();
 		}
-		database::process_gsml_data(this->ai_cast, scope);
+		scope.process(this->ai_cast.get());
 	} else if (tag == "resource_costs") {
 		scope.for_each_property([&](const gsml_property &property) {
 			const std::string &key = property.get_key();
@@ -946,7 +946,7 @@ void AutoCastInfo::process_gsml_scope(const gsml_data &scope)
 			this->cast_conditions = std::make_unique<ConditionInfo>();
 		}
 
-		database::process_gsml_data(this->cast_conditions, scope);
+		scope.process(this->cast_conditions.get());
 	} else {
 		throw std::runtime_error("Invalid autocast info scope: \"" + tag + "\".");
 	}

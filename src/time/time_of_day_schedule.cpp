@@ -51,7 +51,7 @@ void time_of_day_schedule::process_gsml_scope(const gsml_data &scope)
 			const time_of_day *time_of_day = time_of_day::get(child_tag);
 			const size_t index = this->scheduled_times_of_day.size();
 			auto scheduled_season = std::make_unique<wyrmgus::scheduled_time_of_day>(index, time_of_day, this);
-			database::process_gsml_data(scheduled_season, child_scope);
+			child_scope.process(scheduled_season.get());
 			this->scheduled_times_of_day.push_back(std::move(scheduled_season));
 		});
 	} else {

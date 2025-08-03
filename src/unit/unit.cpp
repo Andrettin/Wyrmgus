@@ -106,6 +106,7 @@
 #include "util/assert_util.h"
 #include "util/gender.h"
 #include "util/log_util.h"
+#include "util/number_util.h"
 #include "util/point_util.h"
 #include "util/rect_util.h"
 #include "util/size_util.h"

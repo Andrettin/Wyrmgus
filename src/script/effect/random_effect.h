@@ -28,7 +28,7 @@
 
 #include "script/effect/effect.h"
 #include "script/effect/effect_list.h"
-#include "util/fractional_int.h"
+#include "util/decimillesimal_int.h"
 #include "util/number_util.h"
 #include "util/random.h"
 

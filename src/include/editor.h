@@ -27,6 +27,7 @@
 #pragma once
 
 #include "ui/icon.h"
+#include "util/singleton.h"
 #include "vec2i.h"
 
 //Wyrmgus start

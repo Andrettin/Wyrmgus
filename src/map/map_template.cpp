@@ -179,7 +179,7 @@ void map_template::process_gsml_scope(const gsml_data &scope)
 			terrain_type *terrain_type = terrain_type::get(child_scope.get_tag());
 
 			auto generated_terrain = std::make_unique<wyrmgus::generated_terrain>(terrain_type);
-			database::process_gsml_data(generated_terrain, child_scope);
+			child_scope.process(generated_terrain.get());
 
 			this->generated_terrains.push_back(std::move(generated_terrain));
 		});
@@ -257,14 +257,14 @@ void map_template::process_gsml_scope(const gsml_data &scope)
 			const char character = string::to_character(child_scope.get_tag());
 
 			auto unit = std::make_unique<character_unit>();
-			database::process_gsml_data(unit, child_scope);
+			child_scope.process(unit.get());
 
 			this->character_units[character] = std::move(unit);
 		});
 	} else if (tag == "character_substitutions") {
 		scope.for_each_child([&](const gsml_data &child_scope) {
 			auto substitution = std::make_unique<character_substitution>();
-			database::process_gsml_data(substitution, child_scope);
+			child_scope.process(substitution.get());
 			this->character_substitutions.push_back(std::move(substitution));
 		});
 	} else if (tag == "units") {
@@ -278,7 +278,7 @@ void map_template::process_gsml_scope(const gsml_data &scope)
 			}
 
 			auto unit = std::make_unique<map_template_unit>(unit_type, false);
-			database::process_gsml_data(unit, child_scope);
+			child_scope.process(unit.get());
 
 			assert_throw(unit->get_type() != nullptr || unit->get_unit_class() != nullptr);
 
@@ -291,7 +291,7 @@ void map_template::process_gsml_scope(const gsml_data &scope)
 			this->dungeon_generation->moveToThread(QApplication::instance()->thread());
 		}
 
-		database::process_gsml_data(this->dungeon_generation, scope);
+		scope.process(this->dungeon_generation.get());
 	} else if (tag == "generated_factions") {
 		for (const std::string &value : values) {
 			this->generated_factions.push_back(faction::get(value));

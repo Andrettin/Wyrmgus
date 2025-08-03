@@ -51,10 +51,10 @@ void dynasty::process_gsml_scope(const gsml_data &scope)
 
 	if (tag == "preconditions") {
 		this->preconditions = std::make_unique<and_condition<CPlayer>>();
-		database::process_gsml_data(this->preconditions, scope);
+		scope.process(this->preconditions.get());
 	} else if (tag == "conditions") {
 		this->conditions = std::make_unique<and_condition<CPlayer>>();
-		database::process_gsml_data(this->conditions, scope);
+		scope.process(this->conditions.get());
 	} else {
 		data_entry::process_gsml_scope(scope);
 	}

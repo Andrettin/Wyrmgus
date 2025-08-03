@@ -98,7 +98,7 @@ void site_game_data::process_gsml_scope(const gsml_data &scope)
 		scope.for_each_child([&](const gsml_data &child_scope) {
 			auto population_unit = make_qunique<wyrmgus::population_unit>();
 			population_unit->moveToThread(QApplication::instance()->thread());
-			database::process_gsml_data(population_unit, child_scope);
+			child_scope.process(population_unit.get());
 			this->population_units.push_back(std::move(population_unit));
 		});
 	} else {

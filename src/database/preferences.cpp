@@ -88,7 +88,7 @@ void preferences::load_file()
 		log::log_error("Failed to parse preferences file.");
 	}
 
-	database::process_gsml_data(this, data);
+	data.process(this);
 }
 
 void preferences::save() const

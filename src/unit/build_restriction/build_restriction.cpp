@@ -72,7 +72,7 @@ std::unique_ptr<build_restriction> build_restriction::from_gsml_scope(const gsml
 		throw std::runtime_error("Invalid build restriction scope: \"" + tag + "\".");
 	}
 
-	database::process_gsml_data(building_rule, scope);
+	scope.process(building_rule.get());
 
 	return building_rule;
 }

@@ -100,7 +100,7 @@ void delayed_effect_instance<scope_type>::process_gsml_scope(const gsml_data &sc
 
 	if (tag == "context") {
 		this->context = wyrmgus::context();
-		database::process_gsml_data(this->context, scope);
+		scope.process(&this->context);
 	} else {
 		throw std::runtime_error("Invalid delayed effect instance scope: \"" + scope.get_tag() + "\".");
 	}

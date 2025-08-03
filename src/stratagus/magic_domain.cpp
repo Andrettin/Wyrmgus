@@ -49,7 +49,7 @@ void magic_domain::process_gsml_scope(const gsml_data &scope)
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "deity_domain_upgrade") {
-		database::process_gsml_data(this->deity_domain_upgrade, scope);
+		this->deity_domain_upgrade->process_gsml_data(scope);
 	} else {
 		data_entry::process_gsml_scope(scope);
 	}

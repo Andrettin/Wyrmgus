@@ -281,7 +281,7 @@ std::unique_ptr<const condition<scope_type>> condition<scope_type>::from_gsml_sc
 		throw std::runtime_error("Invalid condition scope: \"" + tag + "\".");
 	}
 
-	database::process_gsml_data(condition, scope);
+	scope.process(condition.get());
 
 	return condition;
 }

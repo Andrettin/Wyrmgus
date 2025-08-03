@@ -273,11 +273,11 @@ void button::process_gsml_scope(const gsml_data &scope)
 		this->allow_strings = values;
 	} else if (tag == "preconditions") {
 		this->preconditions = std::make_unique<and_condition<CUnit>>();
-		database::process_gsml_data(this->preconditions, scope);
+		scope.process(this->preconditions.get());
 		this->preconditions_ptr = this->preconditions.get();
 	} else if (tag == "conditions") {
 		this->conditions = std::make_unique<and_condition<CUnit>>();
-		database::process_gsml_data(this->conditions, scope);
+		scope.process(this->conditions.get());
 		this->conditions_ptr = this->conditions.get();
 	} else if (tag == "unit_types") {
 		for (const std::string &value : values) {

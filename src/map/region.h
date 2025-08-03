@@ -50,7 +50,7 @@ public:
 
 	static const std::set<std::string> history_database_dependencies;
 
-	static void load_history_database(const QDate &start_date, const timeline *current_timeline, const QObject *game_rules);
+	static void load_history_database(const QDate &start_date, const timeline *current_timeline, const game_rules_base *game_rules);
 
 	explicit region(const std::string &identifier);
 	virtual ~region() override;

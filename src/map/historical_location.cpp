@@ -38,7 +38,7 @@ namespace wyrmgus {
 
 historical_location::historical_location(const gsml_data &data)
 {
-	database::process_gsml_data(this, data);
+	data.process(this);
 	this->initialize();
 	this->check();
 }

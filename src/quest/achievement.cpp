@@ -29,6 +29,7 @@
 #include "quest/achievement.h"
 
 #include "character.h"
+#include "database/database.h"
 #include "engine_interface.h"
 #include "game/difficulty.h"
 #include "player/player.h"

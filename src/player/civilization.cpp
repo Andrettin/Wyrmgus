@@ -33,6 +33,7 @@
 #include "ai/ai_local.h"
 #include "character.h"
 #include "character_title.h"
+#include "database/database.h"
 #include "database/defines.h"
 #include "language/name_generator.h"
 #include "player/civilization_group.h"
@@ -111,7 +112,7 @@ void civilization::process_gsml_scope(const gsml_data &scope)
 		});
 	} else if (tag == "conditions") {
 		auto conditions = std::make_unique<and_condition<CPlayer>>();
-		database::process_gsml_data(conditions, scope);
+		scope.process(conditions.get());
 		this->conditions = std::move(conditions);
 	} else if (tag == "force_type_weights") {
 		this->ai_force_type_weights.clear();
@@ -126,7 +127,7 @@ void civilization::process_gsml_scope(const gsml_data &scope)
 	} else if (tag == "force_templates") {
 		scope.for_each_child([&](const gsml_data &child_scope) {
 			auto force_template = std::make_unique<ai_force_template>();
-			database::process_gsml_data(force_template, child_scope);
+			child_scope.process(force_template.get());
 			this->ai_force_templates[force_template->get_force_type()].push_back(std::move(force_template));
 		});
 	} else if (tag == "ai_building_templates") {

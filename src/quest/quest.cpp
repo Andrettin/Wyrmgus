@@ -210,16 +210,16 @@ void quest::process_gsml_scope(const gsml_data &scope)
 		}
 	} else if (tag == "conditions") {
 		this->conditions = std::make_unique<and_condition<CPlayer>>();
-		database::process_gsml_data(this->conditions, scope);
+		scope.process(this->conditions.get());
 	} else if (tag == "accept_effects") {
 		this->accept_effects = std::make_unique<effect_list<CPlayer>>();
-		database::process_gsml_data(this->accept_effects, scope);
+		scope.process(this->accept_effects.get());
 	} else if (tag == "completion_effects") {
 		this->completion_effects = std::make_unique<effect_list<CPlayer>>();
-		database::process_gsml_data(this->completion_effects, scope);
+		scope.process(this->completion_effects.get());
 	} else if (tag == "failure_effects") {
 		this->failure_effects = std::make_unique<effect_list<CPlayer>>();
-		database::process_gsml_data(this->failure_effects, scope);
+		scope.process(this->failure_effects.get());
 	} else {
 		data_entry::process_gsml_scope(scope);
 	}

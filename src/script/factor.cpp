@@ -76,7 +76,7 @@ void factor<scope_type>::process_gsml_scope(const gsml_data &scope)
 
 	if (tag == "modifier") {
 		auto modifier = std::make_unique<factor_modifier<scope_type>>();
-		database::process_gsml_data(modifier, scope);
+		scope.process(modifier.get());
 		this->modifiers.push_back(std::move(modifier));
 	} else {
 		throw std::runtime_error("Invalid factor scope: \"" + scope.get_tag() + "\".");

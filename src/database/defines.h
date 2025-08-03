@@ -27,7 +27,7 @@
 #pragma once
 
 #include "database/defines_base.h"
-#include "util/fractional_int.h"
+#include "util/centesimal_int.h"
 #include "util/singleton.h"
 
 Q_MOC_INCLUDE("dialogue.h")

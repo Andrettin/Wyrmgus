@@ -85,7 +85,7 @@ void deity::process_gsml_scope(const gsml_data &scope)
 	const std::string &tag = scope.get_tag();
 
 	if (tag == "character") {
-		database::process_gsml_data(this->get_character(), scope);
+		this->get_character()->process_gsml_data(scope);
 	} else if (tag == "cultural_names") {
 		scope.for_each_property([&](const gsml_property &property) {
 			const civilization *civilization = civilization::get(property.get_key());

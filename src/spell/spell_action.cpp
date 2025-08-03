@@ -58,7 +58,7 @@ std::unique_ptr<spell_action> spell_action::from_gsml_scope(const gsml_data &sco
 		throw std::runtime_error("Invalid scope spell action: \"" + action_identifier + "\".");
 	}
 
-	database::process_gsml_data(action, scope);
+	scope.process(action.get());
 	action->check();
 
 	return action;

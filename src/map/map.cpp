@@ -1942,7 +1942,7 @@ void CMap::process_gsml_scope(const gsml_data &scope)
 				map_layer->moveToThread(QApplication::instance()->thread());
 			}
 
-			database::process_gsml_data(map_layer, map_layer_data);
+			map_layer_data.process(map_layer.get());
 
 			this->Info->MapWidths.push_back(map_layer->get_width());
 			this->Info->MapHeights.push_back(map_layer->get_height());
@@ -1959,13 +1959,13 @@ void CMap::process_gsml_scope(const gsml_data &scope)
 		size_t current_index = 0;
 		scope.for_each_child([&](const gsml_data &landmass_data) {
 			const std::unique_ptr<landmass> &landmass = this->get_landmasses()[current_index];
-			database::process_gsml_data(landmass, landmass_data);
+			landmass_data.process(landmass.get());
 			++current_index;
 		});
 	} else if (tag == "world_data") {
 		scope.for_each_child([&](const gsml_data &child_scope) {
 			const world *world = world::get(child_scope.get_tag());
-			database::process_gsml_data(world->get_game_data(), child_scope);
+			child_scope.process(world->get_game_data());
 		});
 	} else {
 		throw std::runtime_error("Invalid map data scope: \"" + scope.get_tag() + "\".");
@@ -4387,7 +4387,7 @@ void LoadStratagusMapInfo(const std::filesystem::path &map_path)
 
 	if (map_path.string().find(".wmp") != std::string::npos) {
 		gsml_parser parser;
-		database::process_gsml_data(CMap::get()->get_info(), parser.parse(path::from_string(filename)));
+		parser.parse(path::from_string(filename)).process(CMap::get()->get_info());
 	} else {
 		LuaLoadFile(filename);
 	}
@@ -4401,5 +4401,5 @@ void SetMapWorld(const std::string &map_world)
 void load_map_data(const std::string &gsml_string)
 {
 	gsml_parser parser;
-	database::process_gsml_data(CMap::get(), parser.parse(gsml_string));
+	parser.parse(gsml_string).process(CMap::get());
 }

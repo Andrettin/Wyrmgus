@@ -59,34 +59,34 @@ void interface_style::process_gsml_scope(const gsml_data &scope)
 		});
 	} else if (tag == "large_button") {
 		this->large_button = std::make_unique<button_style>(this);
-		database::process_gsml_data(this->large_button, scope);
+		this->large_button->process_gsml_data(scope);
 	} else if (tag == "small_button") {
 		this->small_button = std::make_unique<button_style>(this);
-		database::process_gsml_data(this->small_button, scope);
+		this->small_button->process_gsml_data(scope);
 	} else if (tag == "thin_button") {
 		this->thin_button = std::make_unique<button_style>(this);
-		database::process_gsml_data(this->thin_button, scope);
+		this->thin_button->process_gsml_data(scope);
 	} else if (tag == "small_thin_button") {
 		this->small_thin_button = std::make_unique<button_style>(this);
-		database::process_gsml_data(this->small_thin_button, scope);
+		this->small_thin_button->process_gsml_data(scope);
 	} else if (tag == "thinnest_button") {
 		this->thinnest_button = std::make_unique<button_style>(this);
-		database::process_gsml_data(this->thinnest_button, scope);
+		this->thinnest_button->process_gsml_data(scope);
 	} else if (tag == "radio_button") {
 		this->radio_button = std::make_unique<checkbox_style>(this);
-		database::process_gsml_data(this->radio_button, scope);
+		this->radio_button->process_gsml_data(scope);
 	} else if (tag == "up_arrow_button") {
 		this->up_arrow_button = std::make_unique<button_style>(this);
-		database::process_gsml_data(this->up_arrow_button, scope);
+		this->up_arrow_button->process_gsml_data(scope);
 	} else if (tag == "down_arrow_button") {
 		this->down_arrow_button = std::make_unique<button_style>(this);
-		database::process_gsml_data(this->down_arrow_button, scope);
+		this->down_arrow_button->process_gsml_data(scope);
 	} else if (tag == "left_arrow_button") {
 		this->left_arrow_button = std::make_unique<button_style>(this);
-		database::process_gsml_data(this->left_arrow_button, scope);
+		this->left_arrow_button->process_gsml_data(scope);
 	} else if (tag == "right_arrow_button") {
 		this->right_arrow_button = std::make_unique<button_style>(this);
-		database::process_gsml_data(this->right_arrow_button, scope);
+		this->right_arrow_button->process_gsml_data(scope);
 	} else {
 		data_entry::process_gsml_scope(scope);
 	}

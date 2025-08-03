@@ -28,7 +28,7 @@
 
 #include "util/image_util.h"
 
-#include "util/fractional_int.h"
+#include "util/centesimal_int.h"
 
 #include "xbrz/include/xbrz.h"
 

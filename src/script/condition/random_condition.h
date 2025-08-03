@@ -27,7 +27,7 @@
 #pragma once
 
 #include "script/condition/condition.h"
-#include "util/fractional_int.h"
+#include "util/decimillesimal_int.h"
 
 namespace wyrmgus {
 

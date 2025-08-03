@@ -29,6 +29,7 @@
 #include "engine_interface.h"
 
 #include "character.h"
+#include "database/database.h"
 #include "database/defines.h"
 #include "database/gsml_parser.h"
 #include "database/preferences.h"
@@ -303,7 +304,7 @@ void engine_interface::load_map_info(const std::filesystem::path &filepath)
 
 	if (filepath.extension() == ".wmp") {
 		gsml_parser parser;
-		database::process_gsml_data(CMap::get()->get_info(), parser.parse(filepath));
+		parser.parse(filepath).process(CMap::get()->get_info());
 	} else {
 		LuaLoadFile(path::to_string(filepath));
 	}

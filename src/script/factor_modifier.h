@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include <util/fractional_int.h>
+#include "util/centesimal_int.h"
 
 class CPlayer;
 class CUnit;

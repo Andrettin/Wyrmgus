@@ -78,7 +78,7 @@ void map_info::process_gsml_scope(const gsml_data &scope)
 		if (QApplication::instance()->thread() != QThread::currentThread()) {
 			this->settings->moveToThread(QApplication::instance()->thread());
 		}
-		database::process_gsml_data(this->settings, scope);
+		scope.process(this->settings.get());
 	} else {
 		database::get()->process_gsml_scope_for_object(this, scope);
 	}
